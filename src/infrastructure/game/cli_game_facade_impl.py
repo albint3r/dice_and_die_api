@@ -1,14 +1,25 @@
-from icecream import ic
+from random import choice
 
 from src.domain.board.board import Board
 from src.domain.die.die import Die
 from src.domain.game.game import Game
 from src.domain.game.i_game_facade import IGameFacade
 from src.domain.player.player import Player
-from random import choice
 
 
-class GameFacadeImpl(IGameFacade):
+class CliGameFacadeImpl(IGameFacade):
+
+    def select_column(self, player: Player) -> int:
+        while True:
+            try:
+                col_index = int(input('Select column: '))
+                if 1 <= col_index <= 3:
+                    break
+                else:
+                    print('The value must be between 1 an 3.')
+            except ValueError:
+                print('Please enter an integer. Try again.')
+        return col_index
 
     def select_player_start(self, game: Game) -> Player:
         players_order = [game.p1, game.p2]
@@ -25,9 +36,3 @@ class GameFacadeImpl(IGameFacade):
         die2 = Die()
         p2 = Player(board=board2, die=die2)
         return Game(p1=p1, p2=p2)
-
-    def run(self) -> None:
-        game = self.new_game()
-        start_player = self.select_player_start(game)
-        game.set_current_player(start_player)
-        ic(start_player.is_same_player(game.p1))

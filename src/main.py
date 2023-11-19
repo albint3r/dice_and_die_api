@@ -1,10 +1,15 @@
+from icecream import ic
+
+from src.domain.board.board import Board
 from src.domain.die.die import Die
+from src.domain.player.player import Player
 
 
 def run():
-    dice1 = Die()
-    dice1.roll()
-    print(dice1)
+    die = Die()
+    board = Board()
+    player = Player(die=die, board=board)
+    ic(player)
 
 
 if __name__ == '__main__':

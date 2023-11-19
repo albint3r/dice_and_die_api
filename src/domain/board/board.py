@@ -1,4 +1,3 @@
-from icecream import ic
 from pydantic import BaseModel, validate_call
 
 from src.domain.board.errors import AddError, InvalidColumnError, RemoveError

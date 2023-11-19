@@ -1,4 +1,3 @@
-from icecream import ic
 from pydantic import BaseModel, validate_call
 
 
@@ -13,6 +12,15 @@ class Board(BaseModel):
     @property
     def columns(self) -> dict[int, list[int]]:
         return {1: self.col1, 2: self.col2, 3: self.col3}
+
+    @property
+    def is_full(self) -> bool:
+        """Return True if the board columns are full"""
+        col1 = len(self.get(1))
+        col2 = len(self.get(2))
+        col3 = len(self.get(3))
+        _max = self._max
+        return col1 == _max and col2 == _max and col3 == _max
 
     @validate_call()
     def get(self, col_index: int) -> list[int]:
@@ -48,7 +56,5 @@ class Board(BaseModel):
 
     @validate_call()
     def is_valid_index(self, col_index: int) -> bool:
+        """Validate the index is between 0 and 4. Valid values [1,2,3]"""
         return 0 < col_index < 4
-
-
-a

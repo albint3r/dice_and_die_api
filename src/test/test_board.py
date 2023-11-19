@@ -72,3 +72,95 @@ class TestDie:
         result = board.cad_add(index)
         error_msg = f"Expected value: [{expected}]. Result= {result}"
         assert expected is result, error_msg
+
+    def test_can_not_remove(self, die):
+        """Test the method remove return false, because is empty"""
+        board = Board()
+        # Roll the dice
+        die.roll()
+        expected = False
+        index = 1
+        result = board.cad_remove(index)
+        error_msg = f"Expected value: [{expected}]. Result= {result}"
+        assert expected is result, error_msg
+
+    def test_can_remove(self, die):
+        """Test the method remove return True, because have 1 value"""
+        board = Board()
+        # Roll the dice
+        die.roll()
+        expected = True
+        index = 1
+        board.add(index, die.number)
+        result = board.cad_remove(index)
+        error_msg = f"Expected value: [{expected}]. Result= {result}"
+        assert expected is result, error_msg
+
+    def test_remove_all_values(self, die):
+        """Test the method remove delete all the values of the dice"""
+        board = Board()
+        fake_die_val = 6
+        index = 1
+        # Add values
+        board.add(index, fake_die_val)
+        board.add(index, fake_die_val)
+        # Then remove the value
+        board.remove(index, fake_die_val)
+        # Start test
+        expected = 0
+        col1 = board.get(index)
+        result = len(col1)
+        error_msg = f"Expected value: [{expected}]. Result= {result}"
+        assert expected == result, error_msg
+
+    def test_remove_all_values_and_left_one(self, die):
+        """Test the method remove delete all the values of the dice"""
+        board = Board()
+        fake_die_val = 6
+        other_fake_die_val = 3
+        index = 1
+        # Add values
+        board.add(index, fake_die_val)
+        board.add(index, fake_die_val)
+        board.add(index, other_fake_die_val)  # This is the other value
+        # Then remove the value
+        board.remove(index, fake_die_val)
+        # Start test
+        expected = 1
+        col1 = board.get(index)
+        result = len(col1)
+        error_msg = f"Expected value: [{expected}]. Result= {result}"
+        assert expected == result, error_msg
+
+    def test_is_not_full(self):
+        board = Board()
+        fake_die_val = 6
+        board.add(1, fake_die_val)
+        board.add(2, fake_die_val)
+        board.add(3, fake_die_val)
+        # Start test:
+        expected = False
+        result = board.is_full
+        error_msg = f"Expected value: [{expected}]. Result= {result}"
+        assert expected is result, error_msg
+
+    def test_is_full(self):
+        board = Board()
+        fake_die_val = 6
+        # Column 1
+        board.add(1, fake_die_val)
+        board.add(1, fake_die_val)
+        board.add(1, fake_die_val)
+        # Column 2
+        board.add(2, fake_die_val)
+        board.add(2, fake_die_val)
+        board.add(2, fake_die_val)
+        # Column 3
+        board.add(3, fake_die_val)
+        board.add(3, fake_die_val)
+        board.add(3, fake_die_val)
+        # Start test:
+        expected = True
+        result = board.is_full
+        error_msg = f"Expected value: [{expected}]. Result= {result}"
+        assert expected is result, error_msg

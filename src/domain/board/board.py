@@ -8,6 +8,7 @@ class Board(BaseModel):
     col2: list[int] = []
     col3: list[int] = []
     _max: int = 3
+    _min: int = 0
 
     @property
     def columns(self) -> dict[int, list[int]]:
@@ -20,10 +21,17 @@ class Board(BaseModel):
     @validate_call()
     def add(self, col_index: int, value: int) -> None:
         """Add the dice value in the column index"""
-        if 0 < col_index < 4 and self.cad_add(col_index):
-            ic()
+        if self.is_valid_index(col_index) and self.cad_add(col_index):
             column = self.columns.get(col_index)
             column.append(value)
+
+    @validate_call()
+    def remove(self, col_index: int, value: int) -> None:
+        """Remove all the values in the column"""
+        if self.is_valid_index(col_index) and self.cad_remove(col_index):
+            column = self.columns.get(col_index)
+            while value in column:
+                column.remove(value)
 
     @validate_call()
     def cad_add(self, col_index: int) -> bool:
@@ -31,3 +39,16 @@ class Board(BaseModel):
         The max length of values you can add to each column is 3."""
         column = self.columns.get(col_index)
         return len(column) < self._max
+
+    @validate_call()
+    def cad_remove(self, col_index: int) -> bool:
+        """Check if is possible to remove all the values the column. """
+        column = self.columns.get(col_index)
+        return len(column) > self._min
+
+    @validate_call()
+    def is_valid_index(self, col_index: int) -> bool:
+        return 0 < col_index < 4
+
+
+a

@@ -1,5 +1,4 @@
 import pytest
-from icecream import ic
 
 from src.domain.board.board import Board
 from src.domain.die.die import Die
@@ -45,3 +44,31 @@ class TestDie:
         result = col1[0]
         error_msg = f"Expected value: [{expected}]. Result= {result}"
         assert expected == result, error_msg
+
+    def test_can_add_more(self, die):
+        """Test the player cand add more items"""
+        board = Board()
+        # Roll the dice
+        die.roll()
+        expected = True
+        index = 1
+        board.add(index, die.number)
+        # Check the firs value added in the column
+        result = board.cad_add(index)
+        error_msg = f"Expected value: [{expected}]. Result= {result}"
+        assert expected is result, error_msg
+
+    def test_can_not_add_more(self, die):
+        """Test the player can not add more values in the column"""
+        board = Board()
+        # Roll the dice
+        die.roll()
+        expected = False
+        index = 1
+        board.add(index, die.number)
+        board.add(index, die.number)
+        board.add(index, die.number)
+        # Check the firs value added in the column
+        result = board.cad_add(index)
+        error_msg = f"Expected value: [{expected}]. Result= {result}"
+        assert expected is result, error_msg

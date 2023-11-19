@@ -37,3 +37,8 @@ class Player(BaseModel):
     def remove_dices_in_board_col(self, col_index: int, value: int) -> None:
         """Remove all the values in the player board column index"""
         self.board.remove(col_index, value)
+
+    @validate_call()
+    def is_same_player(self, other) -> bool:
+        """Check if the player is the same"""
+        return self is other

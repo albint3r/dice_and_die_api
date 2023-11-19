@@ -1,15 +1,9 @@
-from icecream import ic
-
-from src.domain.board.board import Board
-from src.domain.die.die import Die
-from src.domain.player.player import Player
+from src.infrastructure.game.game_facade_impl import GameFacadeImpl
+from src.presentation.game.game import run_game
 
 
 def run():
-    die = Die()
-    board = Board()
-    player = Player(die=die, board=board)
-    ic(player)
+    run_game(GameFacadeImpl())
 
 
 if __name__ == '__main__':

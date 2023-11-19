@@ -1,5 +1,6 @@
-from pydantic import BaseModel
 from random import randint
+
+from pydantic import BaseModel
 
 
 class Die(BaseModel):

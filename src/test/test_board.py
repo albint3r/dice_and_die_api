@@ -1,10 +1,11 @@
 import pytest
 
 from src.domain.board.board import Board
+from src.domain.board.errors import InvalidColumnError, AddError, RemoveError
 from src.domain.die.die import Die
 
 
-class TestDie:
+class TestBoar:
 
     @pytest.fixture
     def die(self) -> Die:
@@ -164,3 +165,31 @@ class TestDie:
         result = board.is_full
         error_msg = f"Expected value: [{expected}]. Result= {result}"
         assert expected is result, error_msg
+
+    def test_invalid_column_error_on_get(self):
+        """Test InvalidColumnError is raised when getting an invalid column"""
+        board = Board()
+        invalid_column_index = 4  # an invalid column index
+        expected_error_msg = f'This is a invalid column index: {invalid_column_index}'
+        with pytest.raises(InvalidColumnError, match=expected_error_msg):
+            board.get(invalid_column_index)
+
+    def test_add_error(self):
+        """Test AddError is raised when adding more values than allowed"""
+        board = Board()
+        valid_column_index = 1
+        # Fill the column to the max
+        board.add(valid_column_index, 1)
+        board.add(valid_column_index, 2)
+        board.add(valid_column_index, 3)
+        expected_error_msg = f"You can't add more values in the Board Column: {valid_column_index}"
+        with pytest.raises(AddError, match=expected_error_msg):
+            board.add(valid_column_index, 4)  # adding one more than allowed
+
+    def test_invalid_column_error_on_remove(self):
+        """Test InvalidColumnError is raised when removing from an invalid column"""
+        board = Board()
+        invalid_column_index = 4  # an invalid column index
+        expected_error_msg = f"You can't remove more values in the Board Column: {invalid_column_index}"
+        with pytest.raises(RemoveError, match=expected_error_msg):
+            board.remove(invalid_column_index, 1)

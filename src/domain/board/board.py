@@ -1,4 +1,7 @@
+from icecream import ic
 from pydantic import BaseModel, validate_call
+
+from src.domain.board.errors import AddError, InvalidColumnError, RemoveError
 
 
 class Board(BaseModel):
@@ -11,6 +14,7 @@ class Board(BaseModel):
 
     @property
     def columns(self) -> dict[int, list[int]]:
+        """This is a dict of the columns index"""
         return {1: self.col1, 2: self.col2, 3: self.col3}
 
     @property
@@ -24,7 +28,11 @@ class Board(BaseModel):
 
     @validate_call()
     def get(self, col_index: int) -> list[int]:
-        return self.columns.get(col_index)
+        """Get the column index attribute of the board"""
+        col = self.columns.get(col_index)
+        if isinstance(col, list):
+            return col
+        raise InvalidColumnError(f'This is a invalid column index: {col_index}')
 
     @validate_call()
     def add(self, col_index: int, value: int) -> None:
@@ -32,6 +40,8 @@ class Board(BaseModel):
         if self.is_valid_index(col_index) and self.cad_add(col_index):
             column = self.columns.get(col_index)
             column.append(value)
+            return None
+        raise AddError(f"You can't add more values in the Board Column: {col_index}")
 
     @validate_call()
     def remove(self, col_index: int, value: int) -> None:
@@ -40,6 +50,8 @@ class Board(BaseModel):
             column = self.columns.get(col_index)
             while value in column:
                 column.remove(value)
+            return None
+        raise RemoveError(f"You can't remove more values in the Board Column: {col_index}")
 
     @validate_call()
     def cad_add(self, col_index: int) -> bool:

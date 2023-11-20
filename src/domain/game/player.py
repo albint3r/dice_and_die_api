@@ -1,13 +1,20 @@
-from pydantic import BaseModel, field_validator, validate_call
+import uuid
 
-from src.domain.board.board import Board
-from src.domain.die.die import Die
-from src.domain.player.errors import InvalidNewBoard, InvalidNewDie
+from pydantic import BaseModel, field_validator, validate_call, Field
+
+from src.domain.game.board import Board
+from src.domain.game.die import Die
+from src.domain.game.errors import InvalidNewBoard, InvalidNewDie
 
 
 class Player(BaseModel):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
     board: Board
     die: Die
+
+    @property
+    def die_result(self) -> int:
+        return self.die.number
 
     @field_validator("board")
     def is_new_board(cls, boar):
@@ -32,6 +39,11 @@ class Player(BaseModel):
     def add_dice_in_board_col(self, col_index: int, value: int) -> None:
         """Player add the dice value in the board"""
         self.board.add(col_index, value)
+
+    @validate_call()
+    def can_add_to_board_col(self, col_index: int) -> bool:
+        """Check if the Player can add to the board column"""
+        return self.board.cad_add(col_index)
 
     @validate_call()
     def remove_dices_in_board_col(self, col_index: int, value: int) -> None:

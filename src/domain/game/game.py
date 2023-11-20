@@ -1,6 +1,6 @@
 from pydantic import BaseModel, validate_call
 
-from src.domain.player.player import Player
+from src.domain.game.player import Player
 
 
 class Game(BaseModel):

@@ -1,6 +1,6 @@
 from pydantic import BaseModel, validate_call
 
-from src.domain.board.errors import AddError, InvalidColumnError, RemoveError
+from src.domain.game.errors import AddError, InvalidColumnError, RemoveError
 
 
 class Board(BaseModel):

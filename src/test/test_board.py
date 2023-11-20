@@ -1,8 +1,8 @@
 import pytest
 
-from src.domain.board.board import Board
-from src.domain.board.errors import InvalidColumnError, AddError, RemoveError
-from src.domain.die.die import Die
+from src.domain.game.board import Board
+from src.domain.game.errors import InvalidColumnError, AddError, RemoveError
+from src.domain.game.die import Die
 
 
 class TestBoar:

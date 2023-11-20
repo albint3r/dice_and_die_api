@@ -1,10 +1,10 @@
 from random import choice
 
-from src.domain.board.board import Board
-from src.domain.die.die import Die
+from src.domain.game.board import Board
+from src.domain.game.die import Die
 from src.domain.game.game import Game
 from src.domain.game.i_game_facade import IGameFacade
-from src.domain.player.player import Player
+from src.domain.game.player import Player
 
 
 class CliGameFacadeImpl(IGameFacade):
@@ -12,7 +12,7 @@ class CliGameFacadeImpl(IGameFacade):
     def select_column(self, player: Player) -> int:
         while True:
             try:
-                col_index = int(input('Select column: '))
+                col_index = int(input(f'Select column player id {player.id}: '))
                 if 1 <= col_index <= 3:
                     break
                 else:

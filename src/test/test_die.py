@@ -1,6 +1,6 @@
 import pytest
 
-from src.domain.die.die import Die
+from src.domain.game.die import Die
 
 
 class TestDie:

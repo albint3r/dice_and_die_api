@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from abc import ABC, abstractmethod
 
 from src.domain.game.game import Game
-from src.domain.player.player import Player
+from src.domain.game.player import Player
 
 
 class IGameFacade(ABC, BaseModel):

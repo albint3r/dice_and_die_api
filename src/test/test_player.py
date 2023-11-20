@@ -1,9 +1,9 @@
 import pytest
 
-from src.domain.board.board import Board
-from src.domain.die.die import Die
-from src.domain.player.errors import InvalidNewBoard, InvalidNewDie
-from src.domain.player.player import Player
+from src.domain.game.board import Board
+from src.domain.game.die import Die
+from src.domain.game.errors import InvalidNewDie, InvalidNewBoard
+from src.domain.game.player import Player
 
 
 class TestPlayer:

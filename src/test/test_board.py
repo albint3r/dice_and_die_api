@@ -1,8 +1,8 @@
 import pytest
 
 from src.domain.game.board import Board
-from src.domain.game.errors import InvalidColumnError, AddError, RemoveError
 from src.domain.game.die import Die
+from src.domain.game.errors import InvalidColumnError, AddError, RemoveError
 
 
 class TestBoar:
@@ -15,9 +15,9 @@ class TestBoar:
         """Test the columns property get correctly the columns in the board"""
         board = Board()
         # Check is get empty columns from column 1 to 3.
-        col1 = board.get(1)
-        col2 = board.get(2)
-        col3 = board.get(3)
+        col1 = board.get_column(1)
+        col2 = board.get_column(2)
+        col3 = board.get_column(3)
         expected = type([])
         # First test:
         result = type(col1)
@@ -40,7 +40,7 @@ class TestBoar:
         expected = die.number
         index = 1
         board.add(index, expected)
-        col1 = board.get(index)
+        col1 = board.get_column(index)
         # Check the firs value added in the column
         result = col1[0]
         error_msg = f"Expected value: [{expected}]. Result= {result}"
@@ -109,7 +109,7 @@ class TestBoar:
         board.remove(index, fake_die_val)
         # Start test
         expected = 0
-        col1 = board.get(index)
+        col1 = board.get_column(index)
         result = len(col1)
         error_msg = f"Expected value: [{expected}]. Result= {result}"
         assert expected == result, error_msg
@@ -128,7 +128,7 @@ class TestBoar:
         board.remove(index, fake_die_val)
         # Start test
         expected = 1
-        col1 = board.get(index)
+        col1 = board.get_column(index)
         result = len(col1)
         error_msg = f"Expected value: [{expected}]. Result= {result}"
         assert expected == result, error_msg
@@ -172,7 +172,7 @@ class TestBoar:
         invalid_column_index = 4  # an invalid column index
         expected_error_msg = f'This is a invalid column index: {invalid_column_index}'
         with pytest.raises(InvalidColumnError, match=expected_error_msg):
-            board.get(invalid_column_index)
+            board.get_column(invalid_column_index)
 
     def test_add_error(self):
         """Test AddError is raised when adding more values than allowed"""
@@ -193,3 +193,69 @@ class TestBoar:
         expected_error_msg = f"You can't remove more values in the Board Column: {invalid_column_index}"
         with pytest.raises(RemoveError, match=expected_error_msg):
             board.remove(invalid_column_index, 1)
+
+    def test_score_in_columns_3_equal_number(self):
+        """Validate the ColumnScore Classe return valid point score"""
+        board = Board()
+        index = 1
+        board.add(index, 2)
+        board.add(index, 2)
+        board.add(index, 2)
+        expected = 18
+        result = board.get_score(index).val
+        error_msg = f"Expected value: [{expected}]. Result= {result}"
+        assert expected == result, error_msg
+
+    def test_score_in_columns_2_equal_number(self):
+        """Validate the ColumnScore Classe return valid point score"""
+        board = Board()
+        index = 1
+        board.add(index, 1)
+        board.add(index, 1)
+        expected = 4
+        result = board.get_score(index).val
+        error_msg = f"Expected value: [{expected}]. Result= {result}"
+        assert expected == result, error_msg
+
+    def test_score_in_columns_1_equal_number(self):
+        """Validate the ColumnScore Classe return valid point score"""
+        board = Board()
+        index = 1
+        board.add(index, 1)
+        expected = 1
+        result = board.get_score(index).val
+        error_msg = f"Expected value: [{expected}]. Result= {result}"
+        assert expected == result, error_msg
+
+    def test_score_in_columns_2_equal_number_and_1_other_number(self):
+        """Validate the ColumnScore Classe return valid point score"""
+        board = Board()
+        index = 1
+        board.add(index, 1)  # 2
+        board.add(index, 1)  # 2
+        board.add(index, 2)  # 2
+        expected = 6
+        result = board.get_score(index).val
+        error_msg = f"Expected value: [{expected}]. Result= {result}"
+        assert expected == result, error_msg
+
+    def test_score_in_columns_1_equal_number_and_2_other_number(self):
+        """Validate the ColumnScore Classe return valid point score"""
+        board = Board()
+        index = 1
+        board.add(index, 1)  # 1
+        board.add(index, 2)  # 2
+        board.add(index, 3)  # 3
+        expected = 6
+        result = board.get_score(index).val
+        error_msg = f"Expected value: [{expected}]. Result= {result}"
+        assert expected == result, error_msg
+
+    def test_score_in_columns_not_values(self):
+        """Validate the ColumnScore Classe return valid point score"""
+        board = Board()
+        index = 1
+        expected = 0
+        result = board.get_score(index).val
+        error_msg = f"Expected value: [{expected}]. Result= {result}"
+        assert expected == result, error_msg

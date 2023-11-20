@@ -38,7 +38,7 @@ class Game(BaseModel):
     def can_destroy_opponent_target_column(self, col_index: int, value: int) -> bool:
         """Check if the user have values in the target column"""
         opponent_player = self.get_inverse_player()
-        target_column = opponent_player.board.get(col_index)
+        target_column = opponent_player.board.get_column(col_index)
         return value in target_column
 
     @validate_call()

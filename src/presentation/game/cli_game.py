@@ -1,5 +1,3 @@
-from icecream import ic
-
 from src.domain.game.i_game_facade import IGameFacade
 
 

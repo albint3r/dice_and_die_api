@@ -1,5 +1,5 @@
 from src.infrastructure.game.cli_game_facade_impl import CliGameFacadeImpl
-from src.presentation.game.game import run_game
+from src.presentation.game.cli_game import run_game
 
 
 def run():

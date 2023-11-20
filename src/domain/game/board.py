@@ -1,6 +1,8 @@
-from pydantic import BaseModel, validate_call
+from pydantic import BaseModel, validate_call, Field
 
 from src.domain.game.errors import AddError, InvalidColumnError, RemoveError
+from src.domain.game.i_score import IScore
+from src.domain.game.score import ColumScore
 
 
 class Board(BaseModel):
@@ -8,6 +10,9 @@ class Board(BaseModel):
     col1: list[int] = []
     col2: list[int] = []
     col3: list[int] = []
+    score1: ColumScore = Field(default_factory=ColumScore)
+    score2: ColumScore = Field(default_factory=ColumScore)
+    score3: ColumScore = Field(default_factory=ColumScore)
     _max: int = 3
     _min: int = 0
 
@@ -17,20 +22,35 @@ class Board(BaseModel):
         return {1: self.col1, 2: self.col2, 3: self.col3}
 
     @property
+    def column_scores(self) -> dict[int, ColumScore]:
+        """This is a dict of the columns scores index"""
+        return {1: self.score1, 2: self.score2, 3: self.score3}
+
+    @property
     def is_full(self) -> bool:
         """Return True if the board columns are full"""
-        col1 = len(self.get(1))
-        col2 = len(self.get(2))
-        col3 = len(self.get(3))
+        col1 = len(self.get_column(1))
+        col2 = len(self.get_column(2))
+        col3 = len(self.get_column(3))
         _max = self._max
         return col1 == _max and col2 == _max and col3 == _max
 
     @validate_call()
-    def get(self, col_index: int) -> list[int]:
+    def get_column(self, col_index: int) -> list[int]:
         """Get the column index attribute of the board"""
         col = self.columns.get(col_index)
         if isinstance(col, list):
             return col
+        raise InvalidColumnError(f'This is a invalid column index: {col_index}')
+
+    @validate_call()
+    def get_score(self, col_index: int) -> IScore:
+        """Get the column index attribute of the board"""
+        column = self.columns.get(col_index)
+        score = self.column_scores.get(col_index)
+        if isinstance(column, list) and isinstance(score, IScore):
+            _ = score.get_result(column=column)
+            return score
         raise InvalidColumnError(f'This is a invalid column index: {col_index}')
 
     @validate_call()

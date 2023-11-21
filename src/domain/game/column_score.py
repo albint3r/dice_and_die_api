@@ -1,16 +1,14 @@
-from icecream import ic
-
-from src.domain.game.i_score import IScore
+from pydantic import BaseModel
 
 
-class ColumScore(IScore):
+class ColumScore(BaseModel):
     val: int = 0
 
-    def get_result(self, column: list[int]) -> int:
+    def get_points(self, column: list[int]) -> int:
         """Sum the current point in the column"""
         # If is an empty list return: 0
+        self.val = 0
         if not column:
-            self.val = 0
             return self.val
         current_score: dict[int, int] = {}
         # Add values to the dict

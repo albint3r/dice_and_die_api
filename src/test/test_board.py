@@ -202,7 +202,7 @@ class TestBoar:
         board.add(index, 2)
         board.add(index, 2)
         expected = 18
-        result = board.get_score(index).val
+        result = board.update_score(index).val
         error_msg = f"Expected value: [{expected}]. Result= {result}"
         assert expected == result, error_msg
 
@@ -213,7 +213,7 @@ class TestBoar:
         board.add(index, 1)
         board.add(index, 1)
         expected = 4
-        result = board.get_score(index).val
+        result = board.update_score(index).val
         error_msg = f"Expected value: [{expected}]. Result= {result}"
         assert expected == result, error_msg
 
@@ -223,7 +223,7 @@ class TestBoar:
         index = 1
         board.add(index, 1)
         expected = 1
-        result = board.get_score(index).val
+        result = board.update_score(index).val
         error_msg = f"Expected value: [{expected}]. Result= {result}"
         assert expected == result, error_msg
 
@@ -235,7 +235,7 @@ class TestBoar:
         board.add(index, 1)  # 2
         board.add(index, 2)  # 2
         expected = 6
-        result = board.get_score(index).val
+        result = board.update_score(index).val
         error_msg = f"Expected value: [{expected}]. Result= {result}"
         assert expected == result, error_msg
 
@@ -247,7 +247,7 @@ class TestBoar:
         board.add(index, 2)  # 2
         board.add(index, 3)  # 3
         expected = 6
-        result = board.get_score(index).val
+        result = board.update_score(index).val
         error_msg = f"Expected value: [{expected}]. Result= {result}"
         assert expected == result, error_msg
 
@@ -256,6 +256,38 @@ class TestBoar:
         board = Board()
         index = 1
         expected = 0
-        result = board.get_score(index).val
+        result = board.update_score(index).val
+        error_msg = f"Expected value: [{expected}]. Result= {result}"
+        assert expected == result, error_msg
+
+    def test_score_in_columns_values_reset_after_removed(self):
+        """Validate the ColumnScore Classe return valid point score"""
+        board = Board()
+        index = 1
+        board.add(index, 1)  # 1
+        board.add(index, 2)  # 2
+        board.add(index, 3)  # 3
+        # need to update values to have the new ones
+        _ = board.update_score(index)
+        # Then removed the current values and next updated again
+        board.remove(index, 2)
+        expected = 4
+        result = board.update_score(index).val
+        error_msg = f"Expected value: [{expected}]. Result= {result}"
+        assert expected == result, error_msg
+
+    def test_score_in_columns_values_reset_after_removed_all(self):
+        """Validate the ColumnScore Classe return valid point score"""
+        board = Board()
+        index = 1
+        board.add(index, 2)
+        board.add(index, 2)
+        board.add(index, 2)
+        # need to update values to have the new ones
+        _ = board.update_score(index)
+        # Then removed the current values and next updated again
+        board.remove(index, 2)
+        expected = 0
+        result = board.update_score(index).val
         error_msg = f"Expected value: [{expected}]. Result= {result}"
         assert expected == result, error_msg

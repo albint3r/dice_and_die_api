@@ -20,6 +20,7 @@ def run_game(facade: IGameFacade):
                     g.destroy_opponent_target_column(col_index, die_val)
                 g.current_player.add_dice_in_board_col(col_index, die_val)
                 break
+        g.update_players_points(col_index)
         if g.is_finish:
             print('Game is finish')
             break

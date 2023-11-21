@@ -46,3 +46,13 @@ class Game(BaseModel):
         """Remove all the values in the target column"""
         opponent_player = self.get_inverse_player()
         opponent_player.remove_dices_in_board_col(col_index, value)
+
+    @validate_call()
+    def update_players_points(self, col_index: int) -> None:
+        """Update single ant total score of the players"""
+        # Update Player 1
+        self.p1.update_points(col_index)
+        self.p1.update_total_score()
+        # Update Player 2
+        self.p2.update_points(col_index)
+        self.p2.update_total_score()

@@ -54,3 +54,11 @@ class Player(BaseModel):
     def is_same_player(self, other) -> bool:
         """Check if the player is the same"""
         return self is other
+
+    @validate_call()
+    def update_points(self, col_index: int) -> None:
+        """Get the points and update in the same process"""
+        self.board.update_score(col_index)
+
+    def update_total_score(self) -> None:
+        self.board.update_total_score()

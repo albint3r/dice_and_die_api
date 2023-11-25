@@ -11,6 +11,7 @@ class _WsManagerImpl(IWsManager):
         return self._active_connection
 
     async def connect(self, game_id: str, ws: WebSocket):
+        """Connect with a game"""
         self._active_connection.setdefault(game_id, set()).add(ws)
 
     async def disconnect(self, game_id: str, ws: WebSocket):
@@ -18,7 +19,7 @@ class _WsManagerImpl(IWsManager):
 
     async def send_message(self, game_id: str, message: TMessagePayload):
         for ws in self._active_connection.get(game_id, []):
-            await ws.send_json(message)
+            await ws.send_json({'result': message})
 
 
 ws_manager = _WsManagerImpl()

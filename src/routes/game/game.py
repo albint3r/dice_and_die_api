@@ -26,7 +26,10 @@ html = """
             ws.onmessage = function(event) {
                 var messages = document.getElementById('messages');
                 var message = document.createElement('li');
-                var content = document.createTextNode(JSON.parse(event.data).result);
+                var contentObject = JSON.parse(event.data).result;
+                var userMessage = contentObject['message'];
+                var content = document.createTextNode(userMessage);
+                console.log("Texto del usuario:", userMessage);
                 message.appendChild(content);
                 messages.appendChild(message);
             };

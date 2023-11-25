@@ -3,7 +3,7 @@ from starlette.websockets import WebSocket
 from src.domain.core.i_websocket_manager import IWsManager, TMessagePayload, TActiveConnections
 
 
-class WsManagerImpl(IWsManager):
+class _WsManagerImpl(IWsManager):
     _active_connection: TActiveConnections = {}
 
     @property
@@ -19,3 +19,6 @@ class WsManagerImpl(IWsManager):
     async def send_message(self, game_id: str, message: TMessagePayload):
         for ws in self._active_connection.get(game_id, []):
             await ws.send_json(message)
+
+
+ws_manager = _WsManagerImpl()

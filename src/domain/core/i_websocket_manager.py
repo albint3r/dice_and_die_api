@@ -18,16 +18,13 @@ class IWsManager(ABC, BaseModel):
         """Get the Websocket active connections"""
 
     @abstractmethod
-    @validate_call()
     async def connect(self, game_id: str, ws: WebSocket):
         """Connect with a new chanel"""
 
     @abstractmethod
-    @validate_call()
     async def disconnect(self, game_id: str, ws: WebSocket):
         """Disconnect from chanel"""
 
     @abstractmethod
-    @validate_call()
     async def send_message(self, game_id: str, message: TMessagePayload):
         """Send the message to the channel"""

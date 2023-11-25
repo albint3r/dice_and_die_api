@@ -40,3 +40,7 @@ class IWsManager(ABC, BaseModel):
     @abstractmethod
     async def send_message(self, game_id: str, message: TMessagePayload):
         """Send the message to the channel"""
+
+    @abstractmethod
+    async def send_match(self, game_id: str):
+        """Send the Current Match"""

@@ -64,6 +64,7 @@ async def websocket_game_endpoint(websocket: WebSocket, game_id: str):
         start_player = facade.select_player_start(game)
         game.set_current_player(start_player)
     await facade.ws_manager.connect(game_id, game, websocket)
+    ic('-------------------------INICIO-------------------------------------')
     while ic(not game.is_finish):
         ic(game.p1)
         ic(game.p2)
@@ -72,17 +73,20 @@ async def websocket_game_endpoint(websocket: WebSocket, game_id: str):
         # Get user input
         json = await websocket.receive_json()
         col_index = facade.select_column(json)
-        if game.current_player.can_add_to_board_col(col_index):
-            die_val = game.current_player.die_result
-            if game.can_destroy_opponent_target_column(col_index, die_val):
-                game.destroy_opponent_target_column(col_index, die_val)
-            game.current_player.add_dice_in_board_col(col_index, die_val)
-            await ws_manager.send_message(game_id, json)
-        game.update_players_points(col_index)
-        if game.is_finish:
-            ic('Game is finish')
-            await facade.ws_manager.disconnect(game_id, websocket)
-            break
-        next_player = game.get_inverse_player()
-        game.set_current_player(next_player)
-        ic('-*' * 100)
+        if col_index:
+            # TODO: here a need to validate the user is the same and check the value is correct type
+            if game.current_player.can_add_to_board_col(col_index):
+                die_val = game.current_player.die_result
+                if game.can_destroy_opponent_target_column(col_index, die_val):
+                    game.destroy_opponent_target_column(col_index, die_val)
+                game.current_player.add_dice_in_board_col(col_index, die_val)
+                await ws_manager.send_message(game_id, json)
+
+            game.update_players_points(col_index)
+            next_player = game.get_inverse_player()
+            game.set_current_player(next_player)
+            ic('-*' * 100)
+    ic('-*' * 100)
+    ic('-----------FINISH GAME------------------')
+    ic('-*' * 100)
+    await facade.ws_manager.disconnect(game_id, websocket)

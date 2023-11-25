@@ -1,14 +1,12 @@
 from random import choice
 from typing import Any
 
-from src.domain.core.errors import WebSocketColumnError
 from src.domain.core.i_websocket_manager import IWsManager
 from src.domain.game.board import Board
 from src.domain.game.die import Die
 from src.domain.game.game import Game
 from src.domain.game.i_game_facade import IGameFacade
 from src.domain.game.player import Player
-from fastapi import status
 
 
 class GameFacadeImpl(IGameFacade):
@@ -19,8 +17,9 @@ class GameFacadeImpl(IGameFacade):
         try:
             return int(user_input)
         except ValueError:
-            raise WebSocketColumnError(status_code=status.WS_1003_UNSUPPORTED_DATA,
-                                       detail=f'Not integer type: {user_input}: {type(user_input)}')
+            return 0
+            # raise WebSocketColumnError(status_code=status.WS_1003_UNSUPPORTED_DATA,
+            #                            detail=f'Not integer type: {user_input}: {type(user_input)}')
 
     def select_player_start(self, game: Game) -> Player:
         players_order = [game.p1, game.p2]

@@ -28,10 +28,8 @@ html = """
             ws.onmessage = function(event) {
                 var messages = document.getElementById('messages');
                 var message = document.createElement('li');
-                var contentObject = JSON.parse(event.data).result;
-                var userMessage = contentObject['message'];
-                var content = document.createTextNode(userMessage);
-                console.log("Texto del usuario:", userMessage);
+                var match = JSON.parse(event.data).match;
+                var content = document.createTextNode(match);
                 message.appendChild(content);
                 messages.appendChild(message);
             };
@@ -56,12 +54,14 @@ async def get():
 
 @router.websocket('/ws/v1/game/{game_id}')
 async def websocket_game_endpoint(websocket: WebSocket, game_id: str):
-    GameFacadeImpl()
+    facade = GameFacadeImpl(ws_manager=ws_manager)
     await websocket.accept()
-    await ws_manager.connect(game_id, websocket)
-    ic(ws_manager.active_connection)
+    game = facade.ws_manager.get_match(game_id)
+    # Create a new game if it not exists
+    if not game:
+        game = facade.new_game()
+    await facade.ws_manager.connect(game_id, game, websocket)
     while True:
-        message = await websocket.receive_json()
-        ic(message)
-        await ws_manager.send_message(game_id, message)
-        # await websocket.send_json({'result': message})
+        json = await websocket.receive_json()
+        ic(facade.select_column(json))
+        await ws_manager.send_message(game_id, json)

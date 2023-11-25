@@ -2,10 +2,13 @@ from abc import ABC, abstractmethod
 from typing import Dict, Set, Any
 
 from fastapi import WebSocket
-from pydantic import BaseModel, validate_call
+from pydantic import BaseModel
+
+from src.domain.game.game import Game
 
 # This is the typing of the active connections
-TActiveConnections = Dict[str, Set[WebSocket]]
+TActiveGamesConnections = Dict[str, Set[WebSocket]]
+TActiveMatches = Dict[str, Game]
 # Payload message
 TMessagePayload = Any
 
@@ -14,11 +17,20 @@ class IWsManager(ABC, BaseModel):
 
     @property
     @abstractmethod
-    def active_connection(self) -> TActiveConnections:
+    def active_connection(self) -> TActiveGamesConnections:
+        """Get the Websocket active connections"""
+
+    @property
+    @abstractmethod
+    def active_matches(self) -> TActiveMatches:
         """Get the Websocket active connections"""
 
     @abstractmethod
-    async def connect(self, game_id: str, ws: WebSocket):
+    def get_match(self, game_id: str) -> Game:
+        """Return the current playing game"""
+
+    @abstractmethod
+    async def connect(self, game_id: str, game: Game, ws: WebSocket):
         """Connect with a new chanel"""
 
     @abstractmethod

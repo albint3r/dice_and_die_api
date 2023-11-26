@@ -18,8 +18,6 @@ class GameFacadeImpl(IGameFacade):
             return int(user_input)
         except ValueError:
             return 0
-            # raise WebSocketColumnError(status_code=status.WS_1003_UNSUPPORTED_DATA,
-            #                            detail=f'Not integer type: {user_input}: {type(user_input)}')
 
     def select_player_start(self, game: Game) -> Player:
         players_order = [game.p1, game.p2]

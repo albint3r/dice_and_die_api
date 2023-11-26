@@ -41,18 +41,22 @@ class _WsManagerImpl(IWsManager):
 
     async def send_message(self, game_id: str, message: TMessagePayload):
         """Recibe message"""
-        game = self._active_games.get(game_id, [])
+        game = self._active_games.get(game_id, {})
         for ws in game:
-            result = {'message': message}
+            result = {'status': message}
             await ws.send_json(result)
 
     async def send_match(self, game_id: str):
         """Send the Current Match"""
-        game = self._active_games.get(game_id, [])
+        game = self._active_games.get(game_id, {})
         match = self.get_match(game_id)
         for ws in game:
-            result = {'match': match.model_dump_json()}
+            result = {'match': match.model_dump_json(), 'status': ''}
             await ws.send_json(result)
+
+    def is_game_full(self, game_id: str) -> bool:
+        game = self._active_games.get(game_id, [])
+        return ic(len(game) == 2)
 
 
 ws_manager = _WsManagerImpl()

@@ -44,3 +44,7 @@ class IWsManager(ABC, BaseModel):
     @abstractmethod
     async def send_match(self, game_id: str):
         """Send the Current Match"""
+
+    @abstractmethod
+    async def is_game_full(self, game_id: str) -> bool:
+        """Check if in the game are two players"""

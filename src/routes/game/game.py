@@ -1,3 +1,5 @@
+import time
+
 from fastapi import APIRouter, status, WebSocket, WebSocketDisconnect
 from icecream import ic
 from starlette.responses import HTMLResponse
@@ -24,7 +26,7 @@ html = """
         </ul>
         <script>
             var userId = "007";  // Set the desired user ID
-            var ws = new WebSocket(`ws://192.168.1.71:8000/ws/v1/game/${userId}`);
+            var ws = new WebSocket(`ws://192.168.1.71:8000/ws/v1/game2/${userId}`);
             ws.onmessage = function(event) {
                 var messages = document.getElementById('messages');
                 var message = document.createElement('li');
@@ -64,12 +66,46 @@ async def get():
     return HTMLResponse(html)
 
 
+@router.websocket('/ws/v1/game2/{game_id}')
+async def websocket_game_endpoint2(websocket: WebSocket, game_id: str):
+    await websocket.accept()
+    facade = GameFacadeImpl(ws_manager=ws_manager)
+    # Create a new game
+    game = facade.get_game(game_id)
+    if not facade.exist_game(game_id):
+        ic()
+        # Create new game
+        game = facade.new_game2()
+        await facade.ws_manager.connect(game_id, game, websocket)
+        # Create Player 1
+        player = facade.new_player()
+        facade.join_waiting_room(game_id, player)
+    else:
+        ic()
+        # Create player 2
+        player = facade.new_player()
+        if not facade.is_full_room(game_id):
+            facade.join_waiting_room(game_id, player)
+            await facade.ws_manager.connect(game_id, game, websocket)
+    try:
+        while not facade.is_full_room(game_id):
+            ic(game.p1)
+            ic(game.p2)
+            # Get user input
+            json = websocket.state
+            ic(json)
+        ic('EXIT THIS SHIT')
+    except WebSocketDisconnect:
+        await ws_manager.send_message(game_id, 'DISCONNECTED PLAYER')
+        await facade.ws_manager.disconnect(game_id, websocket)
+
+
 @router.websocket('/ws/v1/game/{game_id}')
 async def websocket_game_endpoint(websocket: WebSocket, game_id: str):
     facade = GameFacadeImpl(ws_manager=ws_manager)
     # Accept websocket connection
     await websocket.accept()
-    game = facade.ws_manager.get_match(game_id)
+    game = facade.ws_manager.get_game(game_id)
     ic(game)
     # Create a new game if it not exists
     if not game:
@@ -77,9 +113,10 @@ async def websocket_game_endpoint(websocket: WebSocket, game_id: str):
         start_player = facade.select_player_start(game)
         game.set_current_player(start_player)
     await facade.ws_manager.connect(game_id, game, websocket)
+
     ic('-------------------------INICIO-------------------------------------')
     try:
-        while ic(not game.is_finish):
+        while not game.is_finish:
             ic(game.p1)
             ic(game.p2)
             game.current_player.roll_dice()

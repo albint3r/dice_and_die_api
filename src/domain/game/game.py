@@ -4,8 +4,8 @@ from src.domain.game.player import Player
 
 
 class Game(BaseModel):
-    p1: Player
-    p2: Player
+    p1: Player | None = None
+    p2: Player | None = None
     _current_player: Player | None = None
     _turn: int = 0
 

@@ -22,11 +22,11 @@ class IWsManager(ABC, BaseModel):
 
     @property
     @abstractmethod
-    def active_matches(self) -> TActiveMatches:
+    def active_game(self) -> TActiveMatches:
         """Get the Websocket active connections"""
 
     @abstractmethod
-    def get_match(self, game_id: str) -> Game:
+    def get_game(self, game_id: str) -> Game:
         """Return the current playing game"""
 
     @abstractmethod
@@ -46,5 +46,5 @@ class IWsManager(ABC, BaseModel):
         """Send the Current Match"""
 
     @abstractmethod
-    async def is_game_full(self, game_id: str) -> bool:
+    def is_game_full(self, game_id: str) -> bool:
         """Check if in the game are two players"""

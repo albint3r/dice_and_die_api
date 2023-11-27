@@ -6,56 +6,56 @@ from src.domain.game.game import Game
 
 
 class _WsManagerImpl(IWsManager):
-    _active_games: TActiveGamesConnections = {}
-    _active_match: TActiveMatches = {}
+    _active_connections: TActiveGamesConnections = {}
+    _active_games: TActiveMatches = {}
 
     @property
     def active_connection(self) -> TActiveGamesConnections:
-        return self._active_games
+        return self._active_connections
 
     @property
-    def active_matches(self) -> TActiveMatches:
+    def active_game(self) -> TActiveMatches:
         """Get the Websocket active connections"""
-        return self._active_match
+        return self._active_games
 
-    def get_match(self, game_id: str) -> Game:
+    def get_game(self, game_id: str) -> Game:
         """Return the Game in the active room"""
-        return self._active_match.get(game_id)
+        return self._active_games.get(game_id)
 
     def _create_new_match(self, game_id: str, game: Game, ) -> None:
         """Create a new match"""
-        self._active_match.setdefault(game_id, game)
+        self._active_games.setdefault(game_id, game)
 
     async def connect(self, game_id: str, game: Game, ws: WebSocket):
         """Connect with a game and match if it not exists."""
-        match = self._active_match.get(game_id)
+        match = self._active_games.get(game_id)
         # If not match create a new One
         if not match:
             self._create_new_match(game_id, game)
         # Add New user to game pool
-        self._active_games.setdefault(game_id, set()).add(ws)
+        self._active_connections.setdefault(game_id, set()).add(ws)
 
     async def disconnect(self, game_id: str, ws: WebSocket):
+        self._active_connections[game_id].remove(ws)
         self._active_games[game_id].remove(ws)
-        self._active_match[game_id].remove(ws)
 
     async def send_message(self, game_id: str, message: TMessagePayload):
         """Recibe message"""
-        game = self._active_games.get(game_id, {})
+        game = self._active_connections.get(game_id, {})
         for ws in game:
             result = {'status': message}
             await ws.send_json(result)
 
     async def send_match(self, game_id: str):
         """Send the Current Match"""
-        game = self._active_games.get(game_id, {})
-        match = self.get_match(game_id)
+        game = self._active_connections.get(game_id, {})
+        match = self.get_game(game_id)
         for ws in game:
             result = {'match': match.model_dump_json(), 'status': ''}
             await ws.send_json(result)
 
     def is_game_full(self, game_id: str) -> bool:
-        game = self._active_games.get(game_id, [])
+        game = self._active_connections.get(game_id, [])
         return ic(len(game) == 2)
 
 

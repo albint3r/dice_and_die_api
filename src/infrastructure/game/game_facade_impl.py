@@ -5,8 +5,9 @@ from src.domain.core.i_websocket_manager import IWsManager
 from src.domain.game.board import Board
 from src.domain.game.die import Die
 from src.domain.game.game import Game
-from src.domain.game.i_game_facade import IGameFacade, IGameWebSocketFacade
+from src.domain.game.i_game_facade import IGameWebSocketFacade
 from src.domain.game.player import Player
+from fastapi import WebSocket
 
 
 class GameFacadeImpl(IGameWebSocketFacade):
@@ -25,17 +26,16 @@ class GameFacadeImpl(IGameWebSocketFacade):
 
     def new_game(self) -> Game:
         # Create All the Assets for a new game
-        # Player one
+        return Game()
+
+    def new_player(self) -> Player:
+        """Create a new player"""
         board1 = Board()
         die1 = Die()
-        p1 = Player(board=board1, die=die1)
-        # Player two
-        board2 = Board()
-        die2 = Die()
-        p2 = Player(board=board2, die=die2)
-        return Game(p1=p1, p2=p2)
+        return Player(board=board1, die=die1)
 
     def join_waiting_room(self, game_id: str, player: Player) -> None:
+        """Join player to the game"""
         game = self.ws_manager.get_game(game_id)
         if not game.p1:
             game.p1 = player
@@ -53,10 +53,24 @@ class GameFacadeImpl(IGameWebSocketFacade):
         game = self.ws_manager.get_game(game_id)
         return isinstance(game, Game)
 
-    def new_game2(self) -> Game:
-        return Game()
-
-    def new_player(self) -> Player:
-        board1 = Board()
-        die1 = Die()
-        return Player(board=board1, die=die1)
+    async def create_or_join_game(self, game_id: str, websocket: WebSocket) -> tuple[Game, Player]:
+        game = self.get_game(game_id)
+        if not self.exist_game(game_id):
+            # Create new game
+            game = self.new_game()
+            await self.ws_manager.connect(game_id, game, websocket)
+            # Create Player 1
+            player = self.new_player()
+            self.join_waiting_room(game_id, player)
+            await self.ws_manager.send_message(game_id, 'Player 1 Connected')
+        else:
+            # Create player 2
+            player = self.new_player()
+            if not self.is_full_room(game_id):
+                self.join_waiting_room(game_id, player)
+                # Select Player Start Order
+                start_player = self.select_player_start(game)
+                game.set_current_player(start_player)
+                await self.ws_manager.connect(game_id, game, websocket)
+                await self.ws_manager.send_message(game_id, 'Player 2 Connected')
+        return game, player

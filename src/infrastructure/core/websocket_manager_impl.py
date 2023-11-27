@@ -56,7 +56,7 @@ class _WsManagerImpl(IWsManager):
 
     def is_game_full(self, game_id: str) -> bool:
         game = self._active_connections.get(game_id, [])
-        return ic(len(game) == 2)
+        return len(game) == 2
 
 
 ws_manager = _WsManagerImpl()

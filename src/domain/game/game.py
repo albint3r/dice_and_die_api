@@ -18,6 +18,15 @@ class Game(BaseModel):
         """Validate if the game is finished"""
         return self.p1.board.is_full or self.p2.board.is_full
 
+    @property
+    def is_waiting_player(self) -> bool:
+        """Validate if the game is finished"""
+        return self.p1 is None or self.p2 is None
+
+    def is_player_turn(self, player: Player) -> bool:
+        """Return True if is the players current turn"""
+        return player is self.current_player
+
     @validate_call()
     def set_current_player(self, player: Player) -> None:
         """Set the current player turn"""

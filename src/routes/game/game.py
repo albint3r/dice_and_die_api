@@ -73,79 +73,81 @@ async def websocket_game_endpoint2(websocket: WebSocket, game_id: str):
     # Create a new game
     game = facade.get_game(game_id)
     if not facade.exist_game(game_id):
-        ic()
         # Create new game
         game = facade.new_game2()
         await facade.ws_manager.connect(game_id, game, websocket)
         # Create Player 1
         player = facade.new_player()
         facade.join_waiting_room(game_id, player)
+        await ws_manager.send_message(game_id, 'Player 1 Connected')
     else:
-        ic()
         # Create player 2
         player = facade.new_player()
         if not facade.is_full_room(game_id):
             facade.join_waiting_room(game_id, player)
+            # Select Player Start Order
+            start_player = facade.select_player_start(game)
+            game.set_current_player(start_player)
             await facade.ws_manager.connect(game_id, game, websocket)
+            await ws_manager.send_message(game_id, 'Player 2 Connected')
+
     try:
-        while not facade.is_full_room(game_id):
-            ic(game.p1)
-            ic(game.p2)
-            # Get user input
-            json = websocket.state
-            ic(json)
-        ic('EXIT THIS SHIT')
-    except WebSocketDisconnect:
-        await ws_manager.send_message(game_id, 'DISCONNECTED PLAYER')
-        await facade.ws_manager.disconnect(game_id, websocket)
-
-
-@router.websocket('/ws/v1/game/{game_id}')
-async def websocket_game_endpoint(websocket: WebSocket, game_id: str):
-    facade = GameFacadeImpl(ws_manager=ws_manager)
-    # Accept websocket connection
-    await websocket.accept()
-    game = facade.ws_manager.get_game(game_id)
-    ic(game)
-    # Create a new game if it not exists
-    if not game:
-        game = facade.new_game()
-        start_player = facade.select_player_start(game)
-        game.set_current_player(start_player)
-    await facade.ws_manager.connect(game_id, game, websocket)
-
-    ic('-------------------------INICIO-------------------------------------')
-    try:
-        while not game.is_finish:
-            ic(game.p1)
-            ic(game.p2)
-            game.current_player.roll_dice()
-            ic(f"Die result: {game.current_player.die_result}")
-            # Get user input
+        while game.is_waiting_player or not game.is_finish:
             json = await websocket.receive_json()
-            col_index = facade.select_column(json)
-            is_game_full = facade.ws_manager.is_game_full(game_id)
-            if col_index and is_game_full:
-                # TODO: here a need to validate the user is the same and check the value is correct type
-                if game.current_player.can_add_to_board_col(col_index):
-                    die_val = game.current_player.die_result
-                    if game.can_destroy_opponent_target_column(col_index, die_val):
-                        game.destroy_opponent_target_column(col_index, die_val)
-                    game.current_player.add_dice_in_board_col(col_index, die_val)
-                    await ws_manager.send_match(game_id)
-
-                game.update_players_points(col_index)
-                next_player = game.get_inverse_player()
-                game.set_current_player(next_player)
-                await ws_manager.send_message(game_id, '-*' * 100)
-                ic('-*' * 100)
-            else:
-                await ws_manager.send_message(game_id, 'NO NUMBER')
-        ic('-*' * 100)
-        ic('-----------FINISH GAME------------------')
-        ic('-*' * 100)
-        await ws_manager.send_message(game_id, 'DISCONNECTED PLAYER')
-        await facade.ws_manager.disconnect(game_id, websocket)
+            # Player Can interact?
+            if game.is_player_turn(player):
+                ic(f'Player Name: {player.id}')
+                ic(game.current_player)
     except WebSocketDisconnect:
         await ws_manager.send_message(game_id, 'DISCONNECTED PLAYER')
         await facade.ws_manager.disconnect(game_id, websocket)
+
+# @router.websocket('/ws/v1/game/{game_id}')
+# async def websocket_game_endpoint(websocket: WebSocket, game_id: str):
+#     facade = GameFacadeImpl(ws_manager=ws_manager)
+#     # Accept websocket connection
+#     await websocket.accept()
+#     game = facade.ws_manager.get_game(game_id)
+#     ic(game)
+#     # Create a new game if it not exists
+#     if not game:
+#         game = facade.new_game()
+#         start_player = facade.select_player_start(game)
+#         game.set_current_player(start_player)
+#     await facade.ws_manager.connect(game_id, game, websocket)
+#
+#     ic('-------------------------INICIO-------------------------------------')
+#     try:
+#         while not game.is_finish:
+#             ic(game.p1)
+#             ic(game.p2)
+#             game.current_player.roll_dice()
+#             ic(f"Die result: {game.current_player.die_result}")
+#             # Get user input
+#             json = await websocket.receive_json()
+#             col_index = facade.select_column(json)
+#             is_game_full = facade.ws_manager.is_game_full(game_id)
+#             if col_index and is_game_full:
+#                 # TODO: here a need to validate the user is the same and check the value is correct type
+#                 if game.current_player.can_add_to_board_col(col_index):
+#                     die_val = game.current_player.die_result
+#                     if game.can_destroy_opponent_target_column(col_index, die_val):
+#                         game.destroy_opponent_target_column(col_index, die_val)
+#                     game.current_player.add_dice_in_board_col(col_index, die_val)
+#                     await ws_manager.send_match(game_id)
+#
+#                 game.update_players_points(col_index)
+#                 next_player = game.get_inverse_player()
+#                 game.set_current_player(next_player)
+#                 await ws_manager.send_message(game_id, '-*' * 100)
+#                 ic('-*' * 100)
+#             else:
+#                 await ws_manager.send_message(game_id, 'NO NUMBER')
+#         ic('-*' * 100)
+#         ic('-----------FINISH GAME------------------')
+#         ic('-*' * 100)
+#         await ws_manager.send_message(game_id, 'DISCONNECTED PLAYER')
+#         await facade.ws_manager.disconnect(game_id, websocket)
+#     except WebSocketDisconnect:
+#         await ws_manager.send_message(game_id, 'DISCONNECTED PLAYER')
+#         await facade.ws_manager.disconnect(game_id, websocket)

@@ -22,7 +22,7 @@ class IWsManager(ABC, BaseModel):
 
     @property
     @abstractmethod
-    def active_game(self) -> TActiveMatches:
+    def active_games(self) -> TActiveMatches:
         """Get the Websocket active connections"""
 
     @abstractmethod
@@ -42,7 +42,7 @@ class IWsManager(ABC, BaseModel):
         """Send the message to the channel"""
 
     @abstractmethod
-    async def send_match(self, game_id: str):
+    async def send_match(self, game_id: str, message: str | None):
         """Send the Current Match"""
 
     @abstractmethod

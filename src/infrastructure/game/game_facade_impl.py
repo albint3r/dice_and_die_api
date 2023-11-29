@@ -24,9 +24,9 @@ class GameFacadeImpl(IGameWebSocketFacade):
         players_order = [game.p1, game.p2]
         return choice(players_order)
 
-    def new_game(self) -> Game:
+    def new_game(self, game_id: str) -> Game:
         # Create All the Assets for a new game
-        return Game()
+        return Game(id=game_id)
 
     def new_player(self) -> Player:
         """Create a new player"""
@@ -57,12 +57,13 @@ class GameFacadeImpl(IGameWebSocketFacade):
         game = self.get_game(game_id)
         if not self.exist_game(game_id):
             # Create new game
-            game = self.new_game()
+            game = self.new_game(game_id)
             await self.ws_manager.connect(game_id, game, websocket)
             # Create Player 1
             player = self.new_player()
             self.join_waiting_room(game_id, player)
-            await self.ws_manager.send_message(game_id, 'Player 1 Connected')
+            message = 'Player 1 Connected'
+            await self.update_game(game_id, message)
         else:
             # Create player 2
             player = self.new_player()
@@ -72,5 +73,17 @@ class GameFacadeImpl(IGameWebSocketFacade):
                 start_player = self.select_player_start(game)
                 game.set_current_player(start_player)
                 await self.ws_manager.connect(game_id, game, websocket)
-                await self.ws_manager.send_message(game_id, 'Player 2 Connected')
+                message = 'Player 2 Connected'
+                await self.update_game(game_id, message)
         return game, player
+
+    async def update_game(self, game_id: str, message: str) -> None:
+        """Update the match board"""
+        await self.ws_manager.send_match(game_id, message)
+
+    async def get_player_event_message(self, websocket: WebSocket) -> str:
+        import json
+        response = await websocket.receive()
+        text_dict = response.get('text')
+        json_data = json.loads(text_dict)
+        return json_data.get('message')

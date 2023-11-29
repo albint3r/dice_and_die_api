@@ -8,7 +8,7 @@ from src.domain.game.player import Player
 class IGameFacade(ABC, BaseModel):
 
     @abstractmethod
-    def new_game(self) -> Game:
+    def new_game(self, game_id: str) -> Game:
         """Run the game"""
 
     @abstractmethod

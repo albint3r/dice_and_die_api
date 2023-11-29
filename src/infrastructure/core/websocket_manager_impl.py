@@ -14,7 +14,7 @@ class _WsManagerImpl(IWsManager):
         return self._active_connections
 
     @property
-    def active_game(self) -> TActiveMatches:
+    def active_games(self) -> TActiveMatches:
         """Get the Websocket active connections"""
         return self._active_games
 
@@ -46,12 +46,12 @@ class _WsManagerImpl(IWsManager):
             result = {'status': message}
             await ws.send_json(result)
 
-    async def send_match(self, game_id: str):
+    async def send_match(self, game_id: str, message: str | None = None):
         """Send the Current Match"""
         game = self._active_connections.get(game_id, {})
         match = self.get_game(game_id)
         for ws in game:
-            result = {'match': match.model_dump_json(), 'status': ''}
+            result = {'match': match.model_dump_json(), 'status': message if message else ''}
             await ws.send_json(result)
 
     def is_game_full(self, game_id: str) -> bool:

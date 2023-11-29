@@ -2,6 +2,7 @@ from fastapi import APIRouter, status, WebSocket, WebSocketDisconnect
 from icecream import ic
 from starlette.responses import HTMLResponse
 
+from src.domain.game.schemes import ActiveGamesResponses
 from src.infrastructure.core.websocket_manager_impl import ws_manager
 from src.infrastructure.game.game_facade_impl import GameFacadeImpl
 
@@ -23,8 +24,9 @@ html = """
         <ul id='messages'>
         </ul>
         <script>
-            var userId = "007";  // Set the desired user ID
-            var ws = new WebSocket(`ws://192.168.1.71:8000/ws/v1/game/${userId}`);
+            var gameId = "007";  // Set the desired game ID
+            var userId = "001";  // Set the desired game ID
+            var ws = new WebSocket(`ws://192.168.1.71:8000/ws/v1/game/${gameId}`);
             ws.onmessage = function(event) {
                 var messages = document.getElementById('messages');
                 var message = document.createElement('li');
@@ -50,7 +52,7 @@ html = """
                 var input = document.getElementById("messageText");
                 var message = { "message": input.value };
                 ws.send(JSON.stringify(message));
-                input.value = '';
+                input.value = "";
                 event.preventDefault();
             }
         </script>
@@ -64,39 +66,49 @@ async def get():
     return HTMLResponse(html)
 
 
+@router.get('/v1/waiting_rooms')
+async def websocket_game_endpoint() -> ActiveGamesResponses:
+    active_games = ws_manager.active_games
+    return ActiveGamesResponses(response=active_games)
+
+
 @router.websocket('/ws/v1/game/{game_id}')
 async def websocket_game_endpoint(websocket: WebSocket, game_id: str):
+    import json
     await websocket.accept()
     facade = GameFacadeImpl(ws_manager=ws_manager)
     # Create a new game
     game, player = await facade.create_or_join_game(game_id, websocket)
     try:
         while game.is_waiting_player or not game.is_finish:
-            json = await websocket.receive_json()
-            message = json.get('message')
+            await facade.update_game(game_id, 'start_new_round')
+            message = await facade.get_player_event_message(websocket)
             # Player Can interact?
             # This could be temporal until I deside how the player would take the turn
-            if game.is_player_turn(player) and message == 'ok':
+            if game.is_player_turn(player) and message == '1':
                 game.current_player.roll_dice()
-                await ws_manager.send_message(game_id, f'Dice result: {game.current_player.die_result}')
+                await facade.update_game(game_id, 'roll_dice')
+                ic(game.current_player.die_result)
                 while True:
-                    ic(game.current_player.die_result)
-                    await ws_manager.send_message(game_id, f'Player1: {game.p1}')
-                    await ws_manager.send_message(game_id, f'Player2: {game.p2}')
-                    json = await websocket.receive_json()
-                    col_index = facade.select_column(json)
+                    json_data = await websocket.receive_json()
+                    col_index = facade.select_column(json_data)
+                    ic(col_index)
                     if game.current_player.can_add_to_board_col(col_index):
                         die_val = game.current_player.die_result
                         if game.can_destroy_opponent_target_column(col_index, die_val):
                             game.destroy_opponent_target_column(col_index, die_val)
+                            await facade.update_game(game_id, 'destroy_opponent_target_column')
                         game.current_player.add_dice_in_board_col(col_index, die_val)
+                        await facade.update_game(game_id, 'add_dice_to_colum')
+
                         break
                 game.update_players_points(col_index)
+                await facade.update_game(game_id, 'update_players_points')
                 if game.is_finish:
-                    await ws_manager.send_message(game_id, 'FINISH GAME!!!!!!!')
+                    await facade.update_game(game_id, 'finish_game')
                     break
                 next_player = game.get_inverse_player()
                 game.set_current_player(next_player)
     except WebSocketDisconnect:
-        await ws_manager.send_message(game_id, 'DISCONNECTED PLAYER')
+        await facade.update_game(game_id, 'disconnect_player')
         await facade.ws_manager.disconnect(game_id, websocket)

@@ -91,7 +91,7 @@ async def websocket_game_endpoint(websocket: WebSocket, game_id: str):
                     json_data = await websocket.receive_json()
                     col_index = facade.select_column(json_data)
                     ic(col_index)
-                    if game.current_player.can_add_to_board_col(col_index):
+                    if col_index and game.current_player.can_add_to_board_col(col_index):
                         die_val = game.current_player.die_result
                         if game.can_destroy_opponent_target_column(col_index, die_val):
                             game.destroy_opponent_target_column(col_index, die_val)
@@ -103,6 +103,8 @@ async def websocket_game_endpoint(websocket: WebSocket, game_id: str):
                 game.update_players_points(col_index)
                 await facade.update_game(game_id, 'update_players_points')
                 if game.is_finish:
+                    facade.get_winner_player(game_id)
+                    ic(game.winner_player)
                     await facade.update_game(game_id, 'finish_game')
                     break
                 next_player = game.get_inverse_player()

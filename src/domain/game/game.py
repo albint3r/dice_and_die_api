@@ -9,6 +9,7 @@ class Game(BaseModel):
     p2: Player | None = None
     current_player: Player | None = None
     turn: int = 0
+    winner_player: Player | None = None
 
     @property
     def is_finish(self) -> bool:

@@ -49,6 +49,12 @@ class GameFacadeImpl(IGameWebSocketFacade):
     def get_game(self, game_id: str) -> Game:
         return self.ws_manager.get_game(game_id)
 
+    def get_winner_player(self, game_id: str) -> None:
+        game = self.ws_manager.get_game(game_id)
+        p1 = game.p1
+        p2 = game.p2
+        game.winner_player = p1 if p1.board.total_score > p2.board.total_score else p2
+
     def exist_game(self, game_id: str) -> bool:
         game = self.ws_manager.get_game(game_id)
         return isinstance(game, Game)

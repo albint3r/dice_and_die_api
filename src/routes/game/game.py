@@ -110,3 +110,8 @@ async def websocket_game_endpoint(websocket: WebSocket, game_id: str):
     except WebSocketDisconnect:
         await facade.update_game(game_id, 'disconnect_player')
         await facade.ws_manager.disconnect(game_id, websocket)
+        ic('Disconnect Player!')
+    except TypeError as e:
+        ic(e)
+    finally:
+        await facade.ws_manager.disconnect(game_id, websocket)

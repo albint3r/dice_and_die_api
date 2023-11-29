@@ -37,7 +37,7 @@ class _WsManagerImpl(IWsManager):
 
     async def disconnect(self, game_id: str, ws: WebSocket):
         self._active_connections[game_id].remove(ws)
-        self._active_games[game_id].remove(ws)
+        del self._active_games[game_id]
 
     async def send_message(self, game_id: str, message: TMessagePayload):
         """Recibe message"""

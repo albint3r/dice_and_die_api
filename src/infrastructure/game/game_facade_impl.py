@@ -5,6 +5,7 @@ from src.domain.core.i_websocket_manager import IWsManager
 from src.domain.game.board import Board
 from src.domain.game.die import Die
 from src.domain.game.game import Game
+from src.domain.game.game_state import GameState
 from src.domain.game.i_game_facade import IGameWebSocketFacade
 from src.domain.game.player import Player
 from fastapi import WebSocket
@@ -80,12 +81,18 @@ class GameFacadeImpl(IGameWebSocketFacade):
                 game.set_current_player(start_player)
                 await self.ws_manager.connect(game_id, game, websocket)
                 message = 'Player 2 Connected'
+                self.update_game_state(game, GameState.ROLL_DICE)
                 await self.update_game(game_id, message)
         return game, player
 
     async def update_game(self, game_id: str, message: str) -> None:
         """Update the match board"""
         await self.ws_manager.send_match(game_id, message)
+
+    def update_game_state(self, game: Game, new_state: GameState) -> None:
+        """Update the state of the game"""
+        if game.state != new_state:
+            game.state = new_state
 
     async def get_player_event_message(self, websocket: WebSocket) -> str:
         import json

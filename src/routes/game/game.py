@@ -2,6 +2,7 @@ from fastapi import APIRouter, status, WebSocket, WebSocketDisconnect
 from icecream import ic
 from starlette.responses import HTMLResponse
 
+from src.domain.game.game_state import GameState
 from src.domain.game.schemes import ActiveGamesResponses
 from src.infrastructure.core.websocket_manager_impl import ws_manager
 from src.infrastructure.game.game_facade_impl import GameFacadeImpl
@@ -79,13 +80,14 @@ async def websocket_game_endpoint(websocket: WebSocket, game_id: str):
     game, player = await facade.create_or_join_game(game_id, websocket)
     try:
         while game.is_waiting_player or not game.is_finish:
-            await facade.update_game(game_id, 'start_new_round')
+            await facade.update_game(game_id, 'roll_dice')
             message = await facade.get_player_event_message(websocket)
             # Player Can interact?
             # This could be temporal until I deside how the player would take the turn
             if game.is_player_turn(player) and message == 'ok':
                 game.current_player.roll_dice()
-                await facade.update_game(game_id, 'roll_dice')
+                facade.update_game_state(game, GameState.SELECT_COLUMN)
+                await facade.update_game(game_id, 'select_column')
                 ic(game.current_player.die_result)
                 while True:
                     json_data = await websocket.receive_json()
@@ -95,16 +97,20 @@ async def websocket_game_endpoint(websocket: WebSocket, game_id: str):
                         die_val = game.current_player.die_result
                         if game.can_destroy_opponent_target_column(col_index, die_val):
                             game.destroy_opponent_target_column(col_index, die_val)
+                            facade.update_game_state(game, GameState.DESTROY_OPPONENT_TARGET_COLUMN)
                             await facade.update_game(game_id, 'destroy_opponent_target_column')
                         game.current_player.add_dice_in_board_col(col_index, die_val)
+                        facade.update_game_state(game, GameState.ADD_DICE_TO_COLUMN)
                         await facade.update_game(game_id, 'add_dice_to_colum')
-
                         break
                 game.update_players_points(col_index)
+                # facade.update_game_state(game, GameState.UPDATE_PLAYERS_POINTS)
+                facade.update_game_state(game, GameState.ROLL_DICE)
                 await facade.update_game(game_id, 'update_players_points')
                 if game.is_finish:
                     facade.get_winner_player(game_id)
                     ic(game.winner_player)
+                    facade.update_game_state(game, GameState.FINISH_GAME)
                     await facade.update_game(game_id, 'finish_game')
                     break
                 next_player = game.get_inverse_player()

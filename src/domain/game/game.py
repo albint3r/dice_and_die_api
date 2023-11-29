@@ -1,5 +1,6 @@
-from pydantic import BaseModel, validate_call, Field
+from pydantic import BaseModel, validate_call
 
+from src.domain.game.game_state import GameState
 from src.domain.game.player import Player
 
 
@@ -10,6 +11,7 @@ class Game(BaseModel):
     current_player: Player | None = None
     turn: int = 0
     winner_player: Player | None = None
+    state: GameState = GameState.WAITING_PLAYERS
 
     @property
     def is_finish(self) -> bool:

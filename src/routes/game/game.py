@@ -25,7 +25,6 @@ html = """
         </ul>
         <script>
             var gameId = "007";  // Set the desired game ID
-            var userId = "001";  // Set the desired game ID
             var ws = new WebSocket(`ws://192.168.1.71:8000/ws/v1/game/${gameId}`);
             ws.onmessage = function(event) {
                 var messages = document.getElementById('messages');
@@ -74,7 +73,6 @@ async def websocket_game_endpoint() -> ActiveGamesResponses:
 
 @router.websocket('/ws/v1/game/{game_id}')
 async def websocket_game_endpoint(websocket: WebSocket, game_id: str):
-    import json
     await websocket.accept()
     facade = GameFacadeImpl(ws_manager=ws_manager)
     # Create a new game
@@ -85,7 +83,7 @@ async def websocket_game_endpoint(websocket: WebSocket, game_id: str):
             message = await facade.get_player_event_message(websocket)
             # Player Can interact?
             # This could be temporal until I deside how the player would take the turn
-            if game.is_player_turn(player) and message == '1':
+            if game.is_player_turn(player) and message == 'ok':
                 game.current_player.roll_dice()
                 await facade.update_game(game_id, 'roll_dice')
                 ic(game.current_player.die_result)

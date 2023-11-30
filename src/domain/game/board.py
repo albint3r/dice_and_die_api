@@ -1,6 +1,6 @@
 from pydantic import BaseModel, validate_call, Field
 
-from src.domain.game.column_score import ColumScore
+from src.domain.game.column_score import ColumnScore
 from src.domain.game.errors import AddError, InvalidColumnError, RemoveError
 
 
@@ -9,9 +9,9 @@ class Board(BaseModel):
     col1: list[int] = []
     col2: list[int] = []
     col3: list[int] = []
-    score1: ColumScore = Field(default_factory=ColumScore)
-    score2: ColumScore = Field(default_factory=ColumScore)
-    score3: ColumScore = Field(default_factory=ColumScore)
+    score1: ColumnScore = Field(default_factory=ColumnScore)
+    score2: ColumnScore = Field(default_factory=ColumnScore)
+    score3: ColumnScore = Field(default_factory=ColumnScore)
     total_score: int = 0
     _max: int = 3
     _min: int = 0
@@ -22,7 +22,7 @@ class Board(BaseModel):
         return {1: self.col1, 2: self.col2, 3: self.col3}
 
     @property
-    def columns_score(self) -> dict[int, ColumScore]:
+    def columns_score(self) -> dict[int, ColumnScore]:
         """This is a dict of the columns scores index"""
         return {1: self.score1, 2: self.score2, 3: self.score3}
 
@@ -44,11 +44,11 @@ class Board(BaseModel):
         raise InvalidColumnError(f'This is a invalid column index: {col_index}')
 
     @validate_call()
-    def update_score(self, col_index: int) -> ColumScore:
+    def update_score(self, col_index: int) -> ColumnScore:
         """Get the column index attribute of the board"""
         column = self.columns.get(col_index)
         score = self.columns_score.get(col_index)
-        if isinstance(column, list) and isinstance(score, ColumScore):
+        if isinstance(column, list) and isinstance(score, ColumnScore):
             _ = score.get_points(column=column)
             return score
         raise InvalidColumnError(f'This is a invalid column index: {col_index}')

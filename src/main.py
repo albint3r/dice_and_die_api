@@ -1,10 +1,6 @@
-from src.infrastructure.game.cli_game_facade_impl import CliGameFacadeImpl
-from src.presentation.game.cli_game import run_game
+from fastapi import FastAPI
+from src.routes.game import game
 
+app = FastAPI()
 
-def run():
-    run_game(CliGameFacadeImpl())
-
-
-if __name__ == '__main__':
-    run()
+app.include_router(game.router)

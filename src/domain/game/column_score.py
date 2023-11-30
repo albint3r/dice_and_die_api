@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class ColumScore(BaseModel):
+class ColumnScore(BaseModel):
     val: int = 0
 
     def get_points(self, column: list[int]) -> int:

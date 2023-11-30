@@ -1,37 +1,46 @@
 from pydantic import BaseModel, validate_call
 
+from src.domain.game.game_state import GameState
 from src.domain.game.player import Player
 
 
 class Game(BaseModel):
-    p1: Player
-    p2: Player
-    _current_player: Player | None = None
-    _turn: int = 0
-
-    @property
-    def current_player(self) -> Player:
-        return self._current_player
+    id: str | None = None
+    p1: Player | None = None
+    p2: Player | None = None
+    current_player: Player | None = None
+    turn: int = 0
+    winner_player: Player | None = None
+    state: GameState = GameState.WAITING_PLAYERS
 
     @property
     def is_finish(self) -> bool:
         """Validate if the game is finished"""
         return self.p1.board.is_full or self.p2.board.is_full
 
+    @property
+    def is_waiting_player(self) -> bool:
+        """Validate if the game is finished"""
+        return self.p1 is None or self.p2 is None
+
+    def is_player_turn(self, player: Player) -> bool:
+        """Return True if is the players current turn"""
+        return player is self.current_player
+
     @validate_call()
     def set_current_player(self, player: Player) -> None:
         """Set the current player turn"""
-        self._current_player = player
+        self.current_player = player
 
     def add_turn(self) -> None:
         """Add plus +1 to the turn value"""
-        self._turn += 1
+        self.turn += 1
 
     def get_inverse_player(self) -> Player | None:
         """Get the inverse player of the current player"""
-        if self._current_player is not None:
+        if self.current_player is not None:
             # Devuelve p1 si el jugador actual es p2 y viceversa
-            return self.p1 if self._current_player == self.p2 else self.p2
+            return self.p1 if self.current_player == self.p2 else self.p2
         return None
 
     @validate_call()

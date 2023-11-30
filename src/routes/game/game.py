@@ -1,10 +1,13 @@
-from fastapi import APIRouter, status, WebSocket, WebSocketDisconnect
+import time
+
+from fastapi import APIRouter, status, WebSocket, WebSocketDisconnect, WebSocketException
 from icecream import ic
 from starlette.responses import HTMLResponse
 
 from src.domain.game.game_state import GameState
 from src.domain.game.schemes import ActiveGamesResponses
 from src.infrastructure.core.websocket_manager_impl import ws_manager
+from src.infrastructure.core.websocket_manager_waiting_room import ws_manager_waiting_room
 from src.infrastructure.game.game_facade_impl import GameFacadeImpl
 
 router = APIRouter(tags=['game'],
@@ -66,10 +69,36 @@ async def get():
     return HTMLResponse(html)
 
 
-@router.get('/v1/waiting_rooms')
-async def websocket_game_endpoint() -> ActiveGamesResponses:
+@router.websocket('/ws/v1/waiting_rooms')
+async def websocket_game_endpoint(websocket: WebSocket):
+    await ws_manager_waiting_room.connect(websocket)
     active_games = ws_manager.active_games
-    return ActiveGamesResponses(response=active_games)
+    active_games_responses = ActiveGamesResponses(response=active_games)
+    await ws_manager_waiting_room.broadcast(active_games_responses.model_dump_json())
+    try:
+        while True:
+            data = await websocket.receive_json()
+            ic(data)
+            ic(type(data))
+            active_games = ws_manager.active_games
+            active_games_responses = ActiveGamesResponses(response=active_games)
+            ic(active_games_responses)
+            await ws_manager_waiting_room.broadcast(active_games_responses.model_dump_json())
+    except WebSocketDisconnect:
+        ic('exept')
+        active_games = ws_manager.active_games
+        active_games_responses = ActiveGamesResponses(response=active_games)
+        ws_manager_waiting_room.disconnect(websocket)
+        await ws_manager_waiting_room.broadcast(active_games_responses.model_dump_json())
+    except TypeError as e:
+        ic(e)
+    finally:
+        ic('finally')
+        # active_games = ws_manager.active_games
+        # active_games_responses = ActiveGamesResponses(response=active_games)
+        # await ws_manager_waiting_room.broadcast(active_games_responses.model_dump_json())
+        ws_manager_waiting_room.disconnect(websocket)
+
 
 
 @router.websocket('/ws/v1/game/{game_id}')

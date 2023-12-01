@@ -7,6 +7,10 @@ from src.domain.game.game import Game
 class _WebsocketManagerWaitingRoom(BaseModel):
     active_connections: list[WebSocket] = []
 
+    @property
+    def connected_players(self) -> int:
+        return len(self.active_connections)
+
     class Config:
         arbitrary_types_allowed = True
 
@@ -19,7 +23,7 @@ class _WebsocketManagerWaitingRoom(BaseModel):
             self.active_connections.remove(websocket)
 
     async def broadcast(self, games: dict[str, Game]):
-        result = {'status': games}
+        result = {'status': games, 'connected_players': self.connected_players}
         for connection in self.active_connections:
             await connection.send_json(result)
 

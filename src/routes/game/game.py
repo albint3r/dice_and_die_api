@@ -1,13 +1,9 @@
-import time
-
-from fastapi import APIRouter, status, WebSocket, WebSocketDisconnect, WebSocketException
+from fastapi import APIRouter, status, WebSocket, WebSocketDisconnect
 from icecream import ic
 from starlette.responses import HTMLResponse
 
 from src.domain.game.game_state import GameState
-from src.domain.game.schemes import ActiveGamesResponses
 from src.infrastructure.core.websocket_manager_impl import ws_manager
-from src.infrastructure.core.websocket_manager_waiting_room import ws_manager_waiting_room
 from src.infrastructure.game.game_facade_impl import GameFacadeImpl
 
 router = APIRouter(tags=['game'],
@@ -28,7 +24,7 @@ html = """
         <ul id='messages'>
         </ul>
         <script>
-            var gameId = "007";  // Set the desired game ID
+            var gameId = "0000000000007";  // Set the desired game ID
             var ws = new WebSocket(`ws://192.168.1.71:8000/ws/v1/game/${gameId}`);
             ws.onmessage = function(event) {
                 var messages = document.getElementById('messages');
@@ -69,38 +65,6 @@ async def get():
     return HTMLResponse(html)
 
 
-@router.websocket('/ws/v1/waiting_rooms')
-async def websocket_game_endpoint(websocket: WebSocket):
-    await ws_manager_waiting_room.connect(websocket)
-    active_games = ws_manager.active_games
-    active_games_responses = ActiveGamesResponses(response=active_games)
-    await ws_manager_waiting_room.broadcast(active_games_responses.model_dump_json())
-    try:
-        while True:
-            data = await websocket.receive_json()
-            ic(data)
-            ic(type(data))
-            active_games = ws_manager.active_games
-            active_games_responses = ActiveGamesResponses(response=active_games)
-            ic(active_games_responses)
-            await ws_manager_waiting_room.broadcast(active_games_responses.model_dump_json())
-    except WebSocketDisconnect:
-        ic('exept')
-        active_games = ws_manager.active_games
-        active_games_responses = ActiveGamesResponses(response=active_games)
-        ws_manager_waiting_room.disconnect(websocket)
-        await ws_manager_waiting_room.broadcast(active_games_responses.model_dump_json())
-    except TypeError as e:
-        ic(e)
-    finally:
-        ic('finally')
-        # active_games = ws_manager.active_games
-        # active_games_responses = ActiveGamesResponses(response=active_games)
-        # await ws_manager_waiting_room.broadcast(active_games_responses.model_dump_json())
-        ws_manager_waiting_room.disconnect(websocket)
-
-
-
 @router.websocket('/ws/v1/game/{game_id}')
 async def websocket_game_endpoint(websocket: WebSocket, game_id: str):
     await websocket.accept()
@@ -138,17 +102,16 @@ async def websocket_game_endpoint(websocket: WebSocket, game_id: str):
                 await facade.update_game(game_id, 'update_players_points')
                 if game.is_finish:
                     facade.get_winner_player(game_id)
-                    ic(game.winner_player)
                     facade.update_game_state(game, GameState.FINISH_GAME)
                     await facade.update_game(game_id, 'finish_game')
+                    await facade.ws_manager.disconnect(game_id, websocket)
                     break
                 next_player = game.get_inverse_player()
                 game.set_current_player(next_player)
     except WebSocketDisconnect:
-        await facade.update_game(game_id, 'disconnect_player')
         await facade.ws_manager.disconnect(game_id, websocket)
         ic('Disconnect Player!')
-    except TypeError as e:
-        ic(e)
-    finally:
-        await facade.ws_manager.disconnect(game_id, websocket)
+    except TypeError as _:
+        # This happens only to the user that leave the match
+        await facade.get_winner_after_player_disconnect(player, game, game_id, websocket)
+        ic('GAME MATCH', player)

@@ -54,6 +54,12 @@ class _WsManagerImpl(IWsManager):
             result = {'match': match.model_dump_json(), 'status': message if message else ''}
             await ws.send_json(result)
 
+    def get_remained_player_websocket(self, game_id: str) -> WebSocket:
+        """Return the Remained player. This is useful after a user disconnect from the match"""
+        active_connection = self.ws_manager.active_connection.get(game_id)
+        if active_connection:
+            return list(active_connection)[0]
+
     def is_game_full(self, game_id: str) -> bool:
         game = self._active_connections.get(game_id, [])
         return len(game) == 2

@@ -1,6 +1,8 @@
 from random import choice
 from typing import Any
 
+from starlette.websockets import WebSocket
+
 from src.domain.core.i_websocket_manager import IWsManager
 from src.domain.game.board import Board
 from src.domain.game.die import Die
@@ -100,3 +102,9 @@ class GameFacadeImpl(IGameWebSocketFacade):
         text_dict = response.get('text')
         json_data = json.loads(text_dict)
         return json_data.get('message')
+
+    def get_remained_player_websocket(self, game_id: str) -> WebSocket:
+        """Return the Remained player. This is useful after a user disconnect from the match"""
+        active_connection = self.ws_manager.active_connection.get(game_id)
+        if active_connection:
+            return list(active_connection)[0]

@@ -102,7 +102,6 @@ async def websocket_game_endpoint(websocket: WebSocket, game_id: str):
                 await facade.update_game(game_id, 'update_players_points')
                 if game.is_finish:
                     facade.get_winner_player(game_id)
-                    ic(game.winner_player)
                     facade.update_game_state(game, GameState.FINISH_GAME)
                     await facade.update_game(game_id, 'finish_game')
                     await facade.ws_manager.disconnect(game_id, websocket)
@@ -110,14 +109,9 @@ async def websocket_game_endpoint(websocket: WebSocket, game_id: str):
                 next_player = game.get_inverse_player()
                 game.set_current_player(next_player)
     except WebSocketDisconnect:
-        ic('Disconnect Player!')
         await facade.ws_manager.disconnect(game_id, websocket)
+        ic('Disconnect Player!')
     except TypeError as _:
         # This happens only to the user that leave the match
-        await facade.ws_manager.disconnect(game_id, websocket)
-        remaining_player_websocket = list(facade.ws_manager.active_connection.get(game_id))[0]
-        opponent_player = game.p1 if player.id != game.p1.id else game.p2
-        ic(remaining_player_websocket)
-        game.winner_player = opponent_player
-        await remaining_player_websocket.send_json({'match': game.model_dump_json(), 'status': 'player disconnected'})
+        await facade.get_winner_after_player_disconnect(player, game, game_id, websocket)
         ic('GAME MATCH', player)

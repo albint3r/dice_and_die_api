@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 from abc import ABC, abstractmethod
 
+from starlette.websockets import WebSocket
+
 from src.domain.game.game import Game
 from src.domain.game.player import Player
 
@@ -37,3 +39,8 @@ class IGameWebSocketFacade(IGameFacade, ABC):
     @abstractmethod
     def join_waiting_room(self, game_id: str, player: Player) -> None:
         """Join Player to the waiting room."""
+
+    @abstractmethod
+    def get_winner_after_player_disconnect(self, player: Player, game: Game, game_id: str, websocket: WebSocket):
+        """Get the remaining player in the room to selected as the winner. In this proces
+        We take the opportunity to remove the disconnected player and update the board"""

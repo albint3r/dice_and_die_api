@@ -1,4 +1,3 @@
-from icecream import ic
 from starlette.websockets import WebSocket
 
 from src.domain.core.i_websocket_manager import IWsManager, TMessagePayload, TActiveGamesConnections, TActiveMatches
@@ -36,18 +35,23 @@ class _WsManagerImpl(IWsManager):
         self._active_connections.setdefault(game_id, set()).add(ws)
 
     async def disconnect(self, game_id: str, ws: WebSocket):
+        """Disconnect player from the room. Remove the game if one of the players left the match.
+        This have a conditional, because the remaining player could trigger this event, this check
+        if the game already exist to be eliminated.
+        """
         self._active_connections[game_id].remove(ws)
-        del self._active_games[game_id]
+        if self.active_games.get(game_id):
+            del self._active_games[game_id]
 
     async def send_message(self, game_id: str, message: TMessagePayload):
-        """Recibe message"""
+        """Send Json message with the key Status to the listeners users"""
         game = self._active_connections.get(game_id, {})
         for ws in game:
             result = {'status': message}
             await ws.send_json(result)
 
     async def send_match(self, game_id: str, message: str | None = None):
-        """Send the Current Match"""
+        """Send the Current Json Match to all the listeners in the game"""
         game = self._active_connections.get(game_id, {})
         match = self.get_game(game_id)
         for ws in game:
@@ -61,6 +65,7 @@ class _WsManagerImpl(IWsManager):
             return list(active_connection)[0]
 
     def is_game_full(self, game_id: str) -> bool:
+        """Check if Is full the game room"""
         game = self._active_connections.get(game_id, [])
         return len(game) == 2
 

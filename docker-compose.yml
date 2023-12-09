@@ -1,0 +1,11 @@
+version: "1"
+
+services:
+  api:
+    container_name: "dice_and_die_api"
+    image: "dice_and_die_api"
+    build: .
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/dice_and_die_api

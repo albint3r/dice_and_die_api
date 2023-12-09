@@ -1,6 +1,19 @@
 version: "1"
 
 services:
+  db:
+    container_name: "dice_and_die_db"
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: t0b3t0t4l
+      MYSQL_DATABASE: dice_and_die_db
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - mysql  # Unir este servicio a la red 'mysql'
+
+
   api:
     container_name: "dice_and_die_api"
     image: "dice_and_die_api"
@@ -9,3 +22,10 @@ services:
       - 8001:8001
     volumes:
       - .:/dice_and_die_api
+
+networks:
+  mysql:
+    external: False
+
+volumes:
+  mysql-data:  # Definición del volumen para MySQL

@@ -66,4 +66,7 @@ CREATE TABLE users_play_history (
     FOREIGN KEY (play_history_id) REFERENCES play_history(play_history_id)
 );
 
+ALTER USER 'root'@'%' IDENTIFIED WITH 'mysql_native_password' BY 't0b3t0t4l';
+
+
 

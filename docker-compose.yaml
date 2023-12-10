@@ -2,6 +2,7 @@ version: "3"
 
 services:
   db:
+    restart: always
     container_name: "dice_and_die_db"
     image: mysql:latest
     environment:
@@ -22,6 +23,10 @@ services:
       - "8001:8001"
     volumes:
       - .:/dice_and_die_api
+    depends_on:
+      - db
+    networks:
+      - mysql  # Unir este servicio a la red 'mysql'
 
 networks:
   mysql:

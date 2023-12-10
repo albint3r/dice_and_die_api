@@ -31,3 +31,38 @@ CREATE TABLE bank_accounts (
     user_id VARCHAR(36) NOT NULL UNIQUE,
     amount DOUBLE NOT NULL DEFAULT 0
 );
+
+CREATE TABLE play_history (
+    creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    play_history_id BIGINT PRIMARY KEY AUTO_INCREMENT UNIQUE,
+    p1 CHAR(36),
+    cell_p1_1 INT DEFAULT 0,
+    cell_p1_2 INT DEFAULT 0,
+    cell_p1_3 INT DEFAULT 0,
+    cell_p1_4 INT DEFAULT 0,
+    cell_p1_5 INT DEFAULT 0,
+    cell_p1_6 INT DEFAULT 0,
+    cell_p1_7 INT DEFAULT 0,
+    cell_p1_8 INT DEFAULT 0,
+    cell_p1_9 INT DEFAULT 0,
+    p2 CHAR(36),
+    cell_p2_1 INT DEFAULT 0,
+    cell_p2_2 INT DEFAULT 0,
+    cell_p2_3 INT DEFAULT 0,
+    cell_p2_4 INT DEFAULT 0,
+    cell_p2_5 INT DEFAULT 0,
+    cell_p2_6 INT DEFAULT 0,
+    cell_p2_7 INT DEFAULT 0,
+    cell_p2_8 INT DEFAULT 0,
+    cell_p2_9 INT DEFAULT 0
+);
+
+CREATE TABLE users_play_history (
+    users_play_history_id BIGINT PRIMARY KEY AUTO_INCREMENT UNIQUE,
+    user_id CHAR(36),
+    play_history_id BIGINT,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (play_history_id) REFERENCES play_history(play_history_id)
+);
+
+

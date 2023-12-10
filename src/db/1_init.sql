@@ -14,7 +14,7 @@ CREATE TABLE ranks (
     name VARCHAR(30) NOT NULL UNIQUE
 );
 
-CREATE TABLE users_level (
+CREATE TABLE users_levels (
     user_level VARCHAR(36) DEFAULT (UUID()) PRIMARY KEY UNIQUE,
     user_id CHAR(36),
     rank_id BIGINT DEFAULT 1,

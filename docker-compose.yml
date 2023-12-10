@@ -7,7 +7,7 @@ services:
     environment:
       MYSQL_ROOT_USER: root
       MYSQL_ROOT_PASSWORD: t0b3t0t4l
-#      MYSQL_DATABASE: dice_and_die_db
+      MYSQL_DATABASE: dice_and_die
     volumes:
       - mysql-data:/var/lib/mysql
       - ./src/db/:/docker-entrypoint-initdb.d  # Run all the scrips in the sql_scripts

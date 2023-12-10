@@ -19,9 +19,9 @@ services:
     image: "dice_and_die_api"
     build: .
     ports:
-      - 8001:8001
-    volumes:
-      - .:/dice_and_die_api
+      - "8001:8001"
+#    volumes:
+#      - .:/dice_and_die_api
 
 #networks:
 #  mysql:

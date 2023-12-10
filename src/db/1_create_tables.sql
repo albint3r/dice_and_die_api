@@ -35,6 +35,7 @@ CREATE TABLE bank_accounts (
 CREATE TABLE play_history (
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     play_history_id BIGINT PRIMARY KEY AUTO_INCREMENT UNIQUE,
+    start_player CHAR(36),
     p1 CHAR(36),
     cell_p1_1 INT DEFAULT 0,
     cell_p1_2 INT DEFAULT 0,

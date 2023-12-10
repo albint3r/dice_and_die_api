@@ -1,6 +1,5 @@
 from fastapi import APIRouter, status, WebSocket, WebSocketDisconnect
 from icecream import ic
-from starlette.responses import HTMLResponse
 
 from src.domain.game.game_state import GameState
 from src.infrastructure.core.websocket_manager_impl import ws_manager
@@ -8,61 +7,6 @@ from src.infrastructure.game.game_facade_impl import GameFacadeImpl
 
 router = APIRouter(tags=['game'],
                    responses={status.HTTP_400_BAD_REQUEST: {"description": "Not found"}})
-
-html = """
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Chat</title>
-    </head>
-    <body>
-        <h1>WebSocket Chat</h1>
-        <form action="" onsubmit="sendMessage(event)">
-            <input type="text" id="messageText" autocomplete="off"/>
-            <button>Send</button>
-        </form>
-        <ul id='messages'>
-        </ul>
-        <script>
-            var gameId = "0000000000007";  // Set the desired game ID
-            var ws = new WebSocket(`ws://192.168.1.71:8000/ws/v1/game/${gameId}`);
-            ws.onmessage = function(event) {
-                var messages = document.getElementById('messages');
-                var message = document.createElement('li');
-                var data = JSON.parse(event.data)
-                console.log(data)
-                var match = data.match;
-                var status = data.status;
-                if(status) {
-                    console.log(status)
-                    var content = document.createTextNode(status);
-                    message.appendChild(content);
-                    messages.appendChild(message);
-                }
-                if(match) {
-                    var content = document.createTextNode(match);
-                    message.appendChild(content);
-                    messages.appendChild(message);
-                }
-
-            };
-
-            function sendMessage(event) {
-                var input = document.getElementById("messageText");
-                var message = { "message": input.value };
-                ws.send(JSON.stringify(message));
-                input.value = "";
-                event.preventDefault();
-            }
-        </script>
-    </body>
-</html>
-"""
-
-
-@router.get("/")
-async def get():
-    return HTMLResponse(html)
 
 
 @router.websocket('/ws/v1/game/{game_id}')

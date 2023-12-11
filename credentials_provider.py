@@ -17,7 +17,7 @@ class _CredentialsProvider(BaseModel):
 
     @property
     def secret(self) -> str:
-        return self.env.get('secret')
+        return self.env.get('SECRET')
 
     @property
     def slack_token(self) -> str:

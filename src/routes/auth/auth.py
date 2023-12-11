@@ -8,7 +8,7 @@ router = APIRouter(tags=['auth'],
 
 @router.get('/')
 def index():
-    connection = connector.connect(user="root", password="t0b3t0t4l",
+    connection = connector.connect(user="root", password="root",
                                    host='db', database='dice_and_die',
                                    port='3306', auth_plugin='mysql_native_password')
     connection.cursor()

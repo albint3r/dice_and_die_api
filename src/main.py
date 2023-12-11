@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+
 from src.routes.game import game
 from src.routes.waiting_room import waiting_room
 from src.routes.auth import auth

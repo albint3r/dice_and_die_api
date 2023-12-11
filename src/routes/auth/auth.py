@@ -1,6 +1,6 @@
-from fastapi import APIRouter, status, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, status
 from icecream import ic
-from mysql import connector
+from src.db.db import db
 
 router = APIRouter(tags=['auth'],
                    responses={status.HTTP_400_BAD_REQUEST: {"description": "Not found"}})
@@ -8,11 +8,7 @@ router = APIRouter(tags=['auth'],
 
 @router.get('/')
 def index():
-    connection = connector.connect(user="root", password="root",
-                                   host='db', database='dice_and_die',
-                                   port='3306', auth_plugin='mysql_native_password')
-    connection.cursor()
-    cursor = connection.cursor()
+    cursor = db.connection.cursor()
     cursor.execute('SELECT * FROM users;')
     users = cursor.fetchall()
     ic(users)

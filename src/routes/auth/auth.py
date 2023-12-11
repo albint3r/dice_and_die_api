@@ -1,15 +1,16 @@
 from fastapi import APIRouter, status
-from icecream import ic
+
 from src.db.db import db
+from src.infrastructure.auth.auth_facade_impl import AuthFacadeImpl
+from src.repositories.auth.auth_repository import AuthRepository
 
 router = APIRouter(tags=['auth'],
                    responses={status.HTTP_400_BAD_REQUEST: {"description": "Not found"}})
 
+facade = AuthFacadeImpl(repo=AuthRepository(db=db))
+
 
 @router.get('/')
 def index():
-    cursor = db.connection.cursor()
-    cursor.execute('SELECT * FROM users;')
-    users = cursor.fetchall()
-    ic(users)
-    return 'Hola Mundo'
+    user = facade.signin('fake_user1@gmail.com', 'FAKE_PASSWORD')
+    return user

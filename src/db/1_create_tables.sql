@@ -1,11 +1,15 @@
 CREATE DATABASE IF NOT EXISTS dice_and_die;
 USE dice_and_die;
 
+ALTER USER 'root'@'%' IDENTIFIED WITH 'mysql_native_password' BY 'root';
+
 CREATE TABLE users (
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     user_id VARCHAR(36) DEFAULT (UUID()) PRIMARY KEY UNIQUE,
     email VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(20) NOT NULL,
+    name VARCHAR(50) NOT NULL DEFAULT "",
+    last_name VARCHAR(50) NOT NULL DEFAULT "",
     is_verify BOOLEAN DEFAULT FALSE
 );
 
@@ -66,7 +70,7 @@ CREATE TABLE users_play_history (
     FOREIGN KEY (play_history_id) REFERENCES play_history(play_history_id)
 );
 
-ALTER USER 'root'@'%' IDENTIFIED WITH 'mysql_native_password' BY 'root';
+
 
 
 

@@ -16,6 +16,7 @@ services:
       - mysql  # Unir este servicio a la red 'mysql'
 
   api:
+    restart: always
     container_name: "dice_and_die_api"
     image: "dice_and_die_api"
     build: .

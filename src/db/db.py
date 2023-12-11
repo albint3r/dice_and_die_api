@@ -1,3 +1,5 @@
+from abc import ABC
+
 from mysql import connector
 from mysql.connector import MySQLConnection, InterfaceError
 from pydantic import BaseModel, validate_call
@@ -37,7 +39,21 @@ class _DataBase(BaseModel):
     def execute(self, query: str) -> None:
         cursor = self.connection.cursor(dictionary=True)
         cursor.execute(query)
-        self.engine.commit()
+        self.connection.commit()
+
+
+class AbstractDB(BaseModel, ABC):
+    db: _DataBase
+
+    @validate_call()
+    def query(self, query: str, fetch_all: bool = False) -> list[dict] | dict:
+        """Create a SQL Query to fetch data. By default, you fetch only one element of the query."""
+        return self.db.query(query=query, fetch_all=fetch_all)
+
+    @validate_call()
+    def execute(self, query: str) -> None:
+        """This executes the query and commit the result"""
+        self.db.execute(query=query)
 
 
 db = _DataBase(user=credentials_provider.user, password=credentials_provider.password,

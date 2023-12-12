@@ -31,5 +31,5 @@ def email_and_password_login(form_data: AuthEmailRequest) -> SchemaLogIn:
 
 
 @router.post('/v1/test', status_code=status.HTTP_200_OK)
-def email_and_password_login(user_id: str = Depends(auth_handler.auth_wrapper)):
+def test_route_token_session(user_id: str = Depends(auth_handler.auth_wrapper)):
     return user_id

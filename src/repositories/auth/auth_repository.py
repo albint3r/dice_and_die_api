@@ -25,6 +25,12 @@ class AuthRepository(AbstractDB):
         self.db.execute(query)
 
     @validate_call()
+    def delete_user(self, user_id: str) -> None:
+        """Get the user from the database"""
+        query = f"DELETE FROM users WHERE user_id='{user_id}';"
+        self.db.execute(query)
+
+    @validate_call()
     def get_user_level(self, user_id: str) -> UserLevel:
         """Get the User Level by the user id."""
         query = f"SELECT * FROM users_levels WHERE user_id='{user_id}';"

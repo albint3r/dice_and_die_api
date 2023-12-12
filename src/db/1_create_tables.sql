@@ -25,7 +25,7 @@ CREATE TABLE users_levels (
     level INTEGER DEFAULT 0,
     current_points INTEGER DEFAULT 0,
     next_level_points INTEGER DEFAULT 0,
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (rank_id) REFERENCES ranks(rank_id)
 );
 
@@ -34,7 +34,7 @@ CREATE TABLE bank_accounts (
     bank_account_id VARCHAR(36) DEFAULT (UUID()) PRIMARY KEY UNIQUE,
     user_id VARCHAR(36) NOT NULL UNIQUE,
     amount DOUBLE NOT NULL DEFAULT 0,
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE play_history (

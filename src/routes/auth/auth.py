@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Depends
 
 from src.db.db import db
 from src.domain.auth.schemas import SchemaSignin, SchemaLogIn, AuthEmailRequest
@@ -12,6 +12,7 @@ router = APIRouter(
     responses={
         status.HTTP_201_CREATED: {"description": "Success Create User"},
         status.HTTP_202_ACCEPTED: {"description": "Email and Password correct"},
+        status.HTTP_401_UNAUTHORIZED: {"description": "Invalide token"},
         status.HTTP_409_CONFLICT: {"description": "Email or Password error."},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Internal Server Error"}
     })
@@ -19,11 +20,16 @@ router = APIRouter(
 facade = AuthFacadeImpl(repo=AuthRepository(db=db))
 
 
-@router.post('/signin', status_code=status.HTTP_201_CREATED)
+@router.post('/v1/signin', status_code=status.HTTP_201_CREATED)
 def email_and_password_signin(form_data: AuthEmailRequest) -> SchemaSignin:
     return facade.signin(form_data.email, form_data.password.get_secret_value(), auth_handler)
 
 
-@router.post('/login', status_code=status.HTTP_202_ACCEPTED)
+@router.post('/v1/login', status_code=status.HTTP_202_ACCEPTED)
 def email_and_password_login(form_data: AuthEmailRequest) -> SchemaLogIn:
     return facade.login(form_data.email, form_data.password.get_secret_value(), auth_handler)
+
+
+@router.post('/v1/test', status_code=status.HTTP_200_OK)
+def email_and_password_login(user_id: str = Depends(auth_handler.auth_wrapper)):
+    return user_id

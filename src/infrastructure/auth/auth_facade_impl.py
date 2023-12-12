@@ -16,6 +16,8 @@ class AuthFacadeImpl(IAuthFacade):
             hash_password = auth_handler.get_password_hash(password)
             # Create new user with Hash Password
             self.repo.create_user(email, hash_password.decode('utf-8'))
+            user = self.repo.get_user(email)
+            self.repo.create_user_level(user.user_id)
 
         # Check user hash password
         return self.login(email, password, auth_handler)
@@ -29,5 +31,6 @@ class AuthFacadeImpl(IAuthFacade):
                 detail='User or Password have error.'
             )
         # Return Schema Response
+        user.user_level = self.repo.get_user_level(user.user_id)
         session_token = auth_handler.encode_token(user.user_id)
         return SchemaLogIn(user=user, session_token=session_token)

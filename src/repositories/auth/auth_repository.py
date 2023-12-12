@@ -3,7 +3,9 @@ from icecream import ic
 from src.db.db import AbstractDB
 from pydantic import validate_call
 
+from src.domain.auth.errors import UserLevelNotExist
 from src.domain.auth.user import User
+from src.domain.auth.user_level import UserLevel
 
 
 class AuthRepository(AbstractDB):
@@ -21,4 +23,19 @@ class AuthRepository(AbstractDB):
     def create_user(self, email: str, password: str | bytes) -> None:
         """Get the user from the database"""
         query = f"INSERT INTO users (email, password) VALUES ('{email}', '{password}')"
+        self.db.execute(query)
+
+    @validate_call()
+    def get_user_level(self, user_id: str) -> UserLevel:
+        """Get the User Level by the user id."""
+        query = f"SELECT * FROM users_levels WHERE user_id='{user_id}';"
+        result = self.db.query(query)
+        if result:
+            return UserLevel(**result)
+        raise UserLevelNotExist('User ID no match with the User Level Table Information.')
+
+    @validate_call()
+    def create_user_level(self, user_id: str) -> None:
+        """Create a new User Level Item"""
+        query = f"INSERT INTO users_levels (user_id) VALUES ('{user_id}');"
         self.db.execute(query)

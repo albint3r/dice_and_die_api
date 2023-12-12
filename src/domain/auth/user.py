@@ -2,6 +2,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, EmailStr, SecretStr, field_validator
 
+from src.domain.auth.user_level import UserLevel
+
 
 class User(BaseModel):
     creation_date: datetime
@@ -11,6 +13,7 @@ class User(BaseModel):
     name: str
     last_name: str
     is_verify: bool = False
+    user_level: UserLevel | None = None
 
     @field_validator('name')
     def validate_name_format(cls, name: str):

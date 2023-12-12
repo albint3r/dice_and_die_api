@@ -19,11 +19,6 @@ router = APIRouter(
 facade = AuthFacadeImpl(repo=AuthRepository(db=db))
 
 
-@router.get('/')
-def index():
-    return 'Hola Mundo'
-
-
 @router.post('/signin', status_code=status.HTTP_201_CREATED)
 def email_and_password_signin(form_data: AuthEmailRequest) -> SchemaSignin:
     return facade.signin(form_data.email, form_data.password.get_secret_value(), auth_handler)

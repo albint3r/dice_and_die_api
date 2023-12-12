@@ -58,4 +58,4 @@ class AbstractDB(BaseModel, ABC):
 
 db = _DataBase(user=credentials_provider.user, password=credentials_provider.password,
                host='db', database='dice_and_die', port='3306')
-# db.connect()
+db.connect()

@@ -31,9 +31,10 @@ CREATE TABLE users_levels (
 
 CREATE TABLE bank_accounts (
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    bank_accounts VARCHAR(36) DEFAULT (UUID()) PRIMARY KEY UNIQUE,
+    bank_account_id VARCHAR(36) DEFAULT (UUID()) PRIMARY KEY UNIQUE,
     user_id VARCHAR(36) NOT NULL UNIQUE,
-    amount DOUBLE NOT NULL DEFAULT 0
+    amount DOUBLE NOT NULL DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 CREATE TABLE play_history (

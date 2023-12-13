@@ -19,6 +19,14 @@ class AuthRepository(AbstractDB):
             return User(**result)
 
     @validate_call()
+    def get_user_by_id(self, user_id) -> User | None:
+        """Get the user from the database"""
+        query = f'SELECT * FROM users WHERE user_id="{user_id}";'
+        result = self.db.query(query)
+        if result:
+            return User(**result)
+
+    @validate_call()
     def create_user(self, email: str, password: str | bytes) -> None:
         """Get the user from the database"""
         query = f"INSERT INTO users (email, password) VALUES ('{email}', '{password}')"

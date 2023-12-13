@@ -21,13 +21,18 @@ facade = AuthFacadeImpl(repo=AuthRepository(db=db))
 
 
 @router.post('/v1/signin', status_code=status.HTTP_201_CREATED)
-def email_and_password_signin(form_data: AuthEmailRequest) -> SchemaSignin:
+def signin_email_and_password(form_data: AuthEmailRequest) -> SchemaSignin:
     return facade.signin(form_data.email, form_data.password.get_secret_value(), auth_handler)
 
 
 @router.post('/v1/login', status_code=status.HTTP_202_ACCEPTED)
-def email_and_password_login(form_data: AuthEmailRequest) -> SchemaLogIn:
+def login_email_and_password(form_data: AuthEmailRequest) -> SchemaLogIn:
     return facade.login(form_data.email, form_data.password.get_secret_value(), auth_handler)
+
+
+@router.post('/v1/login/token', status_code=status.HTTP_202_ACCEPTED)
+def login_from_session_token(user_id: str = Depends(auth_handler.auth_wrapper)) -> SchemaLogIn:
+    return facade.login_from_session_token(user_id, auth_handler)
 
 
 @router.post('/v1/test', status_code=status.HTTP_200_OK)

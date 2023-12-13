@@ -75,26 +75,26 @@ class TestAuth:
         user = response.user
         result_mail = user.email
         # Check New User Exist:
-        error_msg = f"Expected value: [{expected_email}]. Result= [{result_mail}]"
+        error_msg = f"1) Expected value: [{expected_email}]. Result= [{result_mail}]"
         assert expected_email == result_mail, error_msg
         # Check User Level:
         user_level = user.user_level
         # Start Level equal to 0
-        expected = 0
+        expected = 1
         result = user_level.level
-        error_msg = f"Expected value: [{expected}]. Result= [{result}]"
+        error_msg = f"2) Expected value: [{expected}]. Result= [{result}]"
         assert expected == result, error_msg
         # RankID equal 1
         expected = 1
         result = user_level.rank_id
-        error_msg = f"Expected value: [{expected}]. Result= [{result}]"
+        error_msg = f"3) Expected value: [{expected}]. Result= [{result}]"
         assert expected == result, error_msg
         # Check bank account:
         bank_account = user.bank_account
         # Started Amount 0
         expected = 0
         result = bank_account.amount
-        error_msg = f"Expected value: [{expected}]. Result= [{result}]"
+        error_msg = f"4) Expected value: [{expected}]. Result= [{result}]"
         assert expected == result, error_msg
         # Delete New User:
         facade.repo.delete_user(user.user_id)

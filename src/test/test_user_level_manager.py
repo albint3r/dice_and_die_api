@@ -6,9 +6,11 @@ from src.domain.auth.i_auth_facade import IAuthFacade
 from src.domain.auth.user import User
 from src.domain.user_level_manager.i_user_level_manager_facade import IUserLevelManagerFacade
 from src.infrastructure.auth.auth_facade_impl import AuthFacadeImpl
-from src.infrastructure.user_level_manager.user_level_manager import next_level_basic_formula, \
-    next_level_advance_formula, user_level_manager, _UserLevelManager
+from src.infrastructure.user_level_manager.level_manager import next_level_basic_formula, \
+    level_manager, _LevelManager
+from src.infrastructure.user_level_manager.rank_manager import rank_manager
 from src.infrastructure.user_level_manager.user_level_manager_facade_impl import UserLevelManagerFacadeImpl
+from src.infrastructure.user_level_manager.utils import next_level_advance_formula
 from src.repositories.auth.auth_handler_impl import auth_handler
 from src.repositories.auth.auth_repository import AuthRepository
 from src.repositories.user_level_manager.user_level_manager_repository import UserLeveRepository
@@ -44,8 +46,8 @@ class TestUserLevelManager:
         return user
 
     @pytest.fixture
-    def user_level_manager_impl(self) -> _UserLevelManager:
-        return _UserLevelManager()
+    def user_level_manager_impl(self) -> _LevelManager:
+        return _LevelManager()
 
     def test_next_level_formulas(self, fake_user_1, user_level_manager_impl):
         """Validate the fake User creation"""
@@ -155,7 +157,8 @@ class TestUserLevelManager:
         new_user = response.user
         exp_points = 30
         # Started Testing of the Update User Level Facade
-        user = facade_ulm.update_user_level(new_user, exp_points, user_level_manager)
+        user = facade_ulm.update_user_level(new_user, exp_points, leve_manager=level_manager,
+                                            rank_manager=rank_manager)
         expected = 30
         result = user.user_level.exp_points
         error_msg = f"1) Expected: {expected}. Result: {result}"
@@ -174,7 +177,8 @@ class TestUserLevelManager:
         new_user = response.user
         exp_points = 105
         # Started Testing of the Update User Level Facade
-        user = facade_ulm.update_user_level(new_user, exp_points, user_level_manager)
+        user = facade_ulm.update_user_level(new_user, exp_points, leve_manager=level_manager,
+                                            rank_manager=rank_manager)
         expected = 105
         result = user.user_level.exp_points
         error_msg = f"1) Expected: {expected}. Result: {result}"

@@ -1,30 +1,13 @@
 from typing import Callable
 
-from pydantic import BaseModel, validate_call
+from pydantic import validate_call
 
 from src.domain.auth.user_level import UserLevel
+from src.domain.core.i_game_manager import IGameManager
+from src.infrastructure.user_level_manager.utils import next_level_basic_formula
 
 
-def next_level_basic_formula(user_level: UserLevel) -> int:
-    """This is the default exp point system"""
-    level = user_level.level
-    exponent1 = 0.1
-    exponent2 = 0.8
-    base_exp = 50
-    return int(exponent1 * (level ** 3) + exponent2 * (level ** 2) + base_exp * level)
-
-
-def next_level_advance_formula(user_level: UserLevel) -> int:
-    exponent = 1.5
-    base_exp = 100
-    return int(base_exp * (user_level.level ** exponent))
-
-
-class GameManager(BaseModel):
-    """Config Manager Base Clase"""
-
-
-class _UserLevelManager(GameManager):
+class _LevelManager(IGameManager):
 
     @validate_call()
     def next_level(self, user_level: UserLevel, *, formula: Callable[[UserLevel], int]) -> int:
@@ -35,7 +18,7 @@ class _UserLevelManager(GameManager):
     def ready_to_level_up(self, user_level: UserLevel, *,
                           formula: Callable[[UserLevel], int] = next_level_basic_formula) -> bool:
         """Check if the user have equal or more point to upgrade to the next level"""
-        points_to_next_lvl = formula(user_level)
+        points_to_next_lvl = self.next_level(user_level, formula=formula)
         return user_level.exp_points >= points_to_next_lvl
 
     @validate_call()
@@ -43,5 +26,11 @@ class _UserLevelManager(GameManager):
         """Add experience point to the user level"""
         return user_level.exp_points + exp_points
 
+    @validate_call()
+    def add_level_up(self, user_level: UserLevel) -> UserLevel:
+        """Add experience level """
+        user_level.level += 1
+        return user_level
 
-user_level_manager = _UserLevelManager()
+
+level_manager = _LevelManager()

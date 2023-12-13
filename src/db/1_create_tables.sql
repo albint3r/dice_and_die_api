@@ -24,7 +24,7 @@ CREATE TABLE users_levels (
     rank_id BIGINT DEFAULT 1,
     level INTEGER DEFAULT 1,
     exp_points INTEGER DEFAULT 0,
-    next_level_points INTEGER DEFAULT 0,
+    next_level_points INTEGER DEFAULT 50,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (rank_id) REFERENCES ranks(rank_id)
 );

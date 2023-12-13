@@ -197,22 +197,25 @@ class TestUserLevelManager:
         """Validate User Win the points"""
         response = facade.signin(test_email, test_password, auth_handler)
         new_user = response.user
-        exp_points = 105
+        exp_points = 70
         # Iterate on each level until the user could rank
         user = None
         for i in range(1, 5):
-            user = facade_ulm.update_user_level(new_user, exp_points * i,
+            user = facade_ulm.update_user_level(new_user, ic(exp_points),
                                                 leve_manager=level_manager,
                                                 rank_manager=rank_manager)
             expected = i + 1
             result = user.user_level.level
-            error_msg = ic(f"{i}) Expected: {expected}. Result: {result}")
+            curren_points = user.user_level.exp_points
+            next_lvl_points = user.user_level.next_level_points
+            error_msg = f"{i}) Lvl Expected: {expected}. Lvl Result: {result}: " \
+                        f"Current Points: {curren_points} -> next_lvl_points: {next_lvl_points}"
             assert expected == result, error_msg
-        # Delete Test user
+
+        # Validate the user change rank after reach the lvl 5
         expected = Rank.IRON
         result = user.user_level.rank
         error_msg = f"1) Expected: {expected}. Result: {result}"
+        # Delete Test user
         facade.repo.delete_user(new_user.user_id)
         assert expected == result, error_msg
-        ic(user)
-        assert False

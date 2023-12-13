@@ -37,7 +37,7 @@ class AuthRepository(AbstractDB):
         result = self.db.query(query)
         if result:
             return UserLevel(**result)
-        raise UserLevelNotExist('User ID no match with the User Level Table Information.')
+        raise UserLevelNotExist('[User] ID no match with the User Level Table Information.')
 
     @validate_call()
     def create_user_level(self, user_id: str) -> None:

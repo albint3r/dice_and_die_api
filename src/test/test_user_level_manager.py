@@ -13,6 +13,9 @@ from src.repositories.auth.auth_handler_impl import auth_handler
 from src.repositories.auth.auth_repository import AuthRepository
 from src.repositories.user_level_manager.user_level_manager_repository import UserLeveRepository
 
+test_email = "test_user@test.com"
+test_password = "test_password_12345"
+
 
 class TestUserLevelManager:
 
@@ -64,19 +67,19 @@ class TestUserLevelManager:
         # Check basic formula
         exp_points = 50
         result = user_level_manager_impl.add_exp_points(fake_user_1.user_level, exp_points)
-        expected = 51
+        expected = 50
         error_msg = f"1) Expected: {expected}. Result: {result}"
         assert expected == result, error_msg
         # Second test after add first points
         exp_points = 20
         result = user_level_manager_impl.add_exp_points(fake_user_1.user_level, exp_points)
-        expected = 21
+        expected = 20
         error_msg = f"2) Expected: {expected}. Result: {result}"
         assert expected == result, error_msg
         # Third test after add the second points
         exp_points = 35  # Total 105
         result = user_level_manager_impl.add_exp_points(fake_user_1.user_level, exp_points)
-        expected = 36
+        expected = 35
         error_msg = f"3) Expected: {expected}. Result: {result}"
         assert expected == result, error_msg
 
@@ -87,7 +90,7 @@ class TestUserLevelManager:
         fake_user_1.user_level.current_points = user_level_manager_impl.add_exp_points(fake_user_1.user_level,
                                                                                        exp_points)
         result = fake_user_1.user_level.current_points
-        expected = 51
+        expected = 50
         error_msg = f"1) Expected: {expected}. Result: {result}"
         assert expected == result, error_msg
         # Second test after add first points
@@ -95,7 +98,7 @@ class TestUserLevelManager:
         fake_user_1.user_level.current_points = user_level_manager_impl.add_exp_points(fake_user_1.user_level,
                                                                                        exp_points)
         result = fake_user_1.user_level.current_points
-        expected = 71
+        expected = 70
         error_msg = f"2) Expected: {expected}. Result: {result}"
         assert expected == result, error_msg
         # Third test after add the second points
@@ -103,7 +106,7 @@ class TestUserLevelManager:
         fake_user_1.user_level.current_points = user_level_manager_impl.add_exp_points(fake_user_1.user_level,
                                                                                        exp_points)
         result = fake_user_1.user_level.current_points
-        expected = 106
+        expected = 105
         error_msg = f"3) Expected: {expected}. Result: {result}"
         assert expected == result, error_msg
 
@@ -145,14 +148,40 @@ class TestUserLevelManager:
         error_msg = f"2) Expected: {expected}. Result: {result}"
         assert expected is result, error_msg
 
-    def test_win_player(self, facade, facade_ulm):
+    def test_win_player_update_points_no_level_up(self, facade, facade_ulm):
         """Validate User Win the points"""
-        response = facade.signin('new_user_test@test.com', 'test_password_12345', auth_handler)
+
+        response = facade.signin(test_email, test_password, auth_handler)
         new_user = response.user
         exp_points = 30
+        # Started Testing of the Update User Level Facade
         user = facade_ulm.update_user_level(new_user, exp_points, user_level_manager)
-        expected = 31
+        expected = 30
         result = user.user_level.current_points
+        error_msg = f"1) Expected: {expected}. Result: {result}"
+        assert expected == result, error_msg
+        # Check not update level:
+        expected = 1
+        result = user.user_level.level
+        error_msg = f"1) Expected: {expected}. Result: {result}"
+        assert expected == result, error_msg
+        # Delete Test user
+        facade.repo.delete_user(user.user_id)
+
+    def test_win_player_update_points_yes_level_up(self, facade, facade_ulm):
+        """Validate User Win the points"""
+        response = facade.signin(test_email, test_password, auth_handler)
+        new_user = response.user
+        exp_points = 105
+        # Started Testing of the Update User Level Facade
+        user = facade_ulm.update_user_level(new_user, exp_points, user_level_manager)
+        expected = 105
+        result = user.user_level.current_points
+        error_msg = f"1) Expected: {expected}. Result: {result}"
+        assert expected == result, error_msg
+        # Check user level up:
+        expected = 2
+        result = user.user_level.level
         error_msg = f"1) Expected: {expected}. Result: {result}"
         assert expected == result, error_msg
         # Delete Test user

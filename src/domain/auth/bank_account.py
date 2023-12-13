@@ -6,9 +6,9 @@ from src.domain.auth.errors import ErrorValidationNotPositiveAmount
 
 
 class BankAccount(BaseModel):
-    creation_date: datetime = Field(exclude=True)
-    bank_account_id: str = Field(exclude=True)
-    user_id: str = Field(exclude=True)
+    creation_date: datetime = Field(exclude=True, repr=False)
+    bank_account_id: str = Field(exclude=True, repr=False)
+    user_id: str = Field(exclude=True, repr=False)
     amount: float = 0.0
 
     @field_validator('amount')

@@ -6,6 +6,7 @@ from src.domain.auth.user_level import UserLevel
 
 
 def next_level_basic_formula(user_level: UserLevel) -> int:
+    """This is the default exp point system"""
     level = user_level.level
     exponent1 = 0.1
     exponent2 = 0.8
@@ -19,11 +20,15 @@ def next_level_advance_formula(user_level: UserLevel) -> int:
     return int(base_exp * (user_level.level ** exponent))
 
 
-class UserLevelManager(BaseModel):
+class GameManager(BaseModel):
+    """Config Manager Base Clase"""
+
+
+class _UserLevelManager(GameManager):
 
     @validate_call()
     def next_level(self, user_level: UserLevel, *, formula: Callable[[UserLevel], int]) -> int:
-        """Get How Many Point Need for the next level"""
+        """Get How Many Point Needs for the next level"""
         return formula(user_level)
 
     @validate_call()
@@ -37,3 +42,6 @@ class UserLevelManager(BaseModel):
     def add_exp_points(self, user_level: UserLevel, exp_points: int) -> int:
         """Add experience point to the user level"""
         return user_level.current_points + exp_points
+
+
+user_level_manager = _UserLevelManager()

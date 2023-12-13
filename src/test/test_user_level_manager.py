@@ -1,15 +1,17 @@
 import pytest
-from icecream import ic
 
 from credentials_provider import credentials_provider
 from src.db.db import _DataBase
 from src.domain.auth.i_auth_facade import IAuthFacade
 from src.domain.auth.user import User
+from src.domain.user_level_manager.i_user_level_manager_facade import IUserLevelManagerFacade
 from src.infrastructure.auth.auth_facade_impl import AuthFacadeImpl
-from src.infrastructure.user_level_manager.user_level_manager import UserLevelManager, next_level_basic_formula, \
-    next_level_advance_formula
-from src.repositories.auth.auth_handler_impl import auth_handler, _AuthHandlerImpl
+from src.infrastructure.user_level_manager.user_level_manager import next_level_basic_formula, \
+    next_level_advance_formula, user_level_manager, _UserLevelManager
+from src.infrastructure.user_level_manager.user_level_manager_facade_impl import UserLevelManagerFacadeImpl
+from src.repositories.auth.auth_handler_impl import auth_handler
 from src.repositories.auth.auth_repository import AuthRepository
+from src.repositories.user_level_manager.user_level_manager_repository import UserLeveRepository
 
 
 class TestUserLevelManager:
@@ -26,6 +28,10 @@ class TestUserLevelManager:
         return AuthFacadeImpl(repo=AuthRepository(db=db))
 
     @pytest.fixture
+    def facade_ulm(self, db) -> IUserLevelManagerFacade:
+        return UserLevelManagerFacadeImpl(repo=UserLeveRepository(db=db))
+
+    @pytest.fixture
     def fake_user_1(self, facade) -> User:
         user_mail = 'fake_user1@gmail.com'
         # Create a new user
@@ -35,8 +41,8 @@ class TestUserLevelManager:
         return user
 
     @pytest.fixture
-    def user_level_manager_impl(self) -> UserLevelManager:
-        return UserLevelManager()
+    def user_level_manager_impl(self) -> _UserLevelManager:
+        return _UserLevelManager()
 
     def test_next_level_formulas(self, fake_user_1, user_level_manager_impl):
         """Validate the fake User creation"""
@@ -117,7 +123,7 @@ class TestUserLevelManager:
                                                                                        exp_points)
         result = user_level_manager_impl.ready_to_level_up(fake_user_1.user_level, formula=next_level_advance_formula)
         expected = True
-        error_msg = f"1) Expected: {expected}. Result: {result}"
+        error_msg = f"2) Expected: {expected}. Result: {result}"
         assert expected is result, error_msg
 
     def test_ready_to_level_up_basic_formula(self, fake_user_1, user_level_manager_impl):
@@ -136,5 +142,18 @@ class TestUserLevelManager:
                                                                                        exp_points)
         result = user_level_manager_impl.ready_to_level_up(fake_user_1.user_level, formula=next_level_basic_formula)
         expected = True
-        error_msg = f"1) Expected: {expected}. Result: {result}"
+        error_msg = f"2) Expected: {expected}. Result: {result}"
         assert expected is result, error_msg
+
+    def test_win_player(self, facade, facade_ulm):
+        """Validate User Win the points"""
+        response = facade.signin('new_user_test@test.com', 'test_password_12345', auth_handler)
+        new_user = response.user
+        exp_points = 30
+        user = facade_ulm.update_user_level(new_user, exp_points, user_level_manager)
+        expected = 31
+        result = user.user_level.current_points
+        error_msg = f"1) Expected: {expected}. Result: {result}"
+        assert expected == result, error_msg
+        # Delete Test user
+        facade.repo.delete_user(user.user_id)

@@ -27,9 +27,13 @@ class _LevelManager(IGameManager):
         return user_level.exp_points + exp_points
 
     @validate_call()
-    def add_level_up(self, user_level: UserLevel) -> UserLevel:
+    def add_level_up(self, user_level: UserLevel,
+                     formula: Callable[[UserLevel], int] = next_level_basic_formula) -> UserLevel:
         """Add experience level """
+        # Update current level
         user_level.level += 1
+        # Update how many points need for the next level?
+        user_level.next_level_points = self.next_level(user_level, formula=formula)
         return user_level
 
 

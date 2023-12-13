@@ -1,10 +1,12 @@
 import pytest
+from icecream import ic
 
 from credentials_provider import credentials_provider
 from src.db.db import _DataBase
 from src.domain.auth.i_auth_facade import IAuthFacade
 from src.domain.auth.user import User
 from src.domain.user_level_manager.i_user_level_manager_facade import IUserLevelManagerFacade
+from src.domain.user_level_manager.rank import Rank
 from src.infrastructure.auth.auth_facade_impl import AuthFacadeImpl
 from src.infrastructure.user_level_manager.level_manager import next_level_basic_formula, \
     level_manager, _LevelManager
@@ -190,3 +192,27 @@ class TestUserLevelManager:
         assert expected == result, error_msg
         # Delete Test user
         facade.repo.delete_user(user.user_id)
+
+    def test_win_player_update_points_rank_up(self, facade, facade_ulm):
+        """Validate User Win the points"""
+        response = facade.signin(test_email, test_password, auth_handler)
+        new_user = response.user
+        exp_points = 105
+        # Iterate on each level until the user could rank
+        user = None
+        for i in range(1, 5):
+            user = facade_ulm.update_user_level(new_user, exp_points * i,
+                                                leve_manager=level_manager,
+                                                rank_manager=rank_manager)
+            expected = i + 1
+            result = user.user_level.level
+            error_msg = ic(f"{i}) Expected: {expected}. Result: {result}")
+            assert expected == result, error_msg
+        # Delete Test user
+        expected = Rank.IRON
+        result = user.user_level.rank
+        error_msg = f"1) Expected: {expected}. Result: {result}"
+        facade.repo.delete_user(new_user.user_id)
+        assert expected == result, error_msg
+        ic(user)
+        assert False

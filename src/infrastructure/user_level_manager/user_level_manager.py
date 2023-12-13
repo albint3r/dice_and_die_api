@@ -36,12 +36,12 @@ class _UserLevelManager(GameManager):
                           formula: Callable[[UserLevel], int] = next_level_basic_formula) -> bool:
         """Check if the user have equal or more point to upgrade to the next level"""
         points_to_next_lvl = formula(user_level)
-        return user_level.current_points >= points_to_next_lvl
+        return user_level.exp_points >= points_to_next_lvl
 
     @validate_call()
     def add_exp_points(self, user_level: UserLevel, exp_points: int) -> int:
         """Add experience point to the user level"""
-        return user_level.current_points + exp_points
+        return user_level.exp_points + exp_points
 
 
 user_level_manager = _UserLevelManager()

@@ -11,7 +11,7 @@ class UserLeveRepository(AbstractDB):
     @validate_call()
     def update_user_level(self, user_level: UserLevel) -> None:
         """Update the level and experience points of the user level"""
-        query = f"UPDATE users_levels SET level = {user_level.level}, current_points = {user_level.current_points}, " \
+        query = f"UPDATE users_levels SET level = {user_level.level}, exp_points = {user_level.exp_points}, " \
                 f"rank_id = {user_level.rank_id} " \
                 f"WHERE user_id = '{user_level.user_id}';"
         ic(query)

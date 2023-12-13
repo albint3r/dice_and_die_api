@@ -87,25 +87,25 @@ class TestUserLevelManager:
         """Validate the fake User creation"""
         # Check basic formula
         exp_points = 50
-        fake_user_1.user_level.current_points = user_level_manager_impl.add_exp_points(fake_user_1.user_level,
-                                                                                       exp_points)
-        result = fake_user_1.user_level.current_points
+        fake_user_1.user_level.exp_points = user_level_manager_impl.add_exp_points(fake_user_1.user_level,
+                                                                                   exp_points)
+        result = fake_user_1.user_level.exp_points
         expected = 50
         error_msg = f"1) Expected: {expected}. Result: {result}"
         assert expected == result, error_msg
         # Second test after add first points
         exp_points = 20
-        fake_user_1.user_level.current_points = user_level_manager_impl.add_exp_points(fake_user_1.user_level,
-                                                                                       exp_points)
-        result = fake_user_1.user_level.current_points
+        fake_user_1.user_level.exp_points = user_level_manager_impl.add_exp_points(fake_user_1.user_level,
+                                                                                   exp_points)
+        result = fake_user_1.user_level.exp_points
         expected = 70
         error_msg = f"2) Expected: {expected}. Result: {result}"
         assert expected == result, error_msg
         # Third test after add the second points
         exp_points = 35  # Total 105
-        fake_user_1.user_level.current_points = user_level_manager_impl.add_exp_points(fake_user_1.user_level,
-                                                                                       exp_points)
-        result = fake_user_1.user_level.current_points
+        fake_user_1.user_level.exp_points = user_level_manager_impl.add_exp_points(fake_user_1.user_level,
+                                                                                   exp_points)
+        result = fake_user_1.user_level.exp_points
         expected = 105
         error_msg = f"3) Expected: {expected}. Result: {result}"
         assert expected == result, error_msg
@@ -114,16 +114,16 @@ class TestUserLevelManager:
         """Validate the fake User creation"""
         # Check basic formula
         exp_points = 50
-        fake_user_1.user_level.current_points = user_level_manager_impl.add_exp_points(fake_user_1.user_level,
-                                                                                       exp_points)
+        fake_user_1.user_level.exp_points = user_level_manager_impl.add_exp_points(fake_user_1.user_level,
+                                                                                   exp_points)
         result = user_level_manager_impl.ready_to_level_up(fake_user_1.user_level, formula=next_level_advance_formula)
         expected = False
         error_msg = f"1) Expected: {expected}. Result: {result}"
         assert expected is result, error_msg
         # User Pass the first threshold and have enough point to upgrade
         exp_points = 55
-        fake_user_1.user_level.current_points = user_level_manager_impl.add_exp_points(fake_user_1.user_level,
-                                                                                       exp_points)
+        fake_user_1.user_level.exp_points = user_level_manager_impl.add_exp_points(fake_user_1.user_level,
+                                                                                   exp_points)
         result = user_level_manager_impl.ready_to_level_up(fake_user_1.user_level, formula=next_level_advance_formula)
         expected = True
         error_msg = f"2) Expected: {expected}. Result: {result}"
@@ -133,16 +133,16 @@ class TestUserLevelManager:
         """Validate the fake User creation"""
         # Check basic formula
         exp_points = 30
-        fake_user_1.user_level.current_points = user_level_manager_impl.add_exp_points(fake_user_1.user_level,
-                                                                                       exp_points)
+        fake_user_1.user_level.exp_points = user_level_manager_impl.add_exp_points(fake_user_1.user_level,
+                                                                                   exp_points)
         result = user_level_manager_impl.ready_to_level_up(fake_user_1.user_level, formula=next_level_basic_formula)
         expected = False
         error_msg = f"1) Expected: {expected}. Result: {result}"
         assert expected is result, error_msg
         # User Pass the first threshold and have enough point to upgrade
         exp_points = 40
-        fake_user_1.user_level.current_points = user_level_manager_impl.add_exp_points(fake_user_1.user_level,
-                                                                                       exp_points)
+        fake_user_1.user_level.exp_points = user_level_manager_impl.add_exp_points(fake_user_1.user_level,
+                                                                                   exp_points)
         result = user_level_manager_impl.ready_to_level_up(fake_user_1.user_level, formula=next_level_basic_formula)
         expected = True
         error_msg = f"2) Expected: {expected}. Result: {result}"
@@ -157,7 +157,7 @@ class TestUserLevelManager:
         # Started Testing of the Update User Level Facade
         user = facade_ulm.update_user_level(new_user, exp_points, user_level_manager)
         expected = 30
-        result = user.user_level.current_points
+        result = user.user_level.exp_points
         error_msg = f"1) Expected: {expected}. Result: {result}"
         assert expected == result, error_msg
         # Check not update level:
@@ -176,7 +176,7 @@ class TestUserLevelManager:
         # Started Testing of the Update User Level Facade
         user = facade_ulm.update_user_level(new_user, exp_points, user_level_manager)
         expected = 105
-        result = user.user_level.current_points
+        result = user.user_level.exp_points
         error_msg = f"1) Expected: {expected}. Result: {result}"
         assert expected == result, error_msg
         # Check user level up:

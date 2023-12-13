@@ -6,5 +6,5 @@ class UserLevel(BaseModel):
     user_id: str = Field(exclude=True, repr=False)
     rank_id: int
     level: int
-    current_points: int
+    exp_points: int
     next_level_points: int

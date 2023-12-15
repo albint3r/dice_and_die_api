@@ -12,11 +12,12 @@ class UserLevelManagerFacadeImpl(IUserLevelManagerFacade):
                           leve_manager: IGameManager,
                           rank_manager: IGameManager) -> User:
         """Update User Level after win.
-        In this facade the user level will be updated in:
-        - xp points
-        - level
+        In this facade the user level will be updated on:
+        - Xp points
+        - Level
         - Rank
-        If this conditions apply it will change it.
+
+        If any of these conditions apply it will the user entity and returned.
         """
         # Add User Points
         user.user_level.exp_points = leve_manager.add_exp_points(user.user_level, exp_points)

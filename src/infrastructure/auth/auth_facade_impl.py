@@ -41,3 +41,10 @@ class AuthFacadeImpl(IAuthFacade):
         user.bank_account = self.repo.get_user_bank_account(user.user_id)
         session_token = auth_handler.encode_token(user.user_id)
         return SchemaLogIn(user=user, session_token=session_token)
+
+    def login_from_session_token(self, user_id: str, auth_handler: IAuthHandler) -> SchemaLogIn:
+        user = self.repo.get_user_by_id(user_id)
+        user.user_level = self.repo.get_user_level(user.user_id)
+        user.bank_account = self.repo.get_user_bank_account(user.user_id)
+        session_token = auth_handler.encode_token(user.user_id)
+        return SchemaLogIn(user=user, session_token=session_token)

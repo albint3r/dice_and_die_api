@@ -1,5 +1,4 @@
 import pytest
-from icecream import ic
 
 from credentials_provider import credentials_provider
 from src.db.db import _DataBase
@@ -50,6 +49,13 @@ class TestUserLevelManager:
     @pytest.fixture
     def user_level_manager_impl(self) -> _LevelManager:
         return _LevelManager()
+
+    @pytest.fixture(autouse=True)
+    def post_user_delete(self, facade, facade_ulm):
+        """Validate User Win the points"""
+        response = facade.signin(test_email, test_password, auth_handler)
+        new_user = response.user
+        facade.repo.delete_user(new_user.user_id)
 
     def test_next_level_formulas(self, fake_user_1, user_level_manager_impl):
         """Validate the fake User creation"""
@@ -154,7 +160,6 @@ class TestUserLevelManager:
 
     def test_win_player_update_points_no_level_up(self, facade, facade_ulm):
         """Validate User Win the points"""
-
         response = facade.signin(test_email, test_password, auth_handler)
         new_user = response.user
         exp_points = 30
@@ -175,20 +180,22 @@ class TestUserLevelManager:
 
     def test_win_player_update_points_yes_level_up(self, facade, facade_ulm):
         """Validate User Win the points"""
+
         response = facade.signin(test_email, test_password, auth_handler)
+
         new_user = response.user
         exp_points = 105
         # Started Testing of the Update User Level Facade
         user = facade_ulm.update_user_level(new_user, exp_points, leve_manager=level_manager,
                                             rank_manager=rank_manager)
-        expected = 105
-        result = user.user_level.exp_points
+        expected = 104
+        result = user.user_level.next_level_points
         error_msg = f"1) Expected: {expected}. Result: {result}"
         assert expected == result, error_msg
         # Check user level up:
         expected = 2
         result = user.user_level.level
-        error_msg = f"1) Expected: {expected}. Result: {result}"
+        error_msg = f"2) Expected: {expected}. Result: {result}"
         assert expected == result, error_msg
         # Delete Test user
         facade.repo.delete_user(user.user_id)
@@ -201,21 +208,39 @@ class TestUserLevelManager:
         # Iterate on each level until the user could rank
         user = None
         for i in range(1, 5):
-            user = facade_ulm.update_user_level(new_user, ic(exp_points),
+            user = facade_ulm.update_user_level(new_user, exp_points * i,  # Multiply the exp point by the index
                                                 leve_manager=level_manager,
                                                 rank_manager=rank_manager)
             expected = i + 1
             result = user.user_level.level
             curren_points = user.user_level.exp_points
             next_lvl_points = user.user_level.next_level_points
-            error_msg = f"{i}) Lvl Expected: {expected}. Lvl Result: {result}: " \
+            error_msg = f"1.{i}) Lvl Expected: {expected}. Lvl Result: {result}: " \
                         f"Current Points: {curren_points} -> next_lvl_points: {next_lvl_points}"
             assert expected == result, error_msg
 
         # Validate the user change rank after reach the lvl 5
         expected = Rank.IRON
         result = user.user_level.rank
-        error_msg = f"1) Expected: {expected}. Result: {result}"
+        error_msg = f"2.1) Expected: {expected}. Result: {result}"
         # Delete Test user
         facade.repo.delete_user(new_user.user_id)
+        assert expected == result, error_msg
+
+    def test_reset_exp_points(self, facade, facade_ulm):
+        """Validate User Win the points"""
+        response = facade.signin(test_email, test_password, auth_handler)
+        new_user = response.user
+        facade.repo.delete_user(new_user.user_id)
+        exp_point = 30
+        user = facade_ulm.update_user_level(new_user, exp_point,
+                                            leve_manager=level_manager,
+                                            rank_manager=rank_manager)
+        exp_point = 40
+        user = facade_ulm.update_user_level(user, exp_point,
+                                            leve_manager=level_manager,
+                                            rank_manager=rank_manager)
+        expected = 20
+        result = user.user_level.exp_points
+        error_msg = f"2.1) Expected: {expected}. Result: {result}"
         assert expected == result, error_msg

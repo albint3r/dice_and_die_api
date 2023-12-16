@@ -1,4 +1,5 @@
 from fastapi import HTTPException, status
+from icecream import ic
 
 from src.domain.auth.i_auth_facade import IAuthFacade
 from src.domain.auth.i_auth_handler import IAuthHandler

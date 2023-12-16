@@ -1,16 +1,20 @@
-from fastapi import APIRouter, status, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, status, WebSocket, WebSocketDisconnect, WebSocketException
 from icecream import ic
 
 from src.domain.game.game_state import GameState
 from src.infrastructure.core.websocket_manager_impl import ws_manager
 from src.infrastructure.game.game_facade_impl import GameFacadeImpl
+from src.repositories.auth.auth_handler_impl import auth_handler
 
 router = APIRouter(tags=['game'],
                    responses={status.HTTP_400_BAD_REQUEST: {"description": "Not found"}})
 
 
-@router.websocket('/ws/v1/game/{game_id}')
-async def websocket_game_endpoint(websocket: WebSocket, game_id: str):
+@router.websocket('/ws/v1/game/{game_id}/{session_token}')
+async def websocket_game_endpoint(websocket: WebSocket, game_id: str, session_token: str):
+    user_id = auth_handler.decode_token(session_token)
+    if not user_id:
+        raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION, reason="User don't provide Session Token")
     await websocket.accept()
     facade = GameFacadeImpl(ws_manager=ws_manager)
     # Create a new game

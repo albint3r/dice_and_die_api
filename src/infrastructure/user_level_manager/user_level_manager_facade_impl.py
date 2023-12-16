@@ -29,9 +29,13 @@ class UserLevelManagerFacadeImpl(IUserLevelManagerFacade):
         # User can update lvl?
         ready_to_level_up = leve_manager.ready_to_level_up(user.user_level, formula=next_level_basic_formula)
         if ready_to_level_up:
+            # Before update the user level We need to get the difference of the remaining points
+            # Example:
+            # Level to need 50 exp
+            # You have 40 + 30 = 70
+            # You have a difference of 20 point for the level to block.
+            user.user_level.exp_points = user.user_level.exp_points - user.user_level.next_level_points
             user.user_level = leve_manager.add_level_up(user.user_level, formula=next_level_basic_formula)
-            # Reset the current points to zero, to restart the level:
-            user.user_level.exp_points = 0
             # User can upgrade rank?
             ready_to_rank_up = rank_manager.ready_to_rank_up(user.user_level)
             if ready_to_rank_up:

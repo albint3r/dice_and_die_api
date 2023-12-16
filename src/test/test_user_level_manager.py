@@ -51,6 +51,13 @@ class TestUserLevelManager:
     def user_level_manager_impl(self) -> _LevelManager:
         return _LevelManager()
 
+    @pytest.fixture(autouse=True)
+    def post_user_delete(self, facade, facade_ulm):
+        """Validate User Win the points"""
+        response = facade.signin(test_email, test_password, auth_handler)
+        new_user = response.user
+        facade.repo.delete_user(new_user.user_id)
+
     def test_next_level_formulas(self, fake_user_1, user_level_manager_impl):
         """Validate the fake User creation"""
         error_msg = f"Expected [User]. Result: [{fake_user_1}]"
@@ -221,8 +228,20 @@ class TestUserLevelManager:
         facade.repo.delete_user(new_user.user_id)
         assert expected == result, error_msg
 
-    def test_delete(self, facade, facade_ulm):
+    def test_reset_exp_points(self, facade, facade_ulm):
         """Validate User Win the points"""
         response = facade.signin(test_email, test_password, auth_handler)
         new_user = response.user
         facade.repo.delete_user(new_user.user_id)
+        exp_point = 30
+        user = facade_ulm.update_user_level(new_user, exp_point,
+                                            leve_manager=level_manager,
+                                            rank_manager=rank_manager)
+        exp_point = 40
+        user = facade_ulm.update_user_level(user, exp_point,
+                                            leve_manager=level_manager,
+                                            rank_manager=rank_manager)
+        expected = 20
+        result = user.user_level.exp_points
+        error_msg = f"2.1) Expected: {expected}. Result: {result}"
+        assert expected == result, error_msg

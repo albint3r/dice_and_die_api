@@ -1,5 +1,6 @@
 from src.domain.auth.user import User
 from src.domain.core.i_game_manager import IGameManager
+from src.domain.game.game import Game
 from src.domain.user_level_manager.i_user_level_manager_facade import IUserLevelManagerFacade
 from src.infrastructure.user_level_manager.utils import next_level_basic_formula
 from src.repositories.user_level_manager.user_level_manager_repository import UserLeveRepository
@@ -7,6 +8,10 @@ from src.repositories.user_level_manager.user_level_manager_repository import Us
 
 class UserLevelManagerFacadeImpl(IUserLevelManagerFacade):
     repo: UserLeveRepository
+
+    def get_winner_earned_exp_points(self, game: Game) -> int:
+        """Get how many point the winner get."""
+        return abs(game.p1.board.total_score - game.p2.board.total_score)
 
     def update_user_level(self, user: User, exp_points: int, *,
                           leve_manager: IGameManager,

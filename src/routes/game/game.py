@@ -5,8 +5,12 @@ from src.db.db import db
 from src.domain.game.game_state import GameState
 from src.infrastructure.core.websocket_manager_impl import ws_manager
 from src.infrastructure.game.game_facade_impl import GameFacadeImpl
+from src.infrastructure.user_level_manager.level_manager import level_manager
+from src.infrastructure.user_level_manager.rank_manager import rank_manager
+from src.infrastructure.user_level_manager.user_level_manager_facade_impl import UserLevelManagerFacadeImpl
 from src.repositories.auth.auth_handler_impl import auth_handler
 from src.repositories.auth.auth_repository import AuthRepository
+from src.repositories.user_level_manager.user_level_manager_repository import UserLeveRepository
 
 router = APIRouter(tags=['game'],
                    responses={status.HTTP_400_BAD_REQUEST: {"description": "Not found"}})
@@ -53,6 +57,15 @@ async def websocket_game_endpoint(websocket: WebSocket, game_id: str, session_to
                 if game.is_finish:
                     facade.get_winner_player(game_id)
                     facade.update_game_state(game, GameState.FINISH_GAME)
+                    # Only the winner gain exp points
+                    user_level_manager_facade = UserLevelManagerFacadeImpl(repo=UserLeveRepository(db=db))
+                    exp_points = user_level_manager_facade.get_winner_earned_exp_points(game)
+                    user_level_manager_facade.update_user_level(game.winner_player.user, exp_points,
+                                                                leve_manager=level_manager, rank_manager=rank_manager)
+                    # Update the winner player that will be returned for the last time to each user
+                    # This helps to display the win exp points in the winner screen.
+                    game.winner_player.user = ic(facade.create_user(game.winner_player.user.user_id))
+                    # After this the user will be updated
                     await facade.update_game(game_id, 'finish_game')
                     await facade.ws_manager.disconnect(game_id, websocket)
                     break

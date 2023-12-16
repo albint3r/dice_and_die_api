@@ -79,14 +79,14 @@ class GameFacadeImpl(IGameWebSocketFacade):
             game = self.new_game(game_id)
             await self.ws_manager.connect(game_id, game, websocket)
             # Create Player 1
-            user = self._create_user(user_id)
+            user = self.create_user(user_id)
             player = self.new_player(user)
             self.join_waiting_room(game_id, player)
             message = 'Player 1 Connected'
             await self.update_game(game_id, message)
         else:
             # Create player 2
-            user = self._create_user(user_id)
+            user = self.create_user(user_id)
             player = self.new_player(user)
             if not self.is_full_room(game_id):
                 self.join_waiting_room(game_id, player)
@@ -99,7 +99,7 @@ class GameFacadeImpl(IGameWebSocketFacade):
                 await self.update_game(game_id, message)
         return game, ic(player)
 
-    def _create_user(self, user_id) -> User:
+    def create_user(self, user_id) -> User:
         # Add User Initial Values
         user = self.repo.get_user_by_id(user_id)
         user.user_level = self.repo.get_user_level(user.user_id)

@@ -1,5 +1,4 @@
 import pytest
-from icecream import ic
 
 from credentials_provider import credentials_provider
 from src.db.db import _DataBase

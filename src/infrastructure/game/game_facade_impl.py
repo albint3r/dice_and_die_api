@@ -2,7 +2,9 @@ from random import choice
 from typing import Any
 
 from fastapi import WebSocket
+from icecream import ic
 
+from src.domain.auth.user import User
 from src.domain.core.i_websocket_manager import IWsManager
 from src.domain.game.board import Board
 from src.domain.game.die import Die
@@ -10,10 +12,12 @@ from src.domain.game.game import Game
 from src.domain.game.game_state import GameState
 from src.domain.game.i_game_facade import IGameWebSocketFacade
 from src.domain.game.player import Player
+from src.repositories.auth.auth_repository import AuthRepository
 
 
 class GameFacadeImpl(IGameWebSocketFacade):
     ws_manager: IWsManager
+    repo: AuthRepository
 
     def select_column(self, json: Any) -> int:
         """Select target column to put the dice"""
@@ -32,11 +36,11 @@ class GameFacadeImpl(IGameWebSocketFacade):
         # Create All the Assets for a new game
         return Game(id=game_id)
 
-    def new_player(self) -> Player:
+    def new_player(self, user: User | None = None) -> Player:
         """Create a new player"""
         board1 = Board()
         die1 = Die()
-        return Player(board=board1, die=die1)
+        return Player(board=board1, die=die1, user=user)
 
     def join_waiting_room(self, game_id: str, player: Player) -> None:
         """Join player to the game"""
@@ -67,7 +71,7 @@ class GameFacadeImpl(IGameWebSocketFacade):
         game = self.ws_manager.get_game(game_id)
         return isinstance(game, Game)
 
-    async def create_or_join_game(self, game_id: str, websocket: WebSocket) -> tuple[Game, Player]:
+    async def create_or_join_game(self, game_id: str, user_id: str, websocket: WebSocket) -> tuple[Game, Player]:
         """Create a game or Join player to existing game"""
         game = self.get_game(game_id)
         if not self.exist_game(game_id):
@@ -75,13 +79,15 @@ class GameFacadeImpl(IGameWebSocketFacade):
             game = self.new_game(game_id)
             await self.ws_manager.connect(game_id, game, websocket)
             # Create Player 1
-            player = self.new_player()
+            user = self._create_user(user_id)
+            player = self.new_player(user)
             self.join_waiting_room(game_id, player)
             message = 'Player 1 Connected'
             await self.update_game(game_id, message)
         else:
             # Create player 2
-            player = self.new_player()
+            user = self._create_user(user_id)
+            player = self.new_player(user)
             if not self.is_full_room(game_id):
                 self.join_waiting_room(game_id, player)
                 # Select Player Start Order
@@ -91,7 +97,14 @@ class GameFacadeImpl(IGameWebSocketFacade):
                 message = 'Player 2 Connected'
                 self.update_game_state(game, GameState.ROLL_DICE)
                 await self.update_game(game_id, message)
-        return game, player
+        return game, ic(player)
+
+    def _create_user(self, user_id) -> User:
+        # Add User Initial Values
+        user = self.repo.get_user_by_id(user_id)
+        user.user_level = self.repo.get_user_level(user.user_id)
+        user.bank_account = self.repo.get_user_bank_account(user.user_id)
+        return user
 
     async def update_game(self, game_id: str, message: str) -> None:
         """Update the match board"""

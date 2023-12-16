@@ -3,6 +3,7 @@ import uuid
 from pydantic import BaseModel, field_validator, validate_call, Field
 from starlette.websockets import WebSocket
 
+from src.domain.auth.user import User
 from src.domain.game.board import Board
 from src.domain.game.die import Die
 from src.domain.game.errors import InvalidNewBoard, InvalidNewDie
@@ -10,8 +11,7 @@ from src.domain.game.errors import InvalidNewBoard, InvalidNewDie
 
 class Player(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
-    name: str = ''
-    # websockets: WebSocket | None = None
+    user: User | None = None
     board: Board
     die: Die
 

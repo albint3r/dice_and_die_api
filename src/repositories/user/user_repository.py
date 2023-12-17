@@ -1,4 +1,3 @@
-from icecream import ic
 from pydantic import validate_call
 
 from src.db.db import AbstractDB

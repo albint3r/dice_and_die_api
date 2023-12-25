@@ -8,10 +8,11 @@ from src.repositories.user_level_manager.user_level_manager_repository import Us
 
 class UserLevelManagerFacadeImpl(IUserLevelManagerFacade):
     repo: UserLeveRepository
+    base_win_points: int = 15
 
     def get_winner_earned_exp_points(self, game: Game) -> int:
-        """Get how many point the winner get."""
-        return abs(game.p1.board.total_score - game.p2.board.total_score)
+        """Get how many point the winner get. And add The base points"""
+        return abs(game.p1.board.total_score - game.p2.board.total_score) + self.base_win_points
 
     def update_user_level(self, user: User, exp_points: int, *,
                           leve_manager: IGameManager,

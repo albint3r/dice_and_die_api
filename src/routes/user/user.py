@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, status, Depends, HTTPException
 
 from src.db.db import db
 from src.domain.user.schemas import NameAndLastNameRequest, SchemaUpdateUserNameAndLastName, SchemaUsersRanks
@@ -25,11 +25,17 @@ facade = UserFacadeImpl(repo=UserRepository(db=db), repo_auth=AuthRepository(db=
 def update_user_name_and_last_name(form_data: NameAndLastNameRequest,
                                    user_id: str = Depends(
                                        auth_handler.auth_wrapper)) -> SchemaUpdateUserNameAndLastName:
-    return facade.update_user_name_and_last_name(user_id,
-                                                 form_data.name,
-                                                 form_data.last_name)
+    try:
+        return facade.update_user_name_and_last_name(user_id,
+                                                     form_data.name,
+                                                     form_data.last_name)
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
 
 
 @router.get('/v1/ranks', status_code=status.HTTP_200_OK)
 def get_user_name_and_last_name(_: str = Depends(auth_handler.auth_wrapper)) -> SchemaUsersRanks:
-    return facade.get_users_ranking()
+    try:
+        return facade.get_users_ranking()
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')

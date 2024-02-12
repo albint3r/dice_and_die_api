@@ -1,11 +1,13 @@
 from abc import ABC
 
+from icecream import ic
 from mysql import connector
 from mysql.connector import MySQLConnection, InterfaceError
 from pydantic import BaseModel, validate_call
 
 from credentials_provider import credentials_provider
 from src.db.errors import DataBaseMySQLStillNotExistError
+import mysql.connector
 
 
 class _DataBase(BaseModel):
@@ -29,17 +31,38 @@ class _DataBase(BaseModel):
 
     @validate_call()
     def query(self, query: str, fetch_all: bool = False) -> list[dict] | dict:
-        cursor = self.connection.cursor(dictionary=True)
-        cursor.execute(query)
-        if fetch_all:
-            return cursor.fetchall()
-        return cursor.fetchone()
+        try:
+            cursor = self.connection.cursor(dictionary=True)
+            cursor.execute(query)
+            return cursor.fetchall() if fetch_all else cursor.fetchone()
+        except mysql.connector.Error as err:
+            ic('I left this comment to have a break point if a watch the logs again and this dont work to fix the bug')
+            if err.errno == mysql.connector.errorcode.CR_SERVER_GONE_ERROR:
+                # Reconectar
+                self.connection.reconnect()
+                cursor = self.connection.cursor()
+                cursor.execute(query)
+                return cursor.fetchall() if fetch_all else cursor.fetchone()
+            else:
+                # Manejar otros errores
+                ic("Error:", err)
 
     @validate_call()
     def execute(self, query: str) -> None:
-        cursor = self.connection.cursor(dictionary=True)
-        cursor.execute(query)
-        self.connection.commit()
+        try:
+            cursor = self.connection.cursor(dictionary=True)
+            cursor.execute(query)
+            self.connection.commit()
+        except mysql.connector.Error as err:
+            ic('I left this comment to have a break point if a watch the logs again and this dont work to fix the bug')
+            if err.errno == mysql.connector.errorcode.CR_SERVER_GONE_ERROR:
+                self.connection.reconnect()
+                cursor = self.connection.cursor(dictionary=True)
+                cursor.execute(query)
+                self.connection.commit()
+            else:
+                # Manejar otros errores
+                ic("Error:", err)
 
 
 class AbstractDB(BaseModel, ABC):

@@ -22,10 +22,10 @@ facade = AuthFacadeImpl(repo=AuthRepository(db=db))
 
 @router.post('/v1/signin', status_code=status.HTTP_201_CREATED)
 def signin_email_and_password(form_data: AuthEmailRequest) -> SchemaSignin:
-    try:
-        return facade.signin(form_data.email, form_data.password.get_secret_value(), auth_handler)
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e}')
+    # try:
+    return facade.signin(form_data.email, form_data.password.get_secret_value(), auth_handler)
+    # except Exception as e:
+    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e}')
 
 
 @router.post('/v1/login', status_code=status.HTTP_202_ACCEPTED)

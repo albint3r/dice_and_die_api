@@ -48,11 +48,9 @@ class _DataBase(BaseModel):
         if not self.connection or not self.connection.is_connected():
             self.connect()
         try:
-            # self.connect()
             cursor = self.connection.cursor(dictionary=True)
             cursor.execute(query)
             result = cursor.fetchall() if fetch_all else cursor.fetchone()
-            # self.disconnect()
             return result
         except connector.Error as err:
             if err.errno == connector.errorcode.CR_SERVER_GONE_ERROR:
@@ -71,11 +69,9 @@ class _DataBase(BaseModel):
         if not self.connection or not self.connection.is_connected():
             self.connect()
         try:
-            # self.connect()
             cursor = self.connection.cursor(dictionary=True)
             cursor.execute(query)
             self.connection.commit()
-            # self.disconnect()
         except connector.Error as err:
             ic(err.errno)
             if err.errno == connector.errorcode.CR_SERVER_GONE_ERROR:

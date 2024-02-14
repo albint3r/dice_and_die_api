@@ -44,15 +44,16 @@ class _DataBase(BaseModel):
 
     @validate_call()
     def query(self, query: str, fetch_all: bool = False) -> list[dict] | dict:
-        # Check every time if there is a connection with the db
-        if not self.connection or not self.connection.is_connected():
-            self.connect()
         try:
+            self.connect()
             cursor = self.connection.cursor(dictionary=True)
             cursor.execute(query)
             result = cursor.fetchall() if fetch_all else cursor.fetchone()
+            self.disconnect()
             return result
         except connector.Error as err:
+            ic(err.errno)
+            ic(connector.errorcode.CR_SERVER_GONE_ERROR)
             if err.errno == connector.errorcode.CR_SERVER_GONE_ERROR:
                 # Reconectar
                 self.connection.reconnect()
@@ -65,15 +66,15 @@ class _DataBase(BaseModel):
 
     @validate_call()
     def execute(self, query: str) -> None:
-        # Check every time if there is a connection with the db
-        if not self.connection or not self.connection.is_connected():
-            self.connect()
         try:
+            self.connect()
             cursor = self.connection.cursor(dictionary=True)
             cursor.execute(query)
             self.connection.commit()
+            self.disconnect()
         except connector.Error as err:
             ic(err.errno)
+            ic(connector.errorcode.CR_SERVER_GONE_ERROR)
             if err.errno == connector.errorcode.CR_SERVER_GONE_ERROR:
                 self.connection.reconnect()
                 cursor = self.connection.cursor(dictionary=True)

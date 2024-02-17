@@ -1,4 +1,3 @@
-from icecream import ic
 from starlette.websockets import WebSocket
 
 from app.domain.core.i_game_websocket_manager import IGameWebSocketManager
@@ -8,8 +7,9 @@ from app.domain.game.errors.errors import NotRemainingActiveConnectionsErro
 from app.domain.game.schemas.response import GameResponse
 
 
-class GameWebSocketManager(IGameWebSocketManager):
+class _GameWebSocketManager(IGameWebSocketManager):
     async def connect(self, game_id: str, new_game: Game, websocket: WebSocket) -> None:
+        await websocket.accept()
         game = self.active_games.get(game_id)
         # Create a new game if not exist.
         if not game:
@@ -37,4 +37,4 @@ class GameWebSocketManager(IGameWebSocketManager):
         raise NotRemainingActiveConnectionsErro('Not remaining active connections.')
 
 
-game_websocket_manger = GameWebSocketManager()
+game_websocket_manger = _GameWebSocketManager()

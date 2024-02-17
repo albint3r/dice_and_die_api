@@ -1,6 +1,5 @@
-from abc import ABC
 from pydantic import BaseModel
 
 
-class GameRequest(BaseModel, ABC):
+class GamePlayerRequest(BaseModel):
     """This is the Base Game Request"""

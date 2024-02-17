@@ -4,7 +4,6 @@ from enum import Enum
 class GameState(Enum):
     """These are the state of the game"""
     CREATE_NEW_GAME: str = "create_new_game"
-    JOIN_PLAYER: str = "join_player"
     WAITING_OPPONENT: str = "waiting_opponent"
     ROLL_DICE: str = "roll_dice"
     SELECT_COLUMN: str = "select_column"

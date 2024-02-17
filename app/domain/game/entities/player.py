@@ -31,6 +31,6 @@ class Player(BaseModel):
             return die
         raise InvalidNewDieInstance("This is not a new Die Instances.")
 
-    def is_player_turn(self, current_player: "Player") -> int:
+    def is_player_turn(self, player: "Player") -> int:
         """Validate if the user have the current game turn."""
-        return self is current_player
+        return self is player

@@ -1,5 +1,5 @@
-import pytest
-from icecream import ic
+from random import choice
+
 from starlette.websockets import WebSocket
 
 from app.domain.auth.entities.user import User
@@ -24,12 +24,23 @@ class GameUseCase(IGameUseCase):
         """Create a new Game."""
         return Game(game_id=game_id, p1=player, state=GameState.CREATE_NEW_GAME)
 
+    def _get_starter_player(self, game: Game) -> Player:  # noqa
+        """Select randomly witch player would start the game."""
+        return choice([game.p1, game.p2])
+
     async def execute(self, game: Game):
         match game.state:
             case GameState.CREATE_NEW_GAME:
                 game.state = GameState.WAITING_OPPONENT
                 await self.websocket_manager.broadcast(game_id=game.game_id,
                                                        message='Player 1 Connected',
+                                                       extras={})
+            case GameState.WAITING_OPPONENT:
+                started_player = self._get_starter_player(game)
+                game.current_player = started_player
+                game.state = GameState.ROLL_DICE
+                await self.websocket_manager.broadcast(game_id=game.game_id,
+                                                       message='Player 2 Connected',
                                                        extras={})
 
     async def create_or_join_game(self, game_id: str, user_id: str, websocket: WebSocket) -> TGamePlayer:
@@ -46,7 +57,5 @@ class GameUseCase(IGameUseCase):
         return game, player
 
     async def get_player_request_event(self, websocket: WebSocket) -> GamePlayerRequest:
-        import json
         json_str = await websocket.receive_json()
-        json_data = json.loads(json_str)
-        return GamePlayerRequest(**json_data)
+        return GamePlayerRequest(**json_str)

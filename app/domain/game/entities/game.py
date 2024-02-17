@@ -22,3 +22,6 @@ class Game(BaseModel):
     def is_waiting_opponent(self) -> bool:
         """Validate if the player 1 is waiting opponent"""
         return self.state == GameState.WAITING_OPPONENT
+
+    def get_opponent_player(self) -> Player:
+        return self.p1 if self.current_player == self.p2 else self.p2

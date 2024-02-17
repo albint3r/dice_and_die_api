@@ -28,7 +28,14 @@ class GameUseCase(IGameUseCase):
         """Select randomly witch player would start the game."""
         return choice([game.p1, game.p2])
 
-    async def execute(self, game: Game):
+    def _select_column(self, request: GamePlayerRequest) -> int:  # noqa
+        """Convert the event string in a number column index. In case is not a valid number return [False]"""
+        try:
+            return int(request.event.value)
+        except ValueError:
+            return False
+
+    async def execute(self, game: Game, **kwargs):
         match game.state:
             case GameState.CREATE_NEW_GAME:
                 game.state = GameState.WAITING_OPPONENT
@@ -42,6 +49,30 @@ class GameUseCase(IGameUseCase):
                 await self.websocket_manager.broadcast(game_id=game.game_id,
                                                        message='Player 2 Connected',
                                                        extras={})
+            case GameState.ROLL_DICE:
+                game.current_player.die.roll()
+                game.state = GameState.SELECT_COLUMN
+                await self.websocket_manager.broadcast(game_id=game.game_id,
+                                                       message=f'User {game.current_player} roll dice',
+                                                       extras={})
+            case GameState.SELECT_COLUMN:
+                request = kwargs['selected_column']
+                column_index = self._select_column(request)
+                column = game.current_player.board.columns.get(column_index)
+                if column_index and not column.is_full():
+                    die_val = game.current_player.die.current_number
+                    column.add(die_val)
+                    opponent_player = game.get_opponent_player()
+                    column_opponent_player = opponent_player.board.columns.get(column_index)
+                    game.state = GameState.ADD_DICE_TO_COLUMN
+                    await self.websocket_manager.broadcast(game_id=game.game_id,
+                                                           message='add_dice_to_colum',
+                                                           extras={})
+                    if column_opponent_player.can_remove_values(die_val):
+                        removed_indices = column.remove(die_val)
+                        await self.websocket_manager.broadcast(game_id=game.game_id,
+                                                               message='destroy_opponent_target_column',
+                                                               extras={'removed_indices': removed_indices})
 
     async def create_or_join_game(self, game_id: str, user_id: str, websocket: WebSocket) -> TGamePlayer:
         game = self.websocket_manager.active_games.get(game_id)

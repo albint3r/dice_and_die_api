@@ -18,18 +18,26 @@ class Column(BaseModel):
         """Check if the Column is not empty to remove values on it."""
         return len(self.values) == 0
 
+    def can_remove_values(self, num: int) -> bool:
+        return num in self.values
+
     def add(self, num: int) -> None:
         """Add Die value into column"""
         if self.is_full():
             raise AddValuesFromColumnError("You can't add more values in a full column")
         self.values.append(num)
 
-    def remove(self, num: int) -> None:
+    def remove(self, num: int) -> list[int]:
         """Add Die value into column"""
         if self.is_empty():
             raise RemoveValuesFromColumnError("Can't remove values from an empty column.")
-        while num in self.values:
-            self.values.remove(num)
+        removed_indices = []
+        for index, value in enumerate(self.values[:]):
+            if value == num:
+                removed_indices.append(index)
+                self.values.remove(value)
+
+        return removed_indices
 
     def get_remaining_turn(self) -> int:
         """Count how many spaces are empty compare with the max length in the column."""

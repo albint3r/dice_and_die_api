@@ -19,3 +19,7 @@ class InvalidNewBoardInstance(GameError):
 
 class InvalidNewDieInstance(GameError):
     """Throw this error when the Die is not a new one"""
+
+
+class NotRemainingActiveConnectionsErro(GameError):
+    """Throw this error when try to get the remaining connections and are empty"""

@@ -1,7 +1,8 @@
 from pydantic import BaseModel
 
-from app.domain.core.ref_types import TColumns
 from app.domain.game.entities.column import Column
+
+TColumns = dict[int, Column]
 
 
 class Board(BaseModel):

@@ -1,3 +1,4 @@
+from icecream import ic
 from starlette.websockets import WebSocket
 
 from app.domain.core.i_game_websocket_manager import IGameWebSocketManager
@@ -34,3 +35,6 @@ class GameWebSocketManager(IGameWebSocketManager):
             websockets = list(connections)[0]
             return websockets
         raise NotRemainingActiveConnectionsErro('Not remaining active connections.')
+
+
+game_websocket_manger = GameWebSocketManager()

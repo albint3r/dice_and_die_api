@@ -1,5 +1,5 @@
-from pydantic import BaseModel
 from abc import ABC, abstractmethod
+
 from starlette.websockets import WebSocket
 
 from app.domain.core.base_websocket_manager import BaseWebSocketManager
@@ -7,7 +7,7 @@ from app.domain.core.ref_types import TActiveConnections, TActiveGames, TExtras
 from app.domain.game.entities.game import Game
 
 
-class IGameWebSocketManager(BaseModel, BaseWebSocketManager, ABC):
+class IGameWebSocketManager(BaseWebSocketManager, ABC):
     """This class handle the websocket game services"""
     active_connections: TActiveConnections = {}
     active_games: TActiveGames = {}

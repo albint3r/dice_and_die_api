@@ -1,7 +1,7 @@
 from collections import Counter
+
 from pydantic import BaseModel
 
-from app.domain.core.ref_types import TCurrentScore
 from app.domain.game.errors.errors import RemoveValuesFromColumnError, AddValuesFromColumnError
 
 
@@ -37,7 +37,7 @@ class Column(BaseModel):
 
     def get_score(self) -> int:
         """Calculate the current score point in the column"""
-        counter: TCurrentScore = Counter(self.values)
+        counter = Counter(self.values)
         # Multiply the repeated values to get the final score
         self.score = sum(val * count * count for val, count in counter.items())
         return self.score

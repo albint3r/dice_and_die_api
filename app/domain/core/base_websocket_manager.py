@@ -1,8 +1,13 @@
 from abc import ABC, abstractmethod
 
+from pydantic import BaseModel
 
-class BaseWebSocketManager(ABC):
+
+class BaseWebSocketManager(BaseModel, ABC):
     """Clase base para manejar WebSockets."""
+
+    class Config:
+        arbitrary_types_allowed = True
 
     @abstractmethod
     async def connect(self, *args, **kwargs) -> None:

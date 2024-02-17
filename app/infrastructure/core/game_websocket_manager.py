@@ -27,7 +27,7 @@ class _GameWebSocketManager(IGameWebSocketManager):
         game = self.active_games.get(game_id)
         for user_connection in connections:
             response = GameResponse(game=game, message=message, extras=extras)
-            await user_connection.send_json(response)
+            await user_connection.send_json(response.model_dump_json())
 
     def get_remained_player_websocket(self, game_id: str) -> WebSocket:
         connections = self.active_connections.get(game_id)

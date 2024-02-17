@@ -1,3 +1,5 @@
+import json
+
 import pytest
 from fastapi.testclient import TestClient
 from icecream import ic
@@ -34,7 +36,11 @@ class TestGame:
     def test_player_create_new_game(self):
         client = TestClient(app)
         FAKE_GAME_ID = 'FAKE_GAME_ID'
-        with client.websocket_connect(f"/v2/game/{FAKE_GAME_ID}/'tobe") as websocket:
-            data = websocket.receive_json()
-            # assert data == {"msg": "Hello WebSocket"}
+        with client.websocket_connect(f"/v2/game/{FAKE_GAME_ID}/'tobe") as ws1:
+            json_string = ws1.receive_json()
+            data = json.loads(json_string)
+            game_data = data.get('game')
+            ic(game_data)
+            ws1.send_json('{"message": "test"}')
+
             assert False

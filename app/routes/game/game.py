@@ -11,9 +11,9 @@ router = APIRouter(tags=['game'], prefix='/v2')
 async def play_game(websocket: WebSocket, game_id: str, user_id: str):
     """This is the websocket endpoint to play the dice and die game"""
     # Todo: Add here the session token validation
-
     game_use_case = GameUseCase(websocket_manager=game_websocket_manger)
     game, player = await game_use_case.create_or_join_game(game_id=game_id, user_id=user_id, websocket=websocket)
-    ic(game)
-    ic(player)
+    await game_use_case.execute(game)
+    while game.is_waiting_opponent or not game.is_finished:
+        await game_use_case.get_player_request_event(websocket)
     await websocket.close()

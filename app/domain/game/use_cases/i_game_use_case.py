@@ -13,7 +13,7 @@ class IGameUseCase(BaseModel, ABC):
     websocket_manager: IGameWebSocketManager
 
     @abstractmethod
-    def execute(self, game: Game):
+    async def execute(self, game: Game):
         """Depends on the [GameState] execute a function that provide the values to continue the [game] flow"""
 
     @abstractmethod
@@ -21,5 +21,5 @@ class IGameUseCase(BaseModel, ABC):
         """Player Create or join to an existed game."""
 
     @abstractmethod
-    def get_player_request_event(self) -> GamePlayerRequest:
+    async def get_player_request_event(self, websocket: WebSocket) -> GamePlayerRequest:
         """Get the player message event from the client"""

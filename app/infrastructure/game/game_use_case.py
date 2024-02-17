@@ -1,3 +1,5 @@
+import pytest
+from icecream import ic
 from starlette.websockets import WebSocket
 
 from app.domain.auth.entities.user import User
@@ -22,8 +24,13 @@ class GameUseCase(IGameUseCase):
         """Create a new Game."""
         return Game(game_id=game_id, p1=player, state=GameState.CREATE_NEW_GAME)
 
-    def execute(self, game: Game):
-        pass
+    async def execute(self, game: Game):
+        match game.state:
+            case GameState.CREATE_NEW_GAME:
+                game.state = GameState.WAITING_OPPONENT
+                await self.websocket_manager.broadcast(game_id=game.game_id,
+                                                       message='Player 1 Connected',
+                                                       extras={})
 
     async def create_or_join_game(self, game_id: str, user_id: str, websocket: WebSocket) -> TGamePlayer:
         game = self.websocket_manager.active_games.get(game_id)
@@ -38,5 +45,8 @@ class GameUseCase(IGameUseCase):
 
         return game, player
 
-    def get_player_request_event(self) -> GamePlayerRequest:
-        pass
+    async def get_player_request_event(self, websocket: WebSocket) -> GamePlayerRequest:
+        import json
+        json_str = await websocket.receive_json()
+        json_data = json.loads(json_str)
+        return GamePlayerRequest(**json_data)

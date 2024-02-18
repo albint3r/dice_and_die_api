@@ -1,5 +1,8 @@
+from json import JSONDecodeError
 from random import choice
 
+from icecream import ic
+from pydantic import ValidationError
 from starlette.websockets import WebSocket
 
 from app.domain.auth.entities.user import User
@@ -9,6 +12,7 @@ from app.domain.game.entities.column import Column
 from app.domain.game.entities.die import Die
 from app.domain.game.entities.game import Game
 from app.domain.game.entities.player import Player
+from app.domain.game.enums.game_event import GameEvent
 from app.domain.game.enums.game_state import GameState
 from app.domain.game.schemas.request import GamePlayerRequest
 from app.domain.game.use_cases.i_game_use_case import IGameUseCase
@@ -31,10 +35,11 @@ class GameUseCase(IGameUseCase):
 
     def _select_column(self, request: GamePlayerRequest) -> int:  # noqa
         """Convert the event string in a number column index. In case is not a valid number return [False]"""
+        ic(request)
         try:
             return int(request.event.value)
         except ValueError:
-            return False
+            return 0
 
     async def execute(self, game: Game, **kwargs):
         match game.state:
@@ -58,7 +63,7 @@ class GameUseCase(IGameUseCase):
                                                        extras={})
             case GameState.SELECT_COLUMN:
                 request: GamePlayerRequest = kwargs['selected_column']
-                column_index = self._select_column(request.event.value)
+                column_index = self._select_column(request)
                 column = game.current_player.board.columns.get(column_index)
                 if column_index and not column.is_full():
                     game.state = GameState.ADD_DICE_TO_COLUMN
@@ -73,20 +78,30 @@ class GameUseCase(IGameUseCase):
                 column_opponent_player = opponent_player.board.columns.get(column_index)
                 if column_opponent_player.can_remove_values(die_val):
                     game.state = GameState.DESTROY_OPPONENT_TARGET_COLUMN
-                    await self.execute(game, column_opponent_player=column_opponent_player, die_val=die_val)
+                    await self.execute(game,
+                                       column_opponent_player=column_opponent_player,
+                                       die_val=die_val,
+                                       column_index=column_index)
                 else:
                     game.state = GameState.UPDATE_PLAYERS_POINTS
                     await self.websocket_manager.broadcast(game_id=game.game_id,
                                                            message='add_dice_to_colum',
                                                            extras={})
+                    await self.execute(game, column_index=column_index)
+
             case GameState.DESTROY_OPPONENT_TARGET_COLUMN:
                 column_opponent_player: Column = kwargs['column_opponent_player']
                 die_val: int = kwargs['die_val']
+                column_index: int = kwargs['column_index']
                 removed_indices = column_opponent_player.remove(die_val)
                 game.state = GameState.UPDATE_PLAYERS_POINTS
                 await self.websocket_manager.broadcast(game_id=game.game_id,
                                                        message='destroy_opponent_target_column',
                                                        extras={'removed_indices': removed_indices})
+                await self.execute(game, column_index=column_index)
+            case GameState.UPDATE_PLAYERS_POINTS:
+                column_index = kwargs['column_index']
+                game.state = GameState.CHANGE_CURRENT_PLAYER
 
     async def create_or_join_game(self, game_id: str, user_id: str, websocket: WebSocket) -> TGamePlayer:
         game = self.websocket_manager.active_games.get(game_id)
@@ -102,5 +117,10 @@ class GameUseCase(IGameUseCase):
         return game, player
 
     async def get_player_request_event(self, websocket: WebSocket) -> GamePlayerRequest:
-        json_str = await websocket.receive_json()
-        return GamePlayerRequest(**json_str)
+        try:
+            json_str = await websocket.receive_json()
+            return GamePlayerRequest(**json_str)
+        except ValidationError:
+            return GamePlayerRequest(event=GameEvent.INVALID_INPUT_EVENT)
+        except JSONDecodeError:
+            return GamePlayerRequest(event=GameEvent.INVALID_INPUT_EVENT)

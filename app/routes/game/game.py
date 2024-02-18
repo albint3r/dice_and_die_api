@@ -22,7 +22,7 @@ async def play_game(websocket: WebSocket, game_id: str, user_id: str):
         if game.current_player and game.current_player.is_player_turn(player) and request.event == GameEvent.ROLL:
             # This part execute the [ROLL_DICE] event
             await game_use_case.execute(game)
-            while game.state != GameState.CHANGE_CURRENT_PLAYER:
+            while game.state != GameState.CHANGE_CURRENT_PLAYER or game.state != GameState.FINISH_GAME:
                 # In this part normally occur the next events: [SELECT_COLUMN], [ADD_DICE], [DESTROY_OPPONENT_COLUMN] AND
                 # [UPDATE_PLAYER_POINTS]. This while loop is mainly to check the user select a valid COLUMN.
                 game_use_case.verbose(game)

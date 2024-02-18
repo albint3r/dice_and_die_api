@@ -132,7 +132,13 @@ class GameUseCase(IGameUseCase):
                                                        extras={})
 
             case GameState.FINISH_GAME:
-                pass
+                winner_player, tied_player = game.get_winner()
+                if tied_player:
+                    # Update both players points and ranks
+                    pass
+                else:
+                    # Update only the winner players points and rank
+                    pass
 
     async def create_or_join_game(self, game_id: str, user_id: str, websocket: WebSocket) -> TGamePlayer:
         game = self.websocket_manager.active_games.get(game_id)

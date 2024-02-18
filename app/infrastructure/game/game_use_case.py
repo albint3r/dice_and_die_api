@@ -48,8 +48,7 @@ class GameUseCase(IGameUseCase):
 
     def verbose(self, game) -> None:
         print('*-' * 100)
-        print(f'Current player: {game.current_player.user.name}')
-        print(f'Current Die: {game.current_player.die.current_number}')
+        print(f'Current player: {game.current_player.user.name} | Die:{game.current_player.die.current_number}')
         print(f'GameState: {game.state}')
         print('*-' * 100)
         print(f'Player 1:{game.p1.user.name}')
@@ -121,10 +120,10 @@ class GameUseCase(IGameUseCase):
                 await self.websocket_manager.broadcast(game_id=game.game_id,
                                                        message='update_players_points',
                                                        extras={})
-                await self.execute(game)
 
             case GameState.CHANGE_CURRENT_PLAYER:
                 game.current_player = game.get_opponent_player()
+                game.state = GameState.ROLL_DICE
                 await self.websocket_manager.broadcast(game_id=game.game_id,
                                                        message='update_players_points',
                                                        extras={})

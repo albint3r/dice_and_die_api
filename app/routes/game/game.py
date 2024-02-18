@@ -26,7 +26,6 @@ async def play_game(websocket: WebSocket, game_id: str, user_id: str):
                 request = await game_use_case.get_player_request_event(websocket)
                 await game_use_case.execute(game, selected_column=request)
                 game_use_case.verbose(game)
-            ic('Stop While  loop')
-            game.state = GameState.ROLL_DICE
+            await game_use_case.execute(game)
 
     await websocket.close()

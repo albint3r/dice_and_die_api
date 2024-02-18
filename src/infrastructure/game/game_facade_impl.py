@@ -19,7 +19,13 @@ class GameFacadeImpl(IGameWebSocketFacade):
     ws_manager: IWsManager
     repo: AuthRepository
 
-u
+    def select_column(self, json: Any) -> int:
+        """Select target column to put the dice"""
+        user_input = json['message']
+        try:
+            return int(user_input)
+        except ValueError:
+            return 0
 
     def select_player_start(self, game: Game) -> Player:
         """Select witch player will start the game"""

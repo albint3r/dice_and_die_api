@@ -46,7 +46,7 @@ class GameUseCase(IGameUseCase):
         game.p1.board.get_score()
         game.p2.board.get_score()
 
-    def verbose(self, game) -> None:
+    def verbose(self, game) -> None:  # noqa
         print('*-' * 100)
         print(f'Current player: {game.current_player.user.name} | Die:{game.current_player.die.current_number}')
         print(f'GameState: {game.state}')
@@ -116,7 +116,10 @@ class GameUseCase(IGameUseCase):
                 await self.execute(game)
             case GameState.UPDATE_PLAYERS_POINTS:
                 self._update_player_scores(game)
-                game.state = GameState.CHANGE_CURRENT_PLAYER
+                if game.is_finished:
+                    game.state = GameState.FINISH_GAME
+                else:
+                    game.state = GameState.CHANGE_CURRENT_PLAYER
                 await self.websocket_manager.broadcast(game_id=game.game_id,
                                                        message='update_players_points',
                                                        extras={})
@@ -127,6 +130,9 @@ class GameUseCase(IGameUseCase):
                 await self.websocket_manager.broadcast(game_id=game.game_id,
                                                        message='update_players_points',
                                                        extras={})
+
+            case GameState.FINISH_GAME:
+                pass
 
     async def create_or_join_game(self, game_id: str, user_id: str, websocket: WebSocket) -> TGamePlayer:
         game = self.websocket_manager.active_games.get(game_id)

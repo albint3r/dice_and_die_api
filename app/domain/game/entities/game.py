@@ -1,8 +1,9 @@
 from pydantic import BaseModel
 
-from app.domain.core.ref_types import TWinner
 from app.domain.game.entities.player import Player
 from app.domain.game.enums.game_state import GameState
+
+TWinner = tuple[Player, Player | None]
 
 
 class Game(BaseModel):

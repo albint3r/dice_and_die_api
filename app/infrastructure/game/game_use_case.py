@@ -135,10 +135,10 @@ class GameUseCase(IGameUseCase):
                 winner_player, tied_player = game.get_winner()
                 if tied_player:
                     # Update both players points and ranks
-                    pass
+                    ic(f'This is a tied game: {winner_player} and {tied_player}')
                 else:
                     # Update only the winner players points and rank
-                    pass
+                    ic(f'Winner Player is: {winner_player}')
 
     async def create_or_join_game(self, game_id: str, user_id: str, websocket: WebSocket) -> TGamePlayer:
         game = self.websocket_manager.active_games.get(game_id)

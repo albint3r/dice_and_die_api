@@ -41,6 +41,24 @@ class GameUseCase(IGameUseCase):
         except ValueError:
             return 0
 
+    def _update_player_scores(self, game: Game) -> None:  # noqa
+        """Update the current players scores"""
+        game.p1.board.get_score()
+        game.p2.board.get_score()
+
+    def verbose(self, game) -> None:
+        print('*-' * 100)
+        print(f'Current player: {game.current_player.user.name}')
+        print(f'Current Die: {game.current_player.die.current_number}')
+        print(f'GameState: {game.state}')
+        print('*-' * 100)
+        print(f'Player 1:{game.p1.user.name}')
+        print(f'Board:{game.p1.board}')
+        print()
+        print(f'Player 2:{game.p2.user.name}')
+        print(f'Board:{game.p2.board}')
+        print('*-' * 100)
+
     async def execute(self, game: Game, **kwargs):
         match game.state:
             case GameState.CREATE_NEW_GAME:
@@ -80,28 +98,36 @@ class GameUseCase(IGameUseCase):
                     game.state = GameState.DESTROY_OPPONENT_TARGET_COLUMN
                     await self.execute(game,
                                        column_opponent_player=column_opponent_player,
-                                       die_val=die_val,
-                                       column_index=column_index)
+                                       die_val=die_val)
                 else:
                     game.state = GameState.UPDATE_PLAYERS_POINTS
                     await self.websocket_manager.broadcast(game_id=game.game_id,
                                                            message='add_dice_to_colum',
                                                            extras={})
-                    await self.execute(game, column_index=column_index)
+                    await self.execute(game)
 
             case GameState.DESTROY_OPPONENT_TARGET_COLUMN:
                 column_opponent_player: Column = kwargs['column_opponent_player']
                 die_val: int = kwargs['die_val']
-                column_index: int = kwargs['column_index']
                 removed_indices = column_opponent_player.remove(die_val)
                 game.state = GameState.UPDATE_PLAYERS_POINTS
                 await self.websocket_manager.broadcast(game_id=game.game_id,
                                                        message='destroy_opponent_target_column',
                                                        extras={'removed_indices': removed_indices})
-                await self.execute(game, column_index=column_index)
+                await self.execute(game)
             case GameState.UPDATE_PLAYERS_POINTS:
-                column_index = kwargs['column_index']
+                self._update_player_scores(game)
                 game.state = GameState.CHANGE_CURRENT_PLAYER
+                await self.websocket_manager.broadcast(game_id=game.game_id,
+                                                       message='update_players_points',
+                                                       extras={})
+                await self.execute(game)
+
+            case GameState.CHANGE_CURRENT_PLAYER:
+                game.current_player = game.get_opponent_player()
+                await self.websocket_manager.broadcast(game_id=game.game_id,
+                                                       message='update_players_points',
+                                                       extras={})
 
     async def create_or_join_game(self, game_id: str, user_id: str, websocket: WebSocket) -> TGamePlayer:
         game = self.websocket_manager.active_games.get(game_id)

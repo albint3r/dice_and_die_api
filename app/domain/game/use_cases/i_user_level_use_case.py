@@ -7,7 +7,7 @@ from src.domain.core.i_game_manager import IGameManager
 from src.domain.game.game import Game
 
 
-class IUserLevelUseCase(BaseModel, ABC):
+class IManagerLevelingUseCase(BaseModel, ABC):
 
     @abstractmethod
     def get_winner_earned_exp_points(self, game: Game) -> int:
@@ -15,6 +15,6 @@ class IUserLevelUseCase(BaseModel, ABC):
 
     @abstractmethod
     def update_user_level(self, user: User, exp_points: int,
-                          config_manager: IGameManager,
+                          leve_manager: IGameManager,
                           rank_manager: IGameManager) -> User:
         """Update the user experience points"""

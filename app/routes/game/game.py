@@ -28,7 +28,6 @@ async def play_game(websocket: WebSocket, game_id: str, user_id: str):
                 game_use_case.verbose(game)
                 request = await game_use_case.get_player_request_event(websocket)
                 await game_use_case.execute(game, selected_column=request)
-                ic()
                 game_use_case.verbose(game)
             # This last execute is mainly responsible from the [CHANGE_CURRENT_PLAYER] OR [FINISH_GAME] event
             await game_use_case.execute(game)

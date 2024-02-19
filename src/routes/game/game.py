@@ -66,7 +66,7 @@ async def websocket_game_endpoint(websocket: WebSocket, game_id: str, session_to
                     # This helps to display the win exp points in the winner screen.
                     game.winner_player.user = ic(facade.create_user(game.winner_player.user.user_id))
                     # After this the user will be updated
-                    await facade.update_game(game_id, 'finish_game')
+                    await facade.update_game(game_id, 'rn')
                     await facade.ws_manager.disconnect(game_id, websocket)
                     break
                 next_player = game.get_inverse_player()

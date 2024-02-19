@@ -80,6 +80,11 @@ class GameUseCase(IGameUseCase):
         except JSONDecodeError:
             return GamePlayerRequest(event=GameEvent.INVALID_INPUT_EVENT)
 
+    async def get_winner_after_player_disconnect(self, player: Player, game: Game, websocket: WebSocket) -> None:
+        # todo: Get the remaining player and give him the win
+        # First We get the remaining player and after that disconnect loser user.
+        await self.websocket_manager.disconnect(game_id=game.game_id, websocket=websocket)
+
     async def execute(self, game: Game, **kwargs):
         match game.state:
             case GameState.CREATE_NEW_GAME:

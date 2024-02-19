@@ -25,8 +25,8 @@ async def play_game(websocket: WebSocket, game_id: str, user_id: str):
     """This is the websocket endpoint to play the dice and die game"""
     leveling_manager = ManagerLevelingUseCase(leve_manager=LevelUserCase(), rank_manager=RankUseCase())
     game_use_case = GameUseCase(websocket_manager=game_websocket_manger, leveling_manager=leveling_manager)
+    game, player = await game_use_case.create_or_join_game(game_id=game_id, user_id=user_id, websocket=websocket)
     try:
-        game, player = await game_use_case.create_or_join_game(game_id=game_id, user_id=user_id, websocket=websocket)
         await game_use_case.execute(game)
         while game.is_waiting_opponent or not game.is_finished:
             request = await game_use_case.get_player_request_event(websocket)
@@ -48,7 +48,5 @@ async def play_game(websocket: WebSocket, game_id: str, user_id: str):
         ic(game)
         await websocket.close()
     except WebSocketDisconnect:
-        # todo: Get the remaining player and give him the win
-        # First We get the remaining player and after that disconnect loser user.
-        await game_use_case.websocket_manager.disconnect(game_id=game_id, websocket=websocket)
-        ic(f'Player: {user_id} is disconnected')
+        await game_use_case.get_winner_after_player_disconnect(player=player, game=game, websocket=websocket)
+        ic(f'Player: {user_id} is disconnected.')

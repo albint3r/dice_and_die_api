@@ -23,3 +23,7 @@ class InvalidNewDieInstance(GameError):
 
 class NotRemainingActiveConnectionsErro(GameError):
     """Throw this error when try to get the remaining connections and are empty"""
+
+
+class NoneGameInResponseValidatorError(GameError):
+    """Throw an error if the game response don't have a game instance"""

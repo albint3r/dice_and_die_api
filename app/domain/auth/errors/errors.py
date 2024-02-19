@@ -11,3 +11,7 @@ class UserLevelNotExist(AuthErrors):
 
 class ErrorValidationNotPositiveAmount(AuthErrors):
     """Error validation to check if the amount is positive"""
+
+
+class NoUserInRanking(AuthErrors):
+    """Raise this error when the ranking ladder is empty"""

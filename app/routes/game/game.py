@@ -1,4 +1,4 @@
-from fastapi import APIRouter, WebSocket
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from icecream import ic
 
 from app.domain.game.enums.game_event import GameEvent
@@ -17,24 +17,27 @@ async def play_game(websocket: WebSocket, game_id: str, user_id: str):
     """This is the websocket endpoint to play the dice and die game"""
     leveling_manager = ManagerLevelingUseCase(leve_manager=LevelUserCase(), rank_manager=RankUseCase())
     game_use_case = GameUseCase(websocket_manager=game_websocket_manger, leveling_manager=leveling_manager)
-    game, player = await game_use_case.create_or_join_game(game_id=game_id, user_id=user_id, websocket=websocket)
-    await game_use_case.execute(game)
-    while game.is_waiting_opponent or not game.is_finished:
-        request = await game_use_case.get_player_request_event(websocket)
-        ic(player.user.name)
-        # game_use_case.verbose(game)
-        if game.current_player and game.current_player.is_player_turn(player) and request.event == GameEvent.ROLL:
-            # This part execute the [ROLL_DICE] event
-            await game_use_case.execute(game)
-            while game.state != GameState.CHANGE_CURRENT_PLAYER and game.state != GameState.FINISH_GAME:
-                # In this part normally occur the next events: [SELECT_COLUMN], [ADD_DICE], [DESTROY_OPPONENT_COLUMN] AND
-                # [UPDATE_PLAYER_POINTS]. This while loop is mainly to check the user select a valid COLUMN.
+    try:
+        game, player = await game_use_case.create_or_join_game(game_id=game_id, user_id=user_id, websocket=websocket)
+        await game_use_case.execute(game)
+        while game.is_waiting_opponent or not game.is_finished:
+            request = await game_use_case.get_player_request_event(websocket)
+            ic(player.user.name)
+            # game_use_case.verbose(game)
+            if game.current_player and game.current_player.is_player_turn(player) and request.event == GameEvent.ROLL:
+                # This part execute the [ROLL_DICE] event
+                await game_use_case.execute(game)
+                while game.state != GameState.CHANGE_CURRENT_PLAYER and game.state != GameState.FINISH_GAME:
+                    # In this part normally occur the next events: [SELECT_COLUMN], [ADD_DICE], [DESTROY_OPPONENT_COLUMN] AND
+                    # [UPDATE_PLAYER_POINTS]. This while loop is mainly to check the user select a valid COLUMN.
+                    game_use_case.verbose(game)
+                    request = await game_use_case.get_player_request_event(websocket)
+                    await game_use_case.execute(game, selected_column=request)
+                    game_use_case.verbose(game)
+                # This last execute is mainly responsible from the [CHANGE_CURRENT_PLAYER] OR [FINISH_GAME] event
+                await game_use_case.execute(game)
                 game_use_case.verbose(game)
-                request = await game_use_case.get_player_request_event(websocket)
-                await game_use_case.execute(game, selected_column=request)
-                game_use_case.verbose(game)
-            # This last execute is mainly responsible from the [CHANGE_CURRENT_PLAYER] OR [FINISH_GAME] event
-            await game_use_case.execute(game)
-            game_use_case.verbose(game)
-    ic(game)
-    await websocket.close()
+        ic(game)
+        await websocket.close()
+    except WebSocketDisconnect:
+        ic(f'Player: {user_id} is disconnected')

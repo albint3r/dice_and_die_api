@@ -21,11 +21,11 @@ router = APIRouter(
 
 @router.post('/signin', status_code=status.HTTP_201_CREATED)
 def signin_email_and_password(form_data: RequestAuthEmail) -> ResponseSignin:
-    # try:
-    facade = AuthUseCase(repo=AuthRepository(db=db))
-    return facade.signin(form_data.email, form_data.password.get_secret_value(), auth_handler)
-    # except Exception as e:
-    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e}')
+    try:
+        facade = AuthUseCase(repo=AuthRepository(db=db))
+        return facade.signin(form_data.email, form_data.password.get_secret_value(), auth_handler)
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e}')
 
 
 @router.post('/login', status_code=status.HTTP_202_ACCEPTED)

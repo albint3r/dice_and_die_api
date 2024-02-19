@@ -92,6 +92,8 @@ class GameUseCase(IGameUseCase):
                 game.winner_player = (game.p1, None) if disconnected_player is game.p2 else (game.p2, None)
                 game.state = GameState.DISCONNECT_PLAYER
                 await self.execute(game)
+        else:
+            await self.websocket_manager.disconnect(game_id=game.game_id, websocket=websocket)
 
     async def execute(self, game: Game, **kwargs):
         match game.state:
@@ -182,6 +184,7 @@ class GameUseCase(IGameUseCase):
             case GameState.DISCONNECT_PLAYER:
                 winner_player, _ = game.winner_player
                 exp_points = self.leveling_manager.get_winner_earned_exp_after_player_disconnect()
+                # todo: still need to save the win exp in the db
                 user = self.leveling_manager.update_user_level(winner_player.user, exp_points)
                 await self.websocket_manager.broadcast(game_id=game.game_id,
                                                        message='player_disconnected_with_out_finished_the_game',

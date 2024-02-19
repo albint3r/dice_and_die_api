@@ -1,6 +1,6 @@
-from pydantic import validate_call, BaseModel
+from pydantic import BaseModel
 
-from app.db.db import _DataBase
+from app.db.db import _DataBase  # noqa
 from src.domain.auth.bank_account import BankAccount
 from src.domain.auth.errors import UserLevelNotExist
 from src.domain.auth.user import User
@@ -8,8 +8,8 @@ from src.domain.auth.user_level import UserLevel
 
 
 class AuthRepository(BaseModel):
-    db: _DataBase
     """Authenticated repository"""
+    db: _DataBase
 
     def get_user(self, email: str) -> User:
         """Get the user from the database"""

@@ -15,6 +15,9 @@ class _DataBase(BaseModel):
     port: str
     connection: MySQLConnection | None = None
 
+    class Config:
+        arbitrary_types_allowed = True
+
     def _execute_query(self, query: str, values: list | tuple, fetch_all: bool = False) -> list[dict] | dict:
         cursor = self.connection.cursor(dictionary=True)
         cursor.execute(query, values)

@@ -12,6 +12,14 @@ from app.infrastructure.game.rank_use_case import RankUseCase
 router = APIRouter(tags=['game'], prefix='/v2')
 
 
+@router.get('/check-connection')
+async def check_connections():
+    ic(game_websocket_manger.active_connections)
+    print('\n\n')
+    ic(game_websocket_manger.active_games)
+    return {'ok': 200}
+
+
 @router.websocket('/game/{game_id}/{user_id}')
 async def play_game(websocket: WebSocket, game_id: str, user_id: str):
     """This is the websocket endpoint to play the dice and die game"""
@@ -40,4 +48,7 @@ async def play_game(websocket: WebSocket, game_id: str, user_id: str):
         ic(game)
         await websocket.close()
     except WebSocketDisconnect:
+        # todo: Get the remaining player and give him the win
+        # First We get the remaining player and after that disconnect loser user.
+        await game_use_case.websocket_manager.disconnect(game_id=game_id, websocket=websocket)
         ic(f'Player: {user_id} is disconnected')

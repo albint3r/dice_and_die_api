@@ -18,9 +18,17 @@ class _GameWebSocketManager(IGameWebSocketManager):
         self.active_connections.setdefault(game_id, set()).add(websocket)
 
     async def disconnect(self, game_id: str, websocket: WebSocket) -> None:
-        self.active_connections[game_id].remove(websocket)
-        if self.active_games.get(game_id):
-            del self.active_games[game_id]
+        if game_id in self.active_connections:
+            # Eliminar el websocket desconectado del conjunto de conexiones activas
+            self.active_connections[game_id].remove(websocket)
+            # Iterar sobre todos los websockets restantes y desconectarlos uno por uno
+            for ws in self.active_connections[game_id]:
+                # Cerrar el websocket
+                await ws.close()
+            # Eliminar la entrada del juego activo si existe
+            if self.active_games.get(game_id):
+                del self.active_games[game_id]
+                del self.active_connections[game_id]
 
     async def broadcast(self, game_id: str, message: str = '', extras: TExtras | None = None) -> None:
         connections = self.active_connections.get(game_id, {})

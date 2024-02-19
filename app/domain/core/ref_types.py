@@ -12,4 +12,3 @@ TActiveConnections = dict[str, set[WebSocket]]
 TActiveGames = dict[str, Game]
 TExtras = dict[str, Any]
 TGamePlayer = tuple[Game, Player]
-

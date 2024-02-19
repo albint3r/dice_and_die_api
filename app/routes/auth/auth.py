@@ -1,10 +1,11 @@
 from fastapi import APIRouter, status, Depends, HTTPException
 
 from app.db.db import db
-from app.infrastructure.auth.auth_facade_use_case import AuthFacadeUseCase
+from app.domain.auth.schemas.request import RequestAuthEmail
+from app.domain.auth.schemas.response import ResponseLogIn, ResponseSignin
 from app.infrastructure.auth.auth_handler_impl import auth_handler
+from app.infrastructure.auth.auth_use_case import AuthUseCase
 from app.repositories.auth.auth_repository import AuthRepository
-from src.domain.auth.schemas import SchemaSignin, SchemaLogIn, AuthEmailRequest
 
 router = APIRouter(
     prefix='/auth/v1',
@@ -19,27 +20,27 @@ router = APIRouter(
 
 
 @router.post('/signin', status_code=status.HTTP_201_CREATED)
-def signin_email_and_password(form_data: AuthEmailRequest) -> SchemaSignin:
-    try:
-        facade = AuthFacadeUseCase(repo=AuthRepository(db=db))
-        return facade.signin(form_data.email, form_data.password.get_secret_value(), auth_handler)
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e}')
+def signin_email_and_password(form_data: RequestAuthEmail) -> ResponseSignin:
+    # try:
+    facade = AuthUseCase(repo=AuthRepository(db=db))
+    return facade.signin(form_data.email, form_data.password.get_secret_value(), auth_handler)
+    # except Exception as e:
+    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e}')
 
 
 @router.post('/login', status_code=status.HTTP_202_ACCEPTED)
-def login_email_and_password(form_data: AuthEmailRequest) -> SchemaLogIn:
+def login_email_and_password(form_data: RequestAuthEmail) -> ResponseLogIn:
     try:
-        facade = AuthFacadeUseCase(repo=AuthRepository(db=db))
+        facade = AuthUseCase(repo=AuthRepository(db=db))
         return facade.login(form_data.email, form_data.password.get_secret_value(), auth_handler)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
 
 
 @router.post('/login/token', status_code=status.HTTP_202_ACCEPTED)
-def login_from_session_token(user_id: str = Depends(auth_handler.auth_wrapper)) -> SchemaLogIn:
+def login_from_session_token(user_id: str = Depends(auth_handler.auth_wrapper)) -> ResponseLogIn:
     try:
-        facade = AuthFacadeUseCase(repo=AuthRepository(db=db))
+        facade = AuthUseCase(repo=AuthRepository(db=db))
         return facade.login_from_session_token(user_id, auth_handler)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')

@@ -1,10 +1,10 @@
 from pydantic import BaseModel
 
 from app.db.db import _DataBase  # noqa
-from src.domain.auth.bank_account import BankAccount
-from src.domain.auth.errors import UserLevelNotExist
-from src.domain.auth.user import User
-from src.domain.auth.user_level import UserLevel
+from app.domain.auth.entities.bank_account import BankAccount
+from app.domain.auth.entities.user import User
+from app.domain.auth.entities.user_level import UserLevel
+from app.domain.auth.errors.errors import UserLevelNotExist
 
 
 class AuthRepository(BaseModel):

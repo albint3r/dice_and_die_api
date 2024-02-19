@@ -1,15 +1,15 @@
 from fastapi import HTTPException, status
 
+from app.domain.auth.schemas.response import ResponseSignin, ResponseLogIn
+from app.domain.auth.use_cases.i_auth_handler import IAuthHandler
+from app.domain.auth.use_cases.i_auth_use_case import IAuthUseCase
 from app.repositories.auth.auth_repository import AuthRepository
-from src.domain.auth.i_auth_facade import IAuthFacade
-from src.domain.auth.i_auth_handler import IAuthHandler
-from src.domain.auth.schemas import SchemaSignin, SchemaLogIn
 
 
-class AuthFacadeUseCase(IAuthFacade):
+class AuthUseCase(IAuthUseCase):
     repo: AuthRepository
 
-    def signin(self, email: str, password: str, auth_handler: IAuthHandler) -> SchemaSignin:
+    def signin(self, email: str, password: str, auth_handler: IAuthHandler) -> ResponseSignin:
         user = self.repo.get_user(email)
         # If user don't exist created
         if not user:
@@ -25,7 +25,7 @@ class AuthFacadeUseCase(IAuthFacade):
         # Check user hash password
         return self.login(email, password, auth_handler)
 
-    def login(self, email: str, password: str, auth_handler: IAuthHandler) -> SchemaLogIn:
+    def login(self, email: str, password: str, auth_handler: IAuthHandler) -> ResponseLogIn:
         user = self.repo.get_user(email)
         # Convert String into bytecodes to very the password
         # without this the method have error.
@@ -46,11 +46,11 @@ class AuthFacadeUseCase(IAuthFacade):
         user.user_level = self.repo.get_user_level(user.user_id)
         user.bank_account = self.repo.get_user_bank_account(user.user_id)
         session_token = auth_handler.encode_token(user.user_id)
-        return SchemaLogIn(user=user, session_token=session_token)
+        return ResponseLogIn(user=user, session_token=session_token)
 
-    def login_from_session_token(self, user_id: str, auth_handler: IAuthHandler) -> SchemaLogIn:
+    def login_from_session_token(self, user_id: str, auth_handler: IAuthHandler) -> ResponseLogIn:
         user = self.repo.get_user_by_id(user_id)
         user.user_level = self.repo.get_user_level(user.user_id)
         user.bank_account = self.repo.get_user_bank_account(user.user_id)
         session_token = auth_handler.encode_token(user.user_id)
-        return SchemaLogIn(user=user, session_token=session_token)
+        return ResponseLogIn(user=user, session_token=session_token)

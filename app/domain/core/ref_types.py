@@ -10,5 +10,6 @@ from app.domain.game.entities.player import Player
 TCurrentScore: dict[int, int]
 TActiveConnections = dict[str, set[WebSocket]]
 TActiveGames = dict[str, Game]
+TLobbyActiveConnections = list[WebSocket]
 TExtras = dict[str, Any]
 TGamePlayer = tuple[Game, Player]

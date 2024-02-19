@@ -2,12 +2,12 @@ from abc import ABC, abstractmethod
 
 from starlette.websockets import WebSocket
 
-from app.domain.core.base_websocket_manager import BaseWebSocketManager
+from app.domain.core.i_websocket_manager import IWebSocketManager
 from app.domain.core.ref_types import TActiveConnections, TActiveGames, TExtras
 from app.domain.game.entities.game import Game
 
 
-class IGameWebSocketManager(BaseWebSocketManager, ABC):
+class IGameWebSocketManager(IWebSocketManager, ABC):
     """This class handle the websocket game services"""
     active_connections: TActiveConnections = {}
     active_games: TActiveGames = {}

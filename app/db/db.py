@@ -1,9 +1,10 @@
 import time
-from typing import Union, List, Dict, Tuple
 
 import mysql.connector as connector
 from mysql.connector import Error as DBError, MySQLConnection
 from pydantic import BaseModel
+
+from credentials_provider import credentials_provider
 
 
 class _DataBase(BaseModel):
@@ -14,7 +15,7 @@ class _DataBase(BaseModel):
     port: str
     connection: MySQLConnection | None = None
 
-    def _execute_query(self, query: str, values: list | tuple = (), fetch_all: bool = False) -> list[dict] | dict:
+    def _execute_query(self, query: str, values: list | tuple, fetch_all: bool = False) -> list[dict] | dict:
         cursor = self.connection.cursor(dictionary=True)
         cursor.execute(query, values)
         result = cursor.fetchall() if fetch_all else cursor.fetchone()
@@ -60,3 +61,8 @@ class _DataBase(BaseModel):
         except DBError as e:
             # Log the error here
             raise e
+
+
+db = _DataBase(user=credentials_provider.user,
+               password=credentials_provider.password,
+               host='db', database='dice_and_die', port='3306')

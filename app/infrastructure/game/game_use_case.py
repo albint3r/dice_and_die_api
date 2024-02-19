@@ -84,8 +84,9 @@ class GameUseCase(IGameUseCase):
                                                  disconnected_player: Player,
                                                  game: Game,
                                                  websocket: WebSocket) -> None:
-        # First We get the remaining player and after that disconnect loser user.
-        if not game.winner_player:
+        # To avoid errors check if is not a winner and player 2 exist. Without this is not necessary
+        # to give it the winne point.
+        if not game.winner_player and game.p2:
             await self.websocket_manager.disconnect(game_id=game.game_id, websocket=websocket)
             connection = self.websocket_manager.get_remained_player_websocket(game.game_id)
             if connection:

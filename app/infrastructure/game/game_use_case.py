@@ -158,9 +158,11 @@ class GameUseCase(IGameUseCase):
                 exp_points = self.leveling_manager.get_winner_earned_exp_points(game)
                 if tied_player:
                     # Update both players points and ranks
+                    # Todo: Use this tied user to add to the repository
                     tied_user = self.leveling_manager.update_user_level(tied_player.user, exp_points)
                 winner_user = self.leveling_manager.update_user_level(winner_player.user, exp_points)
                 # Todo: Update the user rank and level in the Repository
+                game.winner_player = winner_player, tied_player
                 await self.websocket_manager.broadcast(game_id=game.game_id,
                                                        message='finish_game',
                                                        extras={})

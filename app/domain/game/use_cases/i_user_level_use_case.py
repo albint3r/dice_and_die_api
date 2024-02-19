@@ -2,10 +2,9 @@ from abc import ABC, abstractmethod
 
 from pydantic import BaseModel
 
+from app.domain.auth.entities.user import User
+from app.domain.game.entities.game import Game
 from app.domain.game.use_cases.i_leveling_use_case import ILevelUseCase, IRankUseCase
-from src.domain.auth.user import User
-from src.domain.core.i_game_manager import IGameManager
-from src.domain.game.game import Game
 
 
 class IManagerLevelingUseCase(BaseModel, ABC):

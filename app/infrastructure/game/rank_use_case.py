@@ -22,7 +22,7 @@ class RankUseCase(IRankUseCase):
                 return 100
 
     def ready_to_progress(self, user_level: UserLevel) -> bool:
-        level_to_next_rank = self.next_rank(user_level.rank)
+        level_to_next_rank = self.next_stage(user_level.rank)
         return user_level.level >= level_to_next_rank
 
     def progress(self, user_level: UserLevel):

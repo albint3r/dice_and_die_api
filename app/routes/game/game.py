@@ -22,7 +22,7 @@ async def play_game(websocket: WebSocket, game_id: str, user_id: str):
     while game.is_waiting_opponent or not game.is_finished:
         request = await game_use_case.get_player_request_event(websocket)
         ic(player.user.name)
-        game_use_case.verbose(game)
+        # game_use_case.verbose(game)
         if game.current_player and game.current_player.is_player_turn(player) and request.event == GameEvent.ROLL:
             # This part execute the [ROLL_DICE] event
             await game_use_case.execute(game)
@@ -36,4 +36,5 @@ async def play_game(websocket: WebSocket, game_id: str, user_id: str):
             # This last execute is mainly responsible from the [CHANGE_CURRENT_PLAYER] OR [FINISH_GAME] event
             await game_use_case.execute(game)
             game_use_case.verbose(game)
+    ic(game)
     await websocket.close()

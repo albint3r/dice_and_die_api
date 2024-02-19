@@ -4,7 +4,8 @@ from app.db.db import _DataBase  # noqa
 from app.domain.auth.entities.bank_account import BankAccount
 from app.domain.auth.entities.user import User
 from app.domain.auth.entities.user_level import UserLevel
-from app.domain.auth.errors.errors import UserLevelNotExist
+from app.domain.auth.entities.user_rank import UserRank
+from app.domain.auth.errors.errors import UserLevelNotExist, NoUserInRanking
 
 
 class AuthRepository(BaseModel):
@@ -59,3 +60,19 @@ class AuthRepository(BaseModel):
         """Create a new bank account for a user"""
         query = "INSERT INTO bank_accounts (user_id) VALUES (%s);"
         self.db.execute(query, (user_id,))
+
+    def update_user_name_and_last_name(self, user_id: str, name: str, last_name: str) -> None:
+        """Update in the db the name and last name of the user id."""
+        query = "UPDATE users SET name=%s, last_name=%s WHERE user_id=%s;"
+        self.db.execute(query, (name, last_name, user_id))
+
+    def get_users_ranking(self) -> list[UserRank]:
+        """Update in the db the name and last name of the user id."""
+        query = "SELECT u.name, u.last_name, us.level, us.exp_points, us.rank_id " \
+                "FROM users AS u " \
+                "JOIN users_levels AS us ON us.user_id= u.user_id " \
+                "ORDER BY us.level DESC, us.exp_points DESC;"
+        result = self.db.query(query, (), fetch_all=True)
+        if result:
+            return [UserRank(**user) for user in result]
+        raise NoUserInRanking('There is not user in the ranking leader. Crear user first')

@@ -47,16 +47,15 @@ class GameUseCase(IGameUseCase):
         game.p2.board.get_score()
 
     def verbose(self, game) -> None:  # noqa
-        print('*-' * 100)
-        print(f'Current player: {game.current_player.user.name} | Die:{game.current_player.die.current_number}')
-        print(f'GameState: {game.state}')
-        print('*-' * 100)
-        print(f'Player 1:{game.p1.user.name}')
-        print(f'Board:{game.p1.board}')
-        print()
-        print(f'Player 2:{game.p2.user.name}')
-        print(f'Board:{game.p2.board}')
-        print('*-' * 100)
+        ic('*-' * 100)
+        ic(f'Current player: {game.current_player.user.name} | Die:{game.current_player.die.current_number}')
+        ic(f'GameState: {game.state}')
+        ic('*-' * 100)
+        ic(f'Player 1:{game.p1.user.name}')
+        ic(f'Board:{game.p1.board}')
+        ic(f'Player 2:{game.p2.user.name}')
+        ic(f'Board:{game.p2.board}')
+        ic('*-' * 100)
 
     async def create_or_join_game(self, game_id: str, user_id: str, websocket: WebSocket) -> TGamePlayer:
         game = self.websocket_manager.active_games.get(game_id)

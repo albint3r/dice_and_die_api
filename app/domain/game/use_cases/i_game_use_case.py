@@ -28,5 +28,5 @@ class IGameUseCase(BaseModel, ABC):
         """Get the player message event from the client"""
 
     @abstractmethod
-    async def get_winner_after_player_disconnect(self, player: Player, game: Game, websocket: WebSocket) -> None:
+    async def get_winner_after_player_disconnect(self, disconnected_player: Player, game: Game, websocket: WebSocket) -> None:
         """Get the winner after a user disconnect before the game ends."""

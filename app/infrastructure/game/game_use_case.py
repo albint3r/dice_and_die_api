@@ -80,10 +80,18 @@ class GameUseCase(IGameUseCase):
         except JSONDecodeError:
             return GamePlayerRequest(event=GameEvent.INVALID_INPUT_EVENT)
 
-    async def get_winner_after_player_disconnect(self, player: Player, game: Game, websocket: WebSocket) -> None:
-        # todo: Get the remaining player and give him the win
+    async def get_winner_after_player_disconnect(self,
+                                                 disconnected_player: Player,
+                                                 game: Game,
+                                                 websocket: WebSocket) -> None:
         # First We get the remaining player and after that disconnect loser user.
-        await self.websocket_manager.disconnect(game_id=game.game_id, websocket=websocket)
+        if not game.winner_player:
+            await self.websocket_manager.disconnect(game_id=game.game_id, websocket=websocket)
+            connection = self.websocket_manager.get_remained_player_websocket(game.game_id)
+            if connection:
+                game.winner_player = (game.p1, None) if disconnected_player is game.p2 else (game.p2, None)
+                game.state = GameState.DISCONNECT_PLAYER
+                await self.execute(game)
 
     async def execute(self, game: Game, **kwargs):
         match game.state:
@@ -170,4 +178,11 @@ class GameUseCase(IGameUseCase):
                 game.winner_player = winner_player, tied_player
                 await self.websocket_manager.broadcast(game_id=game.game_id,
                                                        message='finish_game',
+                                                       extras={})
+            case GameState.DISCONNECT_PLAYER:
+                winner_player, _ = game.winner_player
+                exp_points = self.leveling_manager.get_winner_earned_exp_after_player_disconnect()
+                user = self.leveling_manager.update_user_level(winner_player.user, exp_points)
+                await self.websocket_manager.broadcast(game_id=game.game_id,
+                                                       message='player_disconnected_with_out_finished_the_game',
                                                        extras={})

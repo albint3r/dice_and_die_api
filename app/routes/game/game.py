@@ -48,5 +48,8 @@ async def play_game(websocket: WebSocket, game_id: str, user_id: str):
         ic(game)
         await websocket.close()
     except WebSocketDisconnect:
-        await game_use_case.get_winner_after_player_disconnect(player=player, game=game, websocket=websocket)
-        ic(f'Player: {user_id} is disconnected.')
+        await game_use_case.get_winner_after_player_disconnect(disconnected_player=player,
+                                                               game=game, websocket=websocket)
+        ic(f'Player: {player.user.name} is disconnected.')
+        ic(f'Winner player: {game.winner_player[0].user.name}')
+        ic(game.winner_player)

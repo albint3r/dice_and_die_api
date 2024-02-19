@@ -16,6 +16,10 @@ class IManagerLevelingUseCase(BaseModel, ABC):
         """Get how many point the winner get."""
 
     @abstractmethod
+    def get_winner_earned_exp_after_player_disconnect(self) -> int:
+        """Get how many point the remaining player get after the other user disconnect"""
+
+    @abstractmethod
     def update_user_level(self, user: User, exp_points: int) -> User:
         """Update User Level after win.
         In this facade the user level will be updated on:

@@ -10,6 +10,9 @@ class ManagerLevelingUseCase(IManagerLevelingUseCase):
     def get_winner_earned_exp_points(self, game: Game) -> int:
         return abs(game.p1.board.score - game.p2.board.score) + self._base_win_points
 
+    def get_winner_earned_exp_after_player_disconnect(self) -> int:
+        return self._base_win_points
+
     def update_user_level(self, user: User, exp_points: int) -> User:
         """Update User Level after win.
         In this facade the user level will be updated on:

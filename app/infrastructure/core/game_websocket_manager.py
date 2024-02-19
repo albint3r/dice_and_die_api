@@ -1,4 +1,3 @@
-from icecream import ic
 from starlette.websockets import WebSocket
 
 from app.domain.core.i_game_websocket_manager import IGameWebSocketManager
@@ -26,9 +25,9 @@ class _GameWebSocketManager(IGameWebSocketManager):
             if not self.active_connections[game_id]:
                 # Si el conjunto está vacío, eliminar la entrada del juego activo
                 del self.active_connections[game_id]
-            # También eliminar la entrada del juego activo si existe en el diccionario de juegos activos
-            if self.active_games.get(game_id):
-                del self.active_games[game_id]
+                # También eliminar la entrada del juego activo si existe en el diccionario de juegos activos
+                if self.active_games.get(game_id):
+                    del self.active_games[game_id]
 
     async def broadcast(self, game_id: str, message: str = '', extras: TExtras | None = None) -> None:
         connections = self.active_connections.get(game_id, {})

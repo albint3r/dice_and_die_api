@@ -93,6 +93,7 @@ class GameUseCase(IGameUseCase):
                 game.winner_player = (game.p1, None) if disconnected_player is game.p2 else (game.p2, None)
                 game.state = GameState.DISCONNECT_PLAYER
                 await self.execute(game)
+        # If is not opponent disconnect safe.
         else:
             await self.websocket_manager.disconnect(game_id=game.game_id, websocket=websocket)
 

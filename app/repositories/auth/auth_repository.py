@@ -76,3 +76,20 @@ class AuthRepository(BaseModel):
         if result:
             return [UserRank(**user) for user in result]
         raise NoUserInRanking('There is not user in the ranking leader. Crear user first')
+
+    def update_user_level(self, user_level: UserLevel) -> None:
+        """Update the level and experience points of the user level"""
+        query = "UPDATE users_levels SET " \
+                "level = %s, " \
+                "exp_points = %s, " \
+                "next_level_points = %s, " \
+                "rank_id = %s " \
+                "WHERE user_id = %s;"
+        values = (user_level.level, user_level.exp_points, user_level.next_level_points, user_level.rank_id,
+                  user_level.user_id)
+        self.db.execute(query, values)
+
+    def update_user_bank_account_amount(self, user_id: str, amount: float) -> None:
+        query = """UPDATE bank_accounts SET amount=%s WHERE user_id=%s;"""
+        values = (amount, user_id)
+        self.db.execute(query, values)

@@ -1,5 +1,6 @@
 from json import JSONDecodeError
 from random import choice
+import copy
 
 from icecream import ic
 from pydantic import ValidationError
@@ -16,7 +17,6 @@ from app.domain.game.enums.game_event import GameEvent
 from app.domain.game.enums.game_state import GameState
 from app.domain.game.schemas.request import GamePlayerRequest
 from app.domain.game.use_cases.i_game_use_case import IGameUseCase
-from app.test.utils import create_fake_p1, create_fake_p2
 
 
 class GameUseCase(IGameUseCase):
@@ -35,7 +35,6 @@ class GameUseCase(IGameUseCase):
 
     def _select_column(self, request: GamePlayerRequest) -> int:  # noqa
         """Convert the event string in a number column index. In case is not a valid number return [False]"""
-        ic(request)
         try:
             return int(request.event.value)
         except ValueError:
@@ -45,6 +44,27 @@ class GameUseCase(IGameUseCase):
         """Update the current players scores"""
         game.p1.board.get_score()
         game.p2.board.get_score()
+
+    def _get_user(self, user_id: str) -> User:
+        """Create an instance of the user by the user id"""
+        user = self.repo.get_user_by_id(user_id)
+        user.user_level = self.repo.get_user_level(user.user_id)
+        user.bank_account = self.repo.get_user_bank_account(user.user_id)
+        return user
+
+    def _update_user_level_rank_and_bank_account(self, exp_points, winner_player):
+        """Update Winner level, rank and bank account.
+
+        This method is used after the game finished or when the usr disconnect.
+        Note: Only update the bank account if the user level up. We have a fix amount by the moment, but later
+        could change this for a dynamic formula.
+        """
+        old_user: User = copy.deepcopy(winner_player.user)
+        user = self.leveling_manager.update_user_level(winner_player.user, exp_points)
+        # Update user bank account if level up:
+        if old_user.user_level.level != user.user_level.level:
+            self.repo.update_user_bank_account_amount(user.user_id, 100.0)
+        self.repo.update_user_level(user.user_level)
 
     def verbose(self, game) -> None:  # noqa
         ic('*-' * 100)
@@ -60,11 +80,11 @@ class GameUseCase(IGameUseCase):
     async def create_or_join_game(self, game_id: str, user_id: str, websocket: WebSocket) -> TGamePlayer:
         game = self.websocket_manager.active_games.get(game_id)
         if not game:
-            player = self._create_new_player(create_fake_p1())
+            player = self._create_new_player(self._get_user(user_id))
             game = self._create_new_game(game_id, player)
             await self.websocket_manager.connect(game_id=game_id, new_game=game, websocket=websocket)
         else:
-            player = self._create_new_player(create_fake_p2())
+            player = self._create_new_player(self._get_user(user_id))
             game.p2 = player
             await self.websocket_manager.connect(game_id=game_id, new_game=game, websocket=websocket)
 
@@ -79,9 +99,7 @@ class GameUseCase(IGameUseCase):
         except JSONDecodeError:
             return GamePlayerRequest(event=GameEvent.INVALID_INPUT_EVENT)
 
-    async def get_winner_after_player_disconnect(self,
-                                                 disconnected_player: Player,
-                                                 game: Game,
+    async def get_winner_after_player_disconnect(self, disconnected_player: Player, game: Game,
                                                  websocket: WebSocket) -> None:
         # To avoid errors check if is not a winner and player 2 exist. Without this is not necessary
         # to give it the winne point.
@@ -100,22 +118,19 @@ class GameUseCase(IGameUseCase):
         match game.state:
             case GameState.CREATE_NEW_GAME:
                 game.state = GameState.WAITING_OPPONENT
-                await self.websocket_manager.broadcast(game_id=game.game_id,
-                                                       message='Player 1 Connected',
-                                                       extras={})
+                await self.websocket_manager.broadcast(game_id=game.game_id, message='player_1_connected', extras={})
+
             case GameState.WAITING_OPPONENT:
                 started_player = self._get_starter_player(game)
                 game.current_player = started_player
                 game.state = GameState.ROLL_DICE
-                await self.websocket_manager.broadcast(game_id=game.game_id,
-                                                       message='Player 2 Connected',
-                                                       extras={})
+                await self.websocket_manager.broadcast(game_id=game.game_id, message='player_2_connected', extras={})
+
             case GameState.ROLL_DICE:
                 game.current_player.die.roll()
                 game.state = GameState.SELECT_COLUMN
-                await self.websocket_manager.broadcast(game_id=game.game_id,
-                                                       message=f'User {game.current_player} roll dice',
-                                                       extras={})
+                await self.websocket_manager.broadcast(game_id=game.game_id, message='roll_dice', extras={})
+
             case GameState.SELECT_COLUMN:
                 request: GamePlayerRequest = kwargs['selected_column']
                 column_index = self._select_column(request)
@@ -138,9 +153,7 @@ class GameUseCase(IGameUseCase):
                                        die_val=die_val)
                 else:
                     game.state = GameState.UPDATE_PLAYERS_POINTS
-                    await self.websocket_manager.broadcast(game_id=game.game_id,
-                                                           message='add_dice_to_colum',
-                                                           extras={})
+                    await self.websocket_manager.broadcast(game_id=game.game_id, message='add_dice_to_colum', extras={})
                     await self.execute(game)
 
             case GameState.DESTROY_OPPONENT_TARGET_COLUMN:
@@ -148,45 +161,35 @@ class GameUseCase(IGameUseCase):
                 die_val: int = kwargs['die_val']
                 removed_indices = column_opponent_player.remove(die_val)
                 game.state = GameState.UPDATE_PLAYERS_POINTS
-                await self.websocket_manager.broadcast(game_id=game.game_id,
-                                                       message='destroy_opponent_target_column',
+                await self.websocket_manager.broadcast(game_id=game.game_id, message='destroy_opponent_target_column',
                                                        extras={'removed_indices': removed_indices})
                 await self.execute(game)
+
             case GameState.UPDATE_PLAYERS_POINTS:
                 self._update_player_scores(game)
                 if game.is_finished:
                     game.state = GameState.FINISH_GAME
                 else:
                     game.state = GameState.CHANGE_CURRENT_PLAYER
-                await self.websocket_manager.broadcast(game_id=game.game_id,
-                                                       message='update_players_points',
-                                                       extras={})
+                await self.websocket_manager.broadcast(game_id=game.game_id, message='update_players_points', extras={})
 
             case GameState.CHANGE_CURRENT_PLAYER:
                 game.current_player = game.get_opponent_player()
                 game.state = GameState.ROLL_DICE
-                await self.websocket_manager.broadcast(game_id=game.game_id,
-                                                       message='update_players_points',
-                                                       extras={})
+                await self.websocket_manager.broadcast(game_id=game.game_id, message='update_players_points', extras={})
 
             case GameState.FINISH_GAME:
                 winner_player, tied_player = game.get_winner()
                 exp_points = self.leveling_manager.get_winner_earned_exp_points(game)
                 if tied_player:
                     # Update both players points and ranks
-                    # Todo: Use this tied user to add to the repository
-                    tied_user = self.leveling_manager.update_user_level(tied_player.user, exp_points)
-                winner_user = self.leveling_manager.update_user_level(winner_player.user, exp_points)
-                # Todo: Update the user rank and level in the Repository
-                game.winner_player = winner_player, tied_player
-                await self.websocket_manager.broadcast(game_id=game.game_id,
-                                                       message='finish_game',
-                                                       extras={})
+                    self._update_user_level_rank_and_bank_account(exp_points, tied_player)
+                self._update_user_level_rank_and_bank_account(exp_points, winner_player)
+                await self.websocket_manager.broadcast(game_id=game.game_id, message='finish_game', extras={})
+
             case GameState.DISCONNECT_PLAYER:
                 winner_player, _ = game.winner_player
                 exp_points = self.leveling_manager.get_winner_earned_exp_after_player_disconnect()
-                # todo: still need to save the win exp in the db
-                user = self.leveling_manager.update_user_level(winner_player.user, exp_points)
-                await self.websocket_manager.broadcast(game_id=game.game_id,
-                                                       message='player_disconnected_with_out_finished_the_game',
-                                                       extras={})
+                # Create a copy to compare if the user level up
+                self._update_user_level_rank_and_bank_account(exp_points, winner_player)
+                await self.websocket_manager.broadcast(game_id=game.game_id, message='player_disconnected', extras={})

@@ -9,11 +9,13 @@ from app.domain.game.entities.game import Game
 from app.domain.game.entities.player import Player
 from app.domain.game.schemas.request import GamePlayerRequest
 from app.domain.game.use_cases.i_user_level_use_case import IManagerLevelingUseCase
+from app.repositories.auth.auth_repository import AuthRepository
 
 
 class IGameUseCase(BaseModel, ABC):
     websocket_manager: IGameWebSocketManager
     leveling_manager: IManagerLevelingUseCase
+    repo: AuthRepository
 
     @abstractmethod
     async def execute(self, game: Game):
@@ -28,5 +30,6 @@ class IGameUseCase(BaseModel, ABC):
         """Get the player message event from the client"""
 
     @abstractmethod
-    async def get_winner_after_player_disconnect(self, disconnected_player: Player, game: Game, websocket: WebSocket) -> None:
+    async def get_winner_after_player_disconnect(self, disconnected_player: Player, game: Game,
+                                                 websocket: WebSocket) -> None:
         """Get the winner after a user disconnect before the game ends."""

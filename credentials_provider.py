@@ -21,11 +21,11 @@ class _CredentialsProvider(BaseModel):
 
     @property
     def slack_token(self) -> str:
-        return self.env.get('slack_token')
+        return self.env.get('SLACK_TOKEN')
 
     @property
-    def slack_log_chanel(self) -> str:
-        return self.env.get('slack_log_chanel')
+    def slack_chanel(self) -> str:
+        return self.env.get('SLACK_CHANNEL')
 
 
 credentials_provider = _CredentialsProvider()

@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from pydantic import BaseModel
 
 
-class BaseWebSocketManager(BaseModel, ABC):
+class IWebSocketManager(BaseModel, ABC):
     """Clase base para manejar WebSockets."""
 
     class Config:

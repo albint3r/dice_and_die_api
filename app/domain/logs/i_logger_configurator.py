@@ -36,8 +36,7 @@ class ILoggerConfigurator(BaseModel, ABC):
         """Handle Request Validators Errors Exceptions logger."""
 
     @abstractmethod
-    async def handle_websocket_exception(self, websocket: WebSocket,
-                                         exc: WebSocketRequestValidationError) -> JSONResponse | Response:
+    async def handle_websocket_exception(self, websocket: WebSocket, exc: WebSocketRequestValidationError):
         """Handle WebSocket Exceptions logger."""
 
     @abstractmethod

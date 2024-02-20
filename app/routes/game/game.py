@@ -1,17 +1,39 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, HTTPException, WebSocketException, status
 from icecream import ic
 
 from app.db.db import db
 from app.domain.game.enums.game_event import GameEvent
 from app.domain.game.enums.game_state import GameState
-from app.infrastructure.game.game_use_case import GameUseCase
 from app.infrastructure.game.game_websocket_manager import game_websocket_manger
+from app.infrastructure.game.game_use_case import GameUseCase
 from app.infrastructure.game.level_use_case import LevelUserCase
 from app.infrastructure.game.manager_leveling_use_case import ManagerLevelingUseCase
 from app.infrastructure.game.rank_use_case import RankUseCase
 from app.repositories.auth.auth_repository import AuthRepository
 
 router = APIRouter(tags=['game'], prefix='/v2')
+
+
+@router.get('/check-connection')
+async def check_connections():
+    ic(game_websocket_manger.active_connections)
+    print('\n\n')
+    ic(game_websocket_manger.active_games)
+    return {'ok': 200}
+
+
+@router.get('/error')
+async def erro_http():
+    raise HTTPException(status_code=501, detail='Another test')
+    print('\n\n')
+    ic(game_websocket_manger.active_games)
+    return {'ok': 200}
+
+
+@router.websocket('/error')
+async def error_socket(websocket: WebSocket):
+    await websocket.accept()
+    raise WebSocketException(reason='ESTO ES UNA SUPER PRUEBA', code=status.WS_1000_NORMAL_CLOSURE)
 
 
 @router.websocket('/game/{game_id}/{user_id}')

@@ -29,6 +29,16 @@ class LoggerConfigurator(ILoggerConfigurator):
     def logger(self) -> logging.Logger:
         return self._logger
 
+    async def _collect_error_data(self, request, message: str):
+        """This method recollect the error data to crate the Log Message."""
+        self._logger.debug(message)
+        host = getattr(getattr(request, "client", None), "host", None)
+        port = getattr(getattr(request, "client", None), "port", None)
+        url = f"{request.url.path}?{request.query_params}" if request.query_params else request.url.path
+        exception_type, exception_value, _ = sys.exc_info()
+        exception_name = getattr(exception_type, "__name__", None)
+        return exception_name, exception_value, host, port, url
+
     def set_up(self) -> None:
         """Initialize all the configuration of the logger."""
         # Disable uvicorn access logger
@@ -52,36 +62,24 @@ class LoggerConfigurator(ILoggerConfigurator):
         return await _request_validation_exception_handler(request, exc)
 
     async def handle_websocket_exception(self, websocket: WebSocket, exc: WebSocketRequestValidationError):
-        self._logger.debug("Our custom [http_exception_handler] was called")
-        host = getattr(getattr(websocket, "client", None), "host", None)
-        port = getattr(getattr(websocket, "client", None), "port", None)
-        url = f"{websocket.url.path}?{websocket.query_params}" if websocket.query_params else websocket.url.path
-        exception_type, exception_value, _ = sys.exc_info()
-        exception_name = getattr(exception_type, "__name__", None)
-        log_msg = f'{host}:{port} - "{url}" {exception_value.code} WebSocket Internal Sever Error => [{exception_name}: {exception_value.reason}]'
+        log_msg = "Our custom [http_exception_handler] was called"
+        exception_name, exception_value, host, port, url = await self._collect_error_data(websocket, log_msg)
+        log_msg = f'{host}:{port} - "WS {url}" {exception_value.code} Internal Sever Error => [{exception_name}: {exception_value.reason}]'
         self._logger.error(log_msg)
         self.storage_logger.store_log_msg(log_msg)
         return await _websocket_request_validation_exception_handler(websocket, exc)
 
     async def handle_http_exception(self, request: Request, exc: HTTPException) -> JSONResponse | Response:
-        self._logger.debug("Our custom [http_exception_handler] was called")
-        host = getattr(getattr(request, "client", None), "host", None)
-        port = getattr(getattr(request, "client", None), "port", None)
-        url = f"{request.url.path}?{request.query_params}" if request.query_params else request.url.path
-        exception_type, exception_value, _ = sys.exc_info()
-        exception_name = getattr(exception_type, "__name__", None)
-        log_msg = f'{host}:{port} - "{request.method} {url}" 500 Internal Server Error => [{exception_name}: {exception_value.detail}]'
+        log_msg = "Our custom [http_exception_handler] was called"
+        exception_name, exception_value, host, port, url = await self._collect_error_data(request, log_msg)
+        log_msg = f'{host}:{port} - "{request.method} {url}" {exception_value.status_code} Internal Server Error => [{exception_name}: {exception_value.detail}]'
         self._logger.error(log_msg)
         self.storage_logger.store_log_msg(log_msg)
         return await _http_exception_handler(request, exc)
 
     async def handle_unhandled_exception(self, request: Request, exc: Exception) -> PlainTextResponse:
-        self._logger.debug("Our custom [unhandled_exception_handler] was called")
-        host = getattr(getattr(request, "client", None), "host", None)
-        port = getattr(getattr(request, "client", None), "port", None)
-        url = f"{request.url.path}?{request.query_params}" if request.query_params else request.url.path
-        exception_type, exception_value, _ = sys.exc_info()
-        exception_name = getattr(exception_type, "__name__", None)
+        log_msg = "Our custom [unhandled_exception_handler] was called"
+        exception_name, exception_value, host, port, url = await self._collect_error_data(request, log_msg)
         log_msg = f'{host}:{port} - "{request.method} {url}" 500 Internal Server Error => [{exception_name}: {exception_value}]'
         self._logger.error(log_msg)
         self.storage_logger.store_log_msg(log_msg)

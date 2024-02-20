@@ -2,11 +2,12 @@ import logging
 from abc import ABC, abstractmethod
 
 from fastapi import Request
-from fastapi.exceptions import RequestValidationError, HTTPException
+from fastapi.exceptions import RequestValidationError, HTTPException, WebSocketRequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.responses import PlainTextResponse
 from fastapi.responses import Response
 from pydantic import BaseModel
+from starlette.websockets import WebSocket
 
 from app.domain.logs.i_log_storage_gateway import ILogStorageGateWay
 
@@ -30,15 +31,19 @@ class ILoggerConfigurator(BaseModel, ABC):
     def set_up(self, *args, **kwargs) -> None:
         """Initialize all the configuration of the logger."""
 
+    @abstractmethod
     async def handle_request_validation_exception(self, request: Request, exc: RequestValidationError) -> JSONResponse:
-        """This is a wrapper to the default RequestValidationException handler of FastAPI.
-        This function will be called when client input is not valid.
-        """
+        """Handle Request Validators Errors Exceptions logger."""
 
+    @abstractmethod
+    async def handle_websocket_exception(self, websocket: WebSocket,
+                                         exc: WebSocketRequestValidationError) -> JSONResponse | Response:
+        """Handle WebSocket Exceptions logger."""
+
+    @abstractmethod
     async def handle_http_exception(self, request: Request, exc: HTTPException) -> JSONResponse | Response:
-        """ This middleware will log all unhandled exceptions.
-        Unhandled exceptions are all exceptions that are not HTTPExceptions or RequestValidationErrors.
-        """
+        """Handle HTTP Exceptions logger."""
 
+    @abstractmethod
     async def handle_unhandled_exception(self, request: Request, exc: Exception) -> PlainTextResponse:
-        """Handle unhandled exception."""
+        """Handle General Exception."""

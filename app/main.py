@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from fastapi.exceptions import RequestValidationError, HTTPException
+from fastapi.exceptions import RequestValidationError, HTTPException, WebSocketException
 
 from app.infrastructure.logs.logger import logger_conf
 from app.infrastructure.logs.middleware import log_request_middleware
@@ -14,6 +14,7 @@ app.middleware("http")(log_request_middleware)
 app.add_exception_handler(RequestValidationError, logger_conf.handle_request_validation_exception)
 app.add_exception_handler(HTTPException, logger_conf.handle_http_exception)
 app.add_exception_handler(Exception, logger_conf.handle_unhandled_exception)
+app.add_exception_handler(WebSocketException, logger_conf.handle_websocket_exception)
 # Routes
 app.include_router(auth.router)
 app.include_router(game.router)

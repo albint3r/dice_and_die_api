@@ -197,3 +197,1168 @@ AttributeError: 'LoggerConfigurator' object has no attribute 'logger'
 2024-02-20 17:58:59,566 - server - serve - line:76 - INFO - Started server process [48]
 2024-02-20 17:58:59,567 - on - startup - line:46 - INFO - Waiting for application startup.
 2024-02-20 17:58:59,568 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:07:06,069 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 59996) - "WebSocket /v2/error" [accepted]
+2024-02-20 18:07:06,069 - websockets_impl - run_asgi - line:251 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 247, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 149, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 26, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 79, in __call__
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 341, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 82, in app
+    await func(session)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 325, in app
+    await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 36, in errorweb
+    raise Exception('Websocket error')
+Exception: Websocket error
+2024-02-20 18:07:06,090 - server - handshake - line:642 - INFO - connection open
+2024-02-20 18:07:06,091 - server - handler - line:264 - INFO - connection closed
+2024-02-20 18:07:29,691 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 42684) - "WebSocket /v2/error" [accepted]
+2024-02-20 18:07:29,692 - websockets_impl - run_asgi - line:251 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 247, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 149, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 26, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 79, in __call__
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 341, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 82, in app
+    await func(session)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 325, in app
+    await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 36, in errorweb
+    raise Exception('Websocket error')
+Exception: Websocket error
+2024-02-20 18:07:29,697 - server - handshake - line:642 - INFO - connection open
+2024-02-20 18:07:29,699 - server - handler - line:264 - INFO - connection closed
+2024-02-20 18:08:04,416 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:08:04,517 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:08:04,518 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:08:04,518 - server - serve - line:86 - INFO - Finished server process [48]
+2024-02-20 18:08:07,210 - server - serve - line:76 - INFO - Started server process [49]
+2024-02-20 18:08:07,211 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:08:07,212 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:08:07,214 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 53976) - "WebSocket /v2/error" [accepted]
+2024-02-20 18:08:07,746 - websockets_impl - run_asgi - line:251 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 247, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 149, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 26, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 79, in __call__
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 341, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 82, in app
+    await func(session)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 325, in app
+    await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 37, in errorweb
+    raise Exception('Websocket error')
+Exception: Websocket error
+2024-02-20 18:08:07,751 - server - handshake - line:642 - INFO - connection open
+2024-02-20 18:08:07,752 - server - handler - line:264 - INFO - connection closed
+2024-02-20 18:10:38,957 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:10:39,058 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:10:39,059 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:10:39,059 - server - serve - line:86 - INFO - Finished server process [49]
+2024-02-20 18:10:41,281 - server - serve - line:76 - INFO - Started server process [50]
+2024-02-20 18:10:41,282 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:10:41,283 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:12:24,974 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:12:25,075 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:12:25,076 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:12:25,077 - server - serve - line:86 - INFO - Finished server process [50]
+2024-02-20 18:14:05,575 - server - serve - line:76 - INFO - Started server process [52]
+2024-02-20 18:14:05,575 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:14:05,576 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:14:50,502 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:14:50,603 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:14:50,604 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:14:50,604 - server - serve - line:86 - INFO - Finished server process [52]
+2024-02-20 18:14:53,045 - server - serve - line:76 - INFO - Started server process [53]
+2024-02-20 18:14:53,045 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:14:53,046 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:15:38,872 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:15:38,974 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:15:38,975 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:15:38,975 - server - serve - line:86 - INFO - Finished server process [53]
+2024-02-20 18:15:41,653 - server - serve - line:76 - INFO - Started server process [54]
+2024-02-20 18:15:41,654 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:15:41,655 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:16:02,610 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:16:02,711 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:16:02,712 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:16:02,713 - server - serve - line:86 - INFO - Finished server process [54]
+2024-02-20 18:21:15,618 - server - serve - line:76 - INFO - Started server process [56]
+2024-02-20 18:21:15,618 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:21:15,619 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:24:14,504 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:24:14,605 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:24:14,606 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:24:14,607 - server - serve - line:86 - INFO - Finished server process [56]
+2024-02-20 18:24:17,670 - server - serve - line:76 - INFO - Started server process [57]
+2024-02-20 18:24:17,670 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:24:17,671 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:25:37,780 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:25:37,881 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:25:37,882 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:25:37,882 - server - serve - line:86 - INFO - Finished server process [57]
+2024-02-20 18:25:40,472 - server - serve - line:76 - INFO - Started server process [58]
+2024-02-20 18:25:40,473 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:25:40,474 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:26:09,171 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 56676) - "WebSocket /v2/error" [accepted]
+2024-02-20 18:26:09,596 - websockets_impl - run_asgi - line:251 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 247, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 149, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 26, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 79, in __call__
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 341, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 82, in app
+    await func(session)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 325, in app
+    await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 37, in errorweb
+    raise Exception('Websocket error')
+Exception: Websocket error
+2024-02-20 18:26:09,601 - server - handshake - line:642 - INFO - connection open
+2024-02-20 18:26:09,603 - server - handler - line:264 - INFO - connection closed
+2024-02-20 18:26:28,451 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:26:28,552 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:26:28,553 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:26:28,553 - server - serve - line:86 - INFO - Finished server process [58]
+2024-02-20 18:32:19,763 - server - serve - line:76 - INFO - Started server process [60]
+2024-02-20 18:32:19,764 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:32:19,765 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:32:52,554 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:32:52,656 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:32:52,656 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:32:52,657 - server - serve - line:86 - INFO - Finished server process [60]
+2024-02-20 18:32:55,438 - server - serve - line:76 - INFO - Started server process [61]
+2024-02-20 18:32:55,438 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:32:55,439 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:32:55,991 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 35664) - "WebSocket /v2/error" [accepted]
+2024-02-20 18:32:56,871 - websockets_impl - run_asgi - line:251 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 247, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 149, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 26, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 79, in __call__
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 341, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 82, in app
+    await func(session)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 325, in app
+    await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 37, in errorweb
+    raise ('Websocket error')
+TypeError: exceptions must derive from BaseException
+2024-02-20 18:32:56,879 - server - handshake - line:642 - INFO - connection open
+2024-02-20 18:32:56,880 - server - handler - line:264 - INFO - connection closed
+2024-02-20 18:33:42,400 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:33:42,502 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:33:42,503 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:33:42,503 - server - serve - line:86 - INFO - Finished server process [61]
+2024-02-20 18:33:44,687 - server - serve - line:76 - INFO - Started server process [62]
+2024-02-20 18:33:44,687 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:33:44,688 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:34:30,389 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 39586) - "WebSocket /v2/error" [accepted]
+2024-02-20 18:34:31,013 - websockets_impl - run_asgi - line:251 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 247, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 149, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 26, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 79, in __call__
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 341, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 82, in app
+    await func(session)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 325, in app
+    await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 37, in errorweb
+    raise Exception('Websocket error')
+Exception: Websocket error
+2024-02-20 18:34:31,020 - server - handshake - line:642 - INFO - connection open
+2024-02-20 18:34:31,022 - server - handler - line:264 - INFO - connection closed
+2024-02-20 18:34:51,685 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:34:51,786 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:34:51,787 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:34:51,787 - server - serve - line:86 - INFO - Finished server process [62]
+2024-02-20 18:34:54,944 - server - serve - line:76 - INFO - Started server process [63]
+2024-02-20 18:34:54,944 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:34:54,945 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:34:54,949 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 56880) - "WebSocket /v2/error" [accepted]
+2024-02-20 18:34:54,949 - websockets_impl - run_asgi - line:251 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 247, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 149, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 26, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 79, in __call__
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 341, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 82, in app
+    await func(session)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 325, in app
+    await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 36, in errorweb
+    raise Exception('Websocket error')
+Exception: Websocket error
+2024-02-20 18:34:54,959 - server - handshake - line:642 - INFO - connection open
+2024-02-20 18:34:54,962 - server - handler - line:264 - INFO - connection closed
+2024-02-20 18:35:59,231 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:35:59,333 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:35:59,333 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:35:59,334 - server - serve - line:86 - INFO - Finished server process [63]
+2024-02-20 18:36:01,554 - server - serve - line:76 - INFO - Started server process [64]
+2024-02-20 18:36:01,555 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:36:01,556 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:36:03,006 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 60176) - "WebSocket /v2/error" [accepted]
+2024-02-20 18:36:03,007 - websockets_impl - run_asgi - line:251 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 247, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 149, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 26, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 79, in __call__
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 341, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 82, in app
+    await func(session)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 325, in app
+    await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 36, in errorweb
+    raise WebSocketDisconnect('Websocket error')
+starlette.websockets.WebSocketDisconnect: Websocket error
+2024-02-20 18:36:03,018 - server - handshake - line:642 - INFO - connection open
+2024-02-20 18:36:03,020 - server - handler - line:264 - INFO - connection closed
+2024-02-20 18:36:41,863 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:36:41,964 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:36:41,965 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:36:41,966 - server - serve - line:86 - INFO - Finished server process [64]
+2024-02-20 18:36:44,172 - server - serve - line:76 - INFO - Started server process [65]
+2024-02-20 18:36:44,172 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:36:44,173 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:36:46,838 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 60150) - "WebSocket /v2/error" [accepted]
+2024-02-20 18:36:46,839 - websockets_impl - run_asgi - line:251 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 341, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 82, in app
+    await func(session)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 325, in app
+    await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 36, in errorweb
+    raise WebSocketException('Websocket error')
+fastapi.exceptions.WebSocketException: Websocket error
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 247, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 149, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 26, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 95, in __call__
+    await handler(websocket, exc)
+  File "/dice_and_die_api/app/infrastructure/logs/logger.py", line 85, in handle_http_exception
+    log_msg = f'{host}:{port} - "{request.method} {url}" 500 Internal Server Error => [{exception_name}: {exception_value.detail}]'
+AttributeError: 'WebSocket' object has no attribute 'method'
+2024-02-20 18:36:46,860 - server - handshake - line:642 - INFO - connection open
+2024-02-20 18:36:46,862 - server - handler - line:264 - INFO - connection closed
+2024-02-20 18:37:35,709 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:37:35,810 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:37:35,811 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:37:35,812 - server - serve - line:86 - INFO - Finished server process [65]
+2024-02-20 18:37:38,701 - server - serve - line:76 - INFO - Started server process [66]
+2024-02-20 18:37:38,702 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:37:38,703 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:38:21,812 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 33960) - "WebSocket /v2/error" [accepted]
+2024-02-20 18:38:21,814 - websockets_impl - run_asgi - line:251 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 341, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 82, in app
+    await func(session)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 325, in app
+    await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 36, in errorweb
+    raise WebSocketException('Websocket error')
+fastapi.exceptions.WebSocketException: Websocket error
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 247, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 149, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 26, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 95, in __call__
+    await handler(websocket, exc)
+  File "/dice_and_die_api/app/infrastructure/logs/logger.py", line 86, in handle_http_exception
+    log_msg = f'{host}:{port} - "{request.method} {url}" 500 Internal Server Error => [{exception_name}: {exception_value.detail}]'
+AttributeError: 'WebSocket' object has no attribute 'method'
+2024-02-20 18:38:21,831 - server - handshake - line:642 - INFO - connection open
+2024-02-20 18:38:21,834 - server - handler - line:264 - INFO - connection closed
+2024-02-20 18:39:02,453 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:39:02,554 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:39:02,555 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:39:02,555 - server - serve - line:86 - INFO - Finished server process [66]
+2024-02-20 18:39:05,423 - server - serve - line:76 - INFO - Started server process [67]
+2024-02-20 18:39:05,423 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:39:05,424 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:39:05,427 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 49296) - "WebSocket /v2/error" [accepted]
+2024-02-20 18:39:05,428 - websockets_impl - run_asgi - line:251 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 341, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 82, in app
+    await func(session)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 325, in app
+    await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 36, in errorweb
+    raise WebSocketException('Websocket error')
+fastapi.exceptions.WebSocketException: Websocket error
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 247, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 149, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 26, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 95, in __call__
+    await handler(websocket, exc)
+  File "/dice_and_die_api/app/infrastructure/logs/logger.py", line 86, in handle_http_exception
+    log_msg = f'{host}:{port} - "{request.method} {url}" 500 Internal Server Error => [{exception_name}: {exception_value.detail}]'
+AttributeError: 'WebSocket' object has no attribute 'method'
+2024-02-20 18:39:05,442 - server - handshake - line:642 - INFO - connection open
+2024-02-20 18:39:05,444 - server - handler - line:264 - INFO - connection closed
+2024-02-20 18:40:19,819 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:40:19,932 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:40:19,933 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:40:19,934 - server - serve - line:86 - INFO - Finished server process [67]
+2024-02-20 18:40:22,694 - server - serve - line:76 - INFO - Started server process [68]
+2024-02-20 18:40:22,695 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:40:22,698 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:40:31,941 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 54810) - "WebSocket /v2/error" [accepted]
+2024-02-20 18:40:32,588 - websockets_impl - run_asgi - line:251 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 341, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 82, in app
+    await func(session)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 325, in app
+    await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 36, in errorweb
+    raise WebSocketException('Websocket error')
+fastapi.exceptions.WebSocketException: Websocket error
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 247, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 149, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 26, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 95, in __call__
+    await handler(websocket, exc)
+  File "/dice_and_die_api/app/infrastructure/logs/logger.py", line 88, in handle_http_exception
+    log_msg = f'{host}:{port} - "{request.method} {url}" 500 Internal Server Error => [{exception_name}: {exception_value.detail}]'
+AttributeError: 'WebSocket' object has no attribute 'method'
+2024-02-20 18:40:32,599 - server - handshake - line:642 - INFO - connection open
+2024-02-20 18:40:32,600 - server - handler - line:264 - INFO - connection closed
+2024-02-20 18:42:06,062 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:42:06,163 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:42:06,164 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:42:06,165 - server - serve - line:86 - INFO - Finished server process [68]
+2024-02-20 18:42:09,020 - server - serve - line:76 - INFO - Started server process [69]
+2024-02-20 18:42:09,021 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:42:09,024 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:42:09,030 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 51660) - "WebSocket /v2/error" [accepted]
+2024-02-20 18:42:09,032 - websockets_impl - run_asgi - line:251 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 247, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 149, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 26, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 79, in __call__
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 341, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 82, in app
+    await func(session)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 325, in app
+    await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 36, in errorweb
+    raise WebSocketDisconnect(reason='ESTO ES UNA SUPER PRUEBA')
+starlette.websockets.WebSocketDisconnect
+2024-02-20 18:42:09,051 - server - handshake - line:642 - INFO - connection open
+2024-02-20 18:42:09,052 - server - handler - line:264 - INFO - connection closed
+2024-02-20 18:45:28,664 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:45:28,766 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:45:28,767 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:45:28,769 - server - serve - line:86 - INFO - Finished server process [69]
+2024-02-20 18:45:31,226 - server - serve - line:76 - INFO - Started server process [70]
+2024-02-20 18:45:31,226 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:45:31,227 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:45:31,331 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 46718) - "WebSocket /v2/error" [accepted]
+2024-02-20 18:45:31,332 - websockets_impl - run_asgi - line:251 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 247, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 149, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 26, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 79, in __call__
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 341, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 82, in app
+    await func(session)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 325, in app
+    await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 36, in errorweb
+    raise WebSocketDisconnect(reason='ESTO ES UNA SUPER PRUEBA')
+starlette.websockets.WebSocketDisconnect
+2024-02-20 18:45:31,341 - server - handshake - line:642 - INFO - connection open
+2024-02-20 18:45:31,343 - server - handler - line:264 - INFO - connection closed
+2024-02-20 18:48:38,015 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:48:38,116 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:48:38,117 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:48:38,117 - server - serve - line:86 - INFO - Finished server process [70]
+2024-02-20 18:48:40,320 - server - serve - line:76 - INFO - Started server process [71]
+2024-02-20 18:48:40,321 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:48:40,322 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:48:44,620 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 59332) - "WebSocket /v2/error" [accepted]
+2024-02-20 18:48:44,621 - websockets_impl - run_asgi - line:251 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 247, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 149, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 26, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 79, in __call__
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 341, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 82, in app
+    await func(session)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 325, in app
+    await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 36, in errorweb
+    raise WebSocketException(reason='ESTO ES UNA SUPER PRUEBA')
+TypeError: WebSocketException.__init__() missing 1 required positional argument: 'code'
+2024-02-20 18:48:44,633 - server - handshake - line:642 - INFO - connection open
+2024-02-20 18:48:44,635 - server - handler - line:264 - INFO - connection closed
+2024-02-20 18:49:46,401 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:49:46,502 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:49:46,502 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:49:46,503 - server - serve - line:86 - INFO - Finished server process [71]
+2024-02-20 18:49:48,826 - server - serve - line:76 - INFO - Started server process [72]
+2024-02-20 18:49:48,827 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:49:48,829 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:49:49,702 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 41984) - "WebSocket /v2/error" [accepted]
+2024-02-20 18:49:50,727 - websockets_impl - run_asgi - line:251 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 341, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 82, in app
+    await func(session)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 325, in app
+    await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 36, in errorweb
+    raise WebSocketException(reason='ESTO ES UNA SUPER PRUEBA', code=status.WS_1000_NORMAL_CLOSURE)
+fastapi.exceptions.WebSocketException
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 247, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 149, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 26, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 95, in __call__
+    await handler(websocket, exc)
+  File "/dice_and_die_api/app/infrastructure/logs/logger.py", line 74, in handle_websocket_exception
+    return await _websocket_request_validation_exception_handler(websocket, exc)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/exception_handlers.py", line 33, in websocket_request_validation_exception_handler
+    code=WS_1008_POLICY_VIOLATION, reason=jsonable_encoder(exc.errors())
+AttributeError: 'WebSocketException' object has no attribute 'errors'
+2024-02-20 18:49:50,740 - server - handshake - line:642 - INFO - connection open
+2024-02-20 18:49:50,744 - server - handler - line:264 - INFO - connection closed
+2024-02-20 18:51:50,649 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:51:50,750 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:51:50,751 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:51:50,752 - server - serve - line:86 - INFO - Finished server process [72]
+2024-02-20 18:51:53,234 - server - serve - line:76 - INFO - Started server process [73]
+2024-02-20 18:51:53,235 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:51:53,236 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:51:53,239 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 51928) - "WebSocket /v2/error" [accepted]
+2024-02-20 18:51:53,239 - websockets_impl - run_asgi - line:251 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 247, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 149, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 26, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 79, in __call__
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 341, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 82, in app
+    await func(session)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 325, in app
+    await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 36, in errorweb
+    raise WebSocketDisconnect(reason='ESTO ES UNA SUPER PRUEBA', code=status.WS_1000_NORMAL_CLOSURE)
+starlette.websockets.WebSocketDisconnect
+2024-02-20 18:51:53,251 - server - handshake - line:642 - INFO - connection open
+2024-02-20 18:51:53,253 - server - handler - line:264 - INFO - connection closed
+2024-02-20 18:52:26,832 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:52:26,933 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:52:26,933 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:52:26,934 - server - serve - line:86 - INFO - Finished server process [73]
+2024-02-20 18:52:29,742 - server - serve - line:76 - INFO - Started server process [74]
+2024-02-20 18:52:29,743 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:52:29,743 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:52:29,746 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 35114) - "WebSocket /v2/error" [accepted]
+2024-02-20 18:52:29,747 - websockets_impl - run_asgi - line:251 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 247, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 149, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 26, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 79, in __call__
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 341, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 82, in app
+    await func(session)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 325, in app
+    await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 36, in errorweb
+    raise WebSocketDisconnect(reason='ESTO ES UNA SUPER PRUEBAAAAAAAAAAAAAAA', code=status.WS_1000_NORMAL_CLOSURE)
+starlette.websockets.WebSocketDisconnect
+2024-02-20 18:52:29,758 - server - handshake - line:642 - INFO - connection open
+2024-02-20 18:52:29,759 - server - handler - line:264 - INFO - connection closed
+2024-02-20 18:54:08,400 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:54:08,502 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:54:08,503 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:54:08,503 - server - serve - line:86 - INFO - Finished server process [74]
+2024-02-20 18:54:10,821 - server - serve - line:76 - INFO - Started server process [75]
+2024-02-20 18:54:10,821 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:54:10,822 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:54:19,002 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 52194) - "WebSocket /v2/error" [accepted]
+2024-02-20 18:54:19,934 - websockets_impl - run_asgi - line:251 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 341, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 82, in app
+    await func(session)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 325, in app
+    await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 36, in errorweb
+    raise WebSocketException(reason='ESTO ES UNA SUPER PRUEBA', code=status.WS_1000_NORMAL_CLOSURE)
+fastapi.exceptions.WebSocketException
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 247, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 149, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 26, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 95, in __call__
+    await handler(websocket, exc)
+  File "/dice_and_die_api/app/infrastructure/logs/logger.py", line 68, in handle_websocket_exception
+    url = f"{websocket.url.path}?{websocket.query_params}" if websocket.query_params else request.url.path
+NameError: name 'request' is not defined
+2024-02-20 18:54:19,945 - server - handshake - line:642 - INFO - connection open
+2024-02-20 18:54:19,947 - server - handler - line:264 - INFO - connection closed
+2024-02-20 18:54:41,107 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:54:41,208 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:54:41,209 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:54:41,209 - server - serve - line:86 - INFO - Finished server process [75]
+2024-02-20 18:54:43,796 - server - serve - line:76 - INFO - Started server process [76]
+2024-02-20 18:54:43,797 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:54:43,798 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:54:45,089 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 52558) - "WebSocket /v2/error" [accepted]
+2024-02-20 18:54:46,055 - websockets_impl - run_asgi - line:251 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 341, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 82, in app
+    await func(session)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 325, in app
+    await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 36, in errorweb
+    raise WebSocketException(reason='ESTO ES UNA SUPER PRUEBA', code=status.WS_1000_NORMAL_CLOSURE)
+fastapi.exceptions.WebSocketException
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 247, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 149, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 26, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 95, in __call__
+    await handler(websocket, exc)
+  File "/dice_and_die_api/app/infrastructure/logs/logger.py", line 71, in handle_websocket_exception
+    log_msg = f'{host}:{port} - "{websocket} {url}" 500 Internal Server Error => [{exception_name}: {exception_value.detail}]'
+AttributeError: 'WebSocketException' object has no attribute 'detail'
+2024-02-20 18:54:46,066 - server - handshake - line:642 - INFO - connection open
+2024-02-20 18:54:46,068 - server - handler - line:264 - INFO - connection closed
+2024-02-20 18:55:04,915 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:55:05,016 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:55:05,017 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:55:05,017 - server - serve - line:86 - INFO - Finished server process [76]
+2024-02-20 18:55:07,363 - server - serve - line:76 - INFO - Started server process [77]
+2024-02-20 18:55:07,364 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:55:07,365 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:55:11,913 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 54484) - "WebSocket /v2/error" [accepted]
+2024-02-20 18:55:12,812 - logger - handle_websocket_exception - line:72 - ERROR - 172.19.0.1:54484 - "<starlette.websockets.WebSocket object at 0x7f092ea87f40> /v2/error" 500 Internal Server Error => [WebSocketException: ]
+2024-02-20 18:55:13,338 - websockets_impl - run_asgi - line:251 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 341, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 82, in app
+    await func(session)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 325, in app
+    await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 36, in errorweb
+    raise WebSocketException(reason='ESTO ES UNA SUPER PRUEBA', code=status.WS_1000_NORMAL_CLOSURE)
+fastapi.exceptions.WebSocketException
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 247, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 149, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 26, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 95, in __call__
+    await handler(websocket, exc)
+  File "/dice_and_die_api/app/infrastructure/logs/logger.py", line 74, in handle_websocket_exception
+    return await _websocket_request_validation_exception_handler(websocket, exc)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/exception_handlers.py", line 33, in websocket_request_validation_exception_handler
+    code=WS_1008_POLICY_VIOLATION, reason=jsonable_encoder(exc.errors())
+AttributeError: 'WebSocketException' object has no attribute 'errors'
+2024-02-20 18:55:13,352 - server - handshake - line:642 - INFO - connection open
+2024-02-20 18:55:13,354 - server - handler - line:264 - INFO - connection closed
+2024-02-20 18:55:33,306 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:55:33,407 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:55:33,407 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:55:33,408 - server - serve - line:86 - INFO - Finished server process [77]
+2024-02-20 18:55:36,269 - server - serve - line:76 - INFO - Started server process [78]
+2024-02-20 18:55:36,270 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:55:36,271 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:55:37,133 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 55424) - "WebSocket /v2/error" [accepted]
+2024-02-20 18:55:38,036 - logger - handle_websocket_exception - line:72 - ERROR - 172.19.0.1:55424 - "<starlette.websockets.WebSocket object at 0x7efcae2a0130> /v2/error" 500 Internal Server Error => [WebSocketException: ESTO ES UNA SUPER PRUEBA]
+2024-02-20 18:55:38,372 - websockets_impl - run_asgi - line:251 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 341, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 82, in app
+    await func(session)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 325, in app
+    await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 36, in errorweb
+    raise WebSocketException(reason='ESTO ES UNA SUPER PRUEBA', code=status.WS_1000_NORMAL_CLOSURE)
+fastapi.exceptions.WebSocketException
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 247, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 149, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 26, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 95, in __call__
+    await handler(websocket, exc)
+  File "/dice_and_die_api/app/infrastructure/logs/logger.py", line 74, in handle_websocket_exception
+    return await _websocket_request_validation_exception_handler(websocket, exc)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/exception_handlers.py", line 33, in websocket_request_validation_exception_handler
+    code=WS_1008_POLICY_VIOLATION, reason=jsonable_encoder(exc.errors())
+AttributeError: 'WebSocketException' object has no attribute 'errors'
+2024-02-20 18:55:38,388 - server - handshake - line:642 - INFO - connection open
+2024-02-20 18:55:38,389 - server - handler - line:264 - INFO - connection closed
+2024-02-20 18:57:12,932 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:57:13,033 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:57:13,034 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:57:13,035 - server - serve - line:86 - INFO - Finished server process [78]
+2024-02-20 18:57:16,542 - server - serve - line:76 - INFO - Started server process [79]
+2024-02-20 18:57:16,542 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:57:16,543 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:57:16,546 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 35198) - "WebSocket /v2/error" [accepted]
+2024-02-20 18:57:17,091 - logger - handle_websocket_exception - line:72 - ERROR - 172.19.0.1:35198 - "/v2/error" Error Code: 1000 => [WebSocketException: ESTO ES UNA SUPER PRUEBA]
+2024-02-20 18:57:17,604 - websockets_impl - run_asgi - line:251 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 341, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 82, in app
+    await func(session)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 325, in app
+    await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 36, in errorweb
+    raise WebSocketException(reason='ESTO ES UNA SUPER PRUEBA', code=status.WS_1000_NORMAL_CLOSURE)
+fastapi.exceptions.WebSocketException
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 247, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 149, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 26, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 95, in __call__
+    await handler(websocket, exc)
+  File "/dice_and_die_api/app/infrastructure/logs/logger.py", line 74, in handle_websocket_exception
+    return await _websocket_request_validation_exception_handler(websocket, exc)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/exception_handlers.py", line 33, in websocket_request_validation_exception_handler
+    code=WS_1008_POLICY_VIOLATION, reason=jsonable_encoder(exc.errors())
+AttributeError: 'WebSocketException' object has no attribute 'errors'
+2024-02-20 18:57:17,631 - server - handshake - line:642 - INFO - connection open
+2024-02-20 18:57:17,633 - server - handler - line:264 - INFO - connection closed
+2024-02-20 18:59:18,544 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 18:59:18,645 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 18:59:18,646 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 18:59:18,646 - server - serve - line:86 - INFO - Finished server process [79]
+2024-02-20 18:59:21,213 - server - serve - line:76 - INFO - Started server process [80]
+2024-02-20 18:59:21,214 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 18:59:21,239 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 18:59:21,245 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 58692) - "WebSocket /v2/error" [accepted]
+2024-02-20 18:59:21,969 - logger - handle_websocket_exception - line:72 - ERROR - 172.19.0.1:58692 - "/v2/error" 1000 WebSocket Internal Sever Erro => [WebSocketException: ESTO ES UNA SUPER PRUEBA]
+2024-02-20 18:59:22,349 - websockets_impl - run_asgi - line:251 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 341, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 82, in app
+    await func(session)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 325, in app
+    await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 36, in errorweb
+    raise WebSocketException(reason='ESTO ES UNA SUPER PRUEBA', code=status.WS_1000_NORMAL_CLOSURE)
+fastapi.exceptions.WebSocketException
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 247, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 149, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 26, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 95, in __call__
+    await handler(websocket, exc)
+  File "/dice_and_die_api/app/infrastructure/logs/logger.py", line 74, in handle_websocket_exception
+    return await _websocket_request_validation_exception_handler(websocket, exc)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/exception_handlers.py", line 33, in websocket_request_validation_exception_handler
+    code=WS_1008_POLICY_VIOLATION, reason=jsonable_encoder(exc.errors())
+AttributeError: 'WebSocketException' object has no attribute 'errors'
+2024-02-20 18:59:22,364 - server - handshake - line:642 - INFO - connection open
+2024-02-20 18:59:22,368 - server - handler - line:264 - INFO - connection closed
+2024-02-20 19:01:50,846 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 19:01:50,947 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 19:01:50,948 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 19:01:50,948 - server - serve - line:86 - INFO - Finished server process [80]
+2024-02-20 19:01:53,409 - server - serve - line:76 - INFO - Started server process [81]
+2024-02-20 19:01:53,410 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 19:01:53,411 - on - startup - line:60 - INFO - Application startup complete.

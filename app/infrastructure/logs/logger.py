@@ -1,16 +1,18 @@
 import logging
 import sys
-from typing import Union, Final
+from typing import Final
 
 from fastapi import Request, status
-from fastapi.exception_handlers import http_exception_handler as _http_exception_handler
 from fastapi.exception_handlers import (
     request_validation_exception_handler as _request_validation_exception_handler,
+    http_exception_handler as _http_exception_handler,
+    websocket_request_validation_exception_handler as _websocket_request_validation_exception_handler
 )
-from fastapi.exceptions import RequestValidationError, HTTPException
+from fastapi.exceptions import RequestValidationError, HTTPException, WebSocketRequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.responses import PlainTextResponse
 from fastapi.responses import Response
+from starlette.websockets import WebSocket
 
 from app.domain.logs.i_logger_configurator import ILoggerConfigurator
 from app.infrastructure.logs.slack_bot import slack_bot
@@ -42,10 +44,6 @@ class LoggerConfigurator(ILoggerConfigurator):
         self._logger.addHandler(fh)  # Exporting logs to a file
 
     async def handle_request_validation_exception(self, request: Request, exc: RequestValidationError) -> JSONResponse:
-        """
-        This is a wrapper to the default RequestValidationException handler of FastAPI.
-        This function will be called when client input is not valid.
-        """
         self._logger.debug("Our custom [request_validation_exception_handler] was called")
         body = await request.body()
         query_params = request.query_params._dict  # noqa
@@ -53,11 +51,19 @@ class LoggerConfigurator(ILoggerConfigurator):
         self._logger.info(detail)
         return await _request_validation_exception_handler(request, exc)
 
-    async def handle_http_exception(self, request: Request, exc: HTTPException) -> Union[JSONResponse, Response]:
-        """
-        This middleware will log all unhandled exceptions.
-        Unhandled exceptions are all exceptions that are not HTTPExceptions or RequestValidationErrors.
-        """
+    async def handle_websocket_exception(self, websocket: WebSocket, exc: WebSocketRequestValidationError):
+        self._logger.debug("Our custom [http_exception_handler] was called")
+        host = getattr(getattr(websocket, "client", None), "host", None)
+        port = getattr(getattr(websocket, "client", None), "port", None)
+        url = f"{websocket.url.path}?{websocket.query_params}" if websocket.query_params else websocket.url.path
+        exception_type, exception_value, _ = sys.exc_info()
+        exception_name = getattr(exception_type, "__name__", None)
+        log_msg = f'{host}:{port} - "{url}" {exception_value.code} WebSocket Internal Sever Error => [{exception_name}: {exception_value.reason}]'
+        self._logger.error(log_msg)
+        self.storage_logger.store_log_msg(log_msg)
+        return await _websocket_request_validation_exception_handler(websocket, exc)
+
+    async def handle_http_exception(self, request: Request, exc: HTTPException) -> JSONResponse | Response:
         self._logger.debug("Our custom [http_exception_handler] was called")
         host = getattr(getattr(request, "client", None), "host", None)
         port = getattr(getattr(request, "client", None), "port", None)
@@ -70,9 +76,6 @@ class LoggerConfigurator(ILoggerConfigurator):
         return await _http_exception_handler(request, exc)
 
     async def handle_unhandled_exception(self, request: Request, exc: Exception) -> PlainTextResponse:
-        """
-        Handle unhandled exception.
-        """
         self._logger.debug("Our custom [unhandled_exception_handler] was called")
         host = getattr(getattr(request, "client", None), "host", None)
         port = getattr(getattr(request, "client", None), "port", None)

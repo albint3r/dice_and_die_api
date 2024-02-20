@@ -4,7 +4,7 @@ from app.domain.core.i_game_websocket_manager import IGameWebSocketManager
 from app.domain.core.ref_types import TExtras
 from app.domain.game.entities.game import Game
 from app.domain.game.errors.errors import NotRemainingActiveConnectionsErro
-from app.domain.game.schemas.response import GameResponse
+from app.domain.game.schemas.response import ResponseGame
 
 
 class _GameWebSocketManager(IGameWebSocketManager):
@@ -32,9 +32,10 @@ class _GameWebSocketManager(IGameWebSocketManager):
     async def broadcast(self, game_id: str, message: str = '', extras: TExtras | None = None) -> None:
         connections = self.active_connections.get(game_id, {})
         game = self.active_games.get(game_id)
+        response = ResponseGame(game=game, message=message, extras=extras)
+        jsons_response = response.model_dump_json()
         for user_connection in connections:
-            response = GameResponse(game=game, message=message, extras=extras)
-            await user_connection.send_json(response.model_dump_json())
+            await user_connection.send_json(jsons_response)
 
     def get_remained_player_websocket(self, game_id: str) -> WebSocket:
         connections = self.active_connections.get(game_id)

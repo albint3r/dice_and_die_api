@@ -3,7 +3,7 @@ from icecream import ic
 
 from app.domain.game.enums.game_event import GameEvent
 from app.domain.game.enums.game_state import GameState
-from app.infrastructure.core.game_websocket_manager import game_websocket_manger
+from app.infrastructure.game.game_websocket_manager import game_websocket_manger
 from app.infrastructure.game.game_use_case import GameUseCase
 from app.infrastructure.game.level_use_case import LevelUserCase
 from app.infrastructure.game.manager_leveling_use_case import ManagerLevelingUseCase

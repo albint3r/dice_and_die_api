@@ -1,7 +1,7 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from icecream import ic
 
-from app.infrastructure.core.game_websocket_manager import game_websocket_manger
+from app.infrastructure.game.game_websocket_manager import game_websocket_manger
 from app.infrastructure.lobby.lobby_use_case import LobbyUseCase
 from app.infrastructure.lobby.lobby_websocket_manager import lobby_websocket_manager
 

@@ -5,7 +5,7 @@ from app.domain.game.entities.game import Game
 from app.domain.game.errors.errors import NoneGameInResponseValidatorError
 
 
-class GameResponse(BaseModel):
+class ResponseGame(BaseModel):
     """This is the Base Game Response"""
     game: Game
     extras: TExtras

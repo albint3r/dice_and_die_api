@@ -17,8 +17,9 @@ class _LobbyWebSocketManager(ILobbyWebSocketManager):
 
     async def broadcast(self, active_games: TActiveGames) -> None:
         response = ResponseLobbyInformation(active_games=active_games, total_players=self.get_total_connected_users())
+        json_response = response.model_dump_json()
         for connection in self.active_connections:
-            await connection.send_json(response.model_dump_json())
+            await connection.send_json(json_response)
 
     def get_total_connected_users(self) -> int:
         return len(self.active_connections)

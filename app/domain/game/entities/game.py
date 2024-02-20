@@ -34,8 +34,9 @@ class Game(BaseModel):
     def get_winner(self) -> TWinner:
         """Get the winner of the game. If the game was a draw return both player"""
         if self.p1.board.score > self.p2.board.score:
-            return self.p1, None
+            self.winner_player = (self.p1, None)
         elif self.p2.board.score > self.p1.board.score:
-            return self.p2, None
+            self.winner_player = (self.p2, None)
         else:
-            return self.p1, self.p2
+            self.winner_player = (self.p1, self.p2)
+        return self.winner_player

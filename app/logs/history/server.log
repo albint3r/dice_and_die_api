@@ -1,0 +1,126 @@
+2024-02-20 15:45:10,977 - server - serve - line:76 - INFO - Started server process [8]
+2024-02-20 15:45:10,977 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 15:45:10,978 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 15:45:23,951 - middleware - log_request_middleware - line:29 - INFO - 172.19.0.1:52310 - "GET /docs" 200 OK 0.72ms
+2024-02-20 15:45:24,131 - middleware - log_request_middleware - line:29 - INFO - 172.19.0.1:52310 - "GET /openapi.json" 200 OK 16.72ms
+2024-02-20 15:45:30,263 - middleware - log_request_middleware - line:29 - INFO - 172.19.0.1:52314 - "GET /v2/error" 200 OK 632.41ms
+2024-02-20 15:48:00,540 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 15:48:00,642 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 15:48:00,642 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 15:48:00,643 - server - serve - line:86 - INFO - Finished server process [8]
+2024-02-20 15:48:02,972 - server - serve - line:76 - INFO - Started server process [9]
+2024-02-20 15:48:02,973 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 15:48:02,974 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 15:48:09,107 - middleware - log_request_middleware - line:29 - INFO - 172.19.0.1:40618 - "GET /v2/error" 200 OK 485.50ms
+2024-02-20 15:48:36,481 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 15:48:36,582 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 15:48:36,583 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 15:48:36,585 - server - serve - line:86 - INFO - Finished server process [9]
+2024-02-20 15:48:39,119 - server - serve - line:76 - INFO - Started server process [10]
+2024-02-20 15:48:39,119 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 15:48:39,121 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 15:48:39,129 - middleware - log_request_middleware - line:29 - INFO - 172.19.0.1:42128 - "GET /docs" 200 OK 0.74ms
+2024-02-20 15:48:39,571 - middleware - log_request_middleware - line:29 - INFO - 172.19.0.1:42128 - "GET /openapi.json" 200 OK 25.73ms
+2024-02-20 15:48:45,489 - exception_handlers - unhandled_exception_handler - line:52 - ERROR - 172.19.0.1:51924 - "GET /v2/error" 500 Internal Server Error => [Exception: This is Just a Test]
+2024-02-20 15:48:46,048 - h11_impl - run_asgi - line:413 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 78, in call_next
+    message = await recv_stream.receive()
+  File "/usr/local/lib/python3.10/site-packages/anyio/streams/memory.py", line 98, in receive
+    return self.receive_nowait()
+  File "/usr/local/lib/python3.10/site-packages/anyio/streams/memory.py", line 91, in receive_nowait
+    raise EndOfStream
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/http/h11_impl.py", line 408, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 184, in __call__
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 162, in __call__
+    await self.app(scope, receive, _send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 108, in __call__
+    response = await self.dispatch_func(request, call_next)
+  File "/dice_and_die_api/app/logs/middleware.py", line 18, in log_request_middleware
+    response = await call_next(request)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 84, in call_next
+    raise app_exc
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 70, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 79, in __call__
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 276, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 66, in app
+    response = await func(request)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 274, in app
+    raw_response = await run_endpoint_function(
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 191, in run_endpoint_function
+    return await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 27, in error
+    raise Exception('This is Just a Test')
+Exception: This is Just a Test
+2024-02-20 15:58:22,383 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 15:58:22,484 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 15:58:22,484 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 15:58:22,485 - server - serve - line:86 - INFO - Finished server process [10]
+2024-02-20 15:58:24,832 - server - serve - line:76 - INFO - Started server process [11]
+2024-02-20 15:58:24,832 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 15:58:24,833 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 15:58:59,123 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 15:58:59,224 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 15:58:59,225 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 15:58:59,225 - server - serve - line:86 - INFO - Finished server process [11]
+2024-02-20 15:59:01,692 - server - serve - line:76 - INFO - Started server process [12]
+2024-02-20 15:59:01,692 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 15:59:01,693 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 15:59:17,937 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 15:59:18,038 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 15:59:18,039 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 15:59:18,039 - server - serve - line:86 - INFO - Finished server process [12]
+2024-02-20 15:59:20,853 - server - serve - line:76 - INFO - Started server process [13]
+2024-02-20 15:59:20,853 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 15:59:20,854 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 15:59:26,110 - websockets_impl - asgi_send - line:296 - INFO - ('172.19.0.1', 41230) - "WebSocket /v2/error" 403
+2024-02-20 15:59:26,111 - server - handler - line:229 - INFO - connection rejected (403 Forbidden)
+2024-02-20 15:59:26,112 - server - handler - line:264 - INFO - connection closed
+2024-02-20 15:59:45,018 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 15:59:45,119 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 15:59:45,120 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 15:59:45,121 - server - serve - line:86 - INFO - Finished server process [13]
+2024-02-20 15:59:47,566 - server - serve - line:76 - INFO - Started server process [14]
+2024-02-20 15:59:47,566 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 15:59:47,567 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 15:59:47,570 - websockets_impl - asgi_send - line:296 - INFO - ('172.19.0.1', 38154) - "WebSocket /v2/error" 403
+2024-02-20 15:59:47,571 - server - handler - line:229 - INFO - connection rejected (403 Forbidden)
+2024-02-20 15:59:47,572 - server - handler - line:264 - INFO - connection closed
+2024-02-20 15:59:58,999 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 15:59:59,100 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 15:59:59,101 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 15:59:59,102 - server - serve - line:86 - INFO - Finished server process [14]
+2024-02-20 16:00:01,825 - server - serve - line:76 - INFO - Started server process [15]
+2024-02-20 16:00:01,826 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 16:00:01,828 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 16:00:01,831 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 55826) - "WebSocket /v2/error" [accepted]
+2024-02-20 16:00:01,832 - server - handshake - line:642 - INFO - connection open
+2024-02-20 16:00:13,159 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 16:00:13,160 - server - handler - line:264 - INFO - connection closed
+2024-02-20 16:00:13,261 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 16:00:13,261 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 16:00:13,262 - server - serve - line:86 - INFO - Finished server process [15]

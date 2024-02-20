@@ -22,6 +22,12 @@ async def check_connections():
     return {'ok': 200}
 
 
+@router.websocket('/error')
+async def errorweb(websocket: WebSocket):
+    await websocket.accept()
+    raise Exception('Websocket error')
+
+
 @router.websocket('/game/{game_id}/{user_id}')
 async def play_game(websocket: WebSocket, game_id: str, user_id: str):
     """This is the websocket endpoint to play the dice and die game"""

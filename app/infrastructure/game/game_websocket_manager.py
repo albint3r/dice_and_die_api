@@ -10,6 +10,7 @@ from app.domain.game.schemas.response import ResponseGame
 
 
 class _GameWebSocketManager(IGameWebSocketManager):
+
     async def connect(self, game_id: str, new_game: Game, websocket: WebSocket) -> None:
         await websocket.accept()
         game = self.active_games.get(game_id)
@@ -18,6 +19,13 @@ class _GameWebSocketManager(IGameWebSocketManager):
             self.active_games.setdefault(game_id, new_game)
         # Add user to game pool connections
         self.active_connections.setdefault(game_id, set()).add(websocket)
+
+    async def connect_viewer(self, game_id: str, websocket: WebSocket) -> None:
+        """Add user websocket to active connection as a viewer roll."""
+        await websocket.accept()
+        game = self.active_games.get(game_id)
+        if game:
+            self.active_connections_viewers.setdefault(game_id, list()).append(websocket)
 
     async def disconnect(self, game_id: str, websocket: WebSocket) -> None:
         if game_id in self.active_connections:
@@ -45,6 +53,12 @@ class _GameWebSocketManager(IGameWebSocketManager):
             websockets = list(connections)[0]
             return websockets
         raise NotRemainingActiveConnectionsErro('Not remaining active connections.')
+
+    def is_full(self, game_id: str) -> bool:
+        game = self.active_connections.get(game_id)
+        if game:
+            return len(game) == 2
+        return False
 
 
 game_websocket_manger: Final[IGameWebSocketManager] = _GameWebSocketManager()

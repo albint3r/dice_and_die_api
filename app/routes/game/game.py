@@ -14,12 +14,23 @@ from app.repositories.auth.auth_repository import AuthRepository
 router = APIRouter(tags=['game'], prefix='/v2')
 
 
+@router.get('/check-connections')
+async def check_active_connections():
+    ic(game_websocket_manger.active_connections)
+    ic(game_websocket_manger.active_connections_viewers)
+    ic(game_websocket_manger.active_games)
+    return {"ok": 200}
+
+
 @router.websocket('/game/{game_id}/{user_id}')
 async def play_game(websocket: WebSocket, game_id: str, user_id: str):
     """This is the websocket endpoint to play the dice and die game"""
     leveling_manager = ManagerLevelingUseCase(leve_manager=LevelUserCase(), rank_manager=RankUseCase())
     game_use_case = GameUseCase(websocket_manager=game_websocket_manger, leveling_manager=leveling_manager,
                                 repo=AuthRepository(db=db))
+    if game_use_case.websocket_manager.is_full(game_id):
+        await game_use_case.join_as_viewer(game_id=game_id, user_id=user_id, websocket=websocket)
+        return
     game, player = await game_use_case.create_or_join_game(game_id=game_id, user_id=user_id, websocket=websocket)
     try:
         await game_use_case.execute(game)

@@ -4,7 +4,7 @@ import copy
 
 from icecream import ic
 from pydantic import ValidationError
-from starlette.websockets import WebSocket
+from starlette.websockets import WebSocket, WebSocketDisconnect
 
 from app.domain.auth.entities.user import User
 from app.domain.core.ref_types import TGamePlayer
@@ -76,6 +76,17 @@ class GameUseCase(IGameUseCase):
         ic(f'Player 2:{game.p2.user.name}')
         ic(f'Board:{game.p2.board}')
         ic('*-' * 100)
+
+    async def join_as_viewer(self, game_id: str, user_id: str, websocket: WebSocket) -> None:
+        """Joint the new user as a viewer. This occurs when the active connection is full (2 players max)."""
+        await self.websocket_manager.connect_viewer(game_id=game_id, websocket=websocket)
+        game = self.websocket_manager.active_games.get(game_id)
+        try:
+            while True:
+                event = await self.get_player_request_event(websocket)
+                ic(event)
+        except WebSocketDisconnect:
+            ic('disconnect viewer')
 
     async def create_or_join_game(self, game_id: str, user_id: str, websocket: WebSocket) -> TGamePlayer:
         game = self.websocket_manager.active_games.get(game_id)

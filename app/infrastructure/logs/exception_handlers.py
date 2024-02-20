@@ -11,8 +11,8 @@ from fastapi.responses import JSONResponse
 from fastapi.responses import PlainTextResponse
 from fastapi.responses import Response
 
-from app.logs.logger import logger
-from app.logs.slack_bot import slack_bot
+from app.infrastructure.logs.logger import logger
+from app.infrastructure.logs.slack_bot import slack_bot
 
 
 async def request_validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
@@ -42,7 +42,7 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> Union[
     log_msg = f'{host}:{port} - "{request.method} {url}" 500 Internal Server Error => [{exception_name}: {exception_value.detail}]'
     logger.error(log_msg)
     # Log Fatal Error to [Slack Logs] Channel
-    slack_bot.post_msg(log_msg)
+    slack_bot.store_log_msg(log_msg)
     return await _http_exception_handler(request, exc)
 
 
@@ -60,5 +60,5 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> Plain
     log_msg = f'{host}:{port} - "{request.method} {url}" 500 Internal Server Error => [{exception_name}: {exception_value}]'
     logger.error(log_msg)
     # Log Fatal Error to [Slack Logs] Channel
-    slack_bot.post_msg(log_msg)
+    slack_bot.store_log_msg(log_msg)
     return PlainTextResponse(str(exc), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)

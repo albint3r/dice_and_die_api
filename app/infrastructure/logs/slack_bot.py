@@ -2,14 +2,15 @@ from pydantic import BaseModel
 from slack import WebClient
 from slack.errors import SlackApiError
 
+from app.domain.logs.i_log_storage_gateway import ILogStorageGateWay
 from credentials_provider import credentials_provider
 
 
-class _SlackBot(BaseModel):
+class _SlackBot(ILogStorageGateWay):
     slack_token: str
     slack_chanel: str
 
-    def post_msg(self, message: str) -> None:
+    def store_log_msg(self, message: str) -> None:
         """Post Error Message in Slack Tobe Total"""
         client = WebClient(token=self.slack_token)
 

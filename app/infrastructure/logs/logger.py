@@ -12,7 +12,7 @@ uvicorn_access.disabled = True
 logger = logging.getLogger("uvicorn")
 logger.setLevel(logging.getLevelName(logging.INFO))
 # Set Server Configuration Format
-fh = logging.FileHandler(filename='./app/logs/history/server.log')
+fh = logging.FileHandler(filename='./server.log')
 formatter = logging.Formatter(
     "%(asctime)s - %(module)s - %(funcName)s - line:%(lineno)s - %(levelname)s - %(message)s"  # noqa
 )

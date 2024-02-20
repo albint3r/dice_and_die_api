@@ -1,0 +1,63 @@
+2024-02-20 16:27:45,254 - server - serve - line:76 - INFO - Started server process [29]
+2024-02-20 16:27:45,254 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 16:27:45,256 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 16:27:45,261 - exception_handlers - http_exception_handler - line:43 - ERROR - 172.19.0.1:34686 - "GET /v2/error-http" 500 Internal Server Error => [HTTPException: Another test]
+2024-02-20 16:27:45,262 - exception_handlers - unhandled_exception_handler - line:61 - ERROR - 172.19.0.1:34686 - "GET /v2/error-http" 500 Internal Server Error => [AttributeError: '_SlackBot' object has no attribute 'post_msg']
+2024-02-20 16:27:45,264 - h11_impl - run_asgi - line:413 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 78, in call_next
+    message = await recv_stream.receive()
+  File "/usr/local/lib/python3.10/site-packages/anyio/streams/memory.py", line 98, in receive
+    return self.receive_nowait()
+  File "/usr/local/lib/python3.10/site-packages/anyio/streams/memory.py", line 91, in receive_nowait
+    raise EndOfStream
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 162, in __call__
+    await self.app(scope, receive, _send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 108, in __call__
+    response = await self.dispatch_func(request, call_next)
+  File "/dice_and_die_api/app/infrastructure/logs/middleware.py", line 18, in log_request_middleware
+    response = await call_next(request)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 84, in call_next
+    raise app_exc
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 70, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 88, in __call__
+    response = await handler(request, exc)
+  File "/dice_and_die_api/app/infrastructure/logs/exception_handlers.py", line 45, in http_exception_handler
+    slack_bot.post_msg(log_msg)
+  File "/usr/local/lib/python3.10/site-packages/pydantic/main.py", line 761, in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+AttributeError: '_SlackBot' object has no attribute 'post_msg'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/http/h11_impl.py", line 408, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 174, in __call__
+    response = await self.handler(request, exc)
+  File "/dice_and_die_api/app/infrastructure/logs/exception_handlers.py", line 63, in unhandled_exception_handler
+    slack_bot.post_msg(log_msg)
+  File "/usr/local/lib/python3.10/site-packages/pydantic/main.py", line 761, in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+AttributeError: '_SlackBot' object has no attribute 'post_msg'
+2024-02-20 16:28:20,355 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 16:28:20,457 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 16:28:20,458 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 16:28:20,458 - server - serve - line:86 - INFO - Finished server process [29]
+2024-02-20 16:28:22,705 - server - serve - line:76 - INFO - Started server process [30]
+2024-02-20 16:28:22,705 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 16:28:22,706 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 16:28:23,132 - exception_handlers - http_exception_handler - line:43 - ERROR - 172.19.0.1:36406 - "GET /v2/error-http" 500 Internal Server Error => [HTTPException: Another test]
+2024-02-20 16:28:23,566 - middleware - log_request_middleware - line:29 - INFO - 172.19.0.1:36406 - "GET /v2/error-http" 500 Internal Server Error 434.22ms

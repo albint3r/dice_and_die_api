@@ -252,3 +252,6 @@ Exception: Websocket error
 2024-02-20 16:17:38,180 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
 2024-02-20 16:17:38,181 - on - shutdown - line:76 - INFO - Application shutdown complete.
 2024-02-20 16:17:38,182 - server - serve - line:86 - INFO - Finished server process [26]
+2024-02-20 16:17:40,413 - server - serve - line:76 - INFO - Started server process [27]
+2024-02-20 16:17:40,413 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 16:17:40,414 - on - startup - line:60 - INFO - Application startup complete.

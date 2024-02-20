@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError, HTTPException
 
-from app.logs.exception_handlers import (request_validation_exception_handler, http_exception_handler,
-                                         unhandled_exception_handler)
-from app.logs.middleware import log_request_middleware
+from app.infrastructure.logs.exception_handlers import (request_validation_exception_handler, http_exception_handler,
+                                                        unhandled_exception_handler)
+from app.infrastructure.logs.middleware import log_request_middleware
 from app.routes.auth import auth
 from app.routes.game import game
 from app.routes.lobby import lobby

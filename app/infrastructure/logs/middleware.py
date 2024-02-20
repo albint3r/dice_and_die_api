@@ -3,7 +3,7 @@ import time
 
 from fastapi import Request
 
-from app.logs.logger import logger
+from app.infrastructure.logs.logger import logger
 
 
 async def log_request_middleware(request: Request, call_next):

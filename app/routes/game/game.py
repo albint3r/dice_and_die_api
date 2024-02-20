@@ -1,4 +1,4 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, WebSocketException, status
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from icecream import ic
 
 from app.db.db import db
@@ -12,12 +12,6 @@ from app.infrastructure.game.rank_use_case import RankUseCase
 from app.repositories.auth.auth_repository import AuthRepository
 
 router = APIRouter(tags=['game'], prefix='/v2')
-
-
-@router.websocket('/error')
-async def error_socket(websocket: WebSocket):
-    await websocket.accept()
-    raise WebSocketException(reason='ESTO ES UNA SUPER PRUEBA', code=status.WS_1000_NORMAL_CLOSURE)
 
 
 @router.websocket('/game/{game_id}/{user_id}')
@@ -48,6 +42,7 @@ async def play_game(websocket: WebSocket, game_id: str, user_id: str):
                 game_use_case.verbose(game)
         ic(game)
         await websocket.close()
+        await game_use_case.websocket_manager.disconnect(game_id=game_id, websocket=websocket)
     except WebSocketDisconnect:
         await game_use_case.get_winner_after_player_disconnect(disconnected_player=player,
                                                                game=game, websocket=websocket)

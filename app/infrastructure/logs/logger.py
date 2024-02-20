@@ -86,5 +86,5 @@ class LoggerConfigurator(ILoggerConfigurator):
         return PlainTextResponse(str(exc), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-logger_conf: Final[LoggerConfigurator] = LoggerConfigurator(storage_logger=slack_bot)
+logger_conf: Final[ILoggerConfigurator] = LoggerConfigurator(storage_logger=slack_bot)
 logger_conf.set_up()

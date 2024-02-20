@@ -1,3 +1,5 @@
+from typing import Final
+
 from slack import WebClient
 from slack.errors import SlackApiError
 
@@ -20,4 +22,5 @@ class _SlackBot(ILogStorageGateWay):
             assert e.response["error"]  # str like 'invalid_auth', 'channel_not_found'
 
 
-slack_bot = _SlackBot(slack_token=credentials_provider.slack_token, slack_chanel=credentials_provider.slack_chanel)
+slack_bot: Final[ILogStorageGateWay] = _SlackBot(slack_token=credentials_provider.slack_token,
+                                                 slack_chanel=credentials_provider.slack_chanel)

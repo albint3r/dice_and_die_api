@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from pydantic import BaseModel
 from starlette.websockets import WebSocket
 
-from app.domain.core.i_game_websocket_manager import IGameWebSocketManager
+from app.domain.game.use_cases.i_game_websocket_manager import IGameWebSocketManager
 from app.domain.core.ref_types import TGamePlayer
 from app.domain.game.entities.game import Game
 from app.domain.game.entities.player import Player

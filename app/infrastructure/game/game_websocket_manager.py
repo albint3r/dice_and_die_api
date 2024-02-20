@@ -1,6 +1,8 @@
+from typing import Final
+
 from starlette.websockets import WebSocket
 
-from app.domain.core.i_game_websocket_manager import IGameWebSocketManager
+from app.domain.game.use_cases.i_game_websocket_manager import IGameWebSocketManager
 from app.domain.core.ref_types import TExtras
 from app.domain.game.entities.game import Game
 from app.domain.game.errors.errors import NotRemainingActiveConnectionsErro
@@ -45,4 +47,4 @@ class _GameWebSocketManager(IGameWebSocketManager):
         raise NotRemainingActiveConnectionsErro('Not remaining active connections.')
 
 
-game_websocket_manger = _GameWebSocketManager()
+game_websocket_manger: Final[IGameWebSocketManager] = _GameWebSocketManager()

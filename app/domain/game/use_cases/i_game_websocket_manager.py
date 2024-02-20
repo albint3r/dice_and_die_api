@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from starlette.websockets import WebSocket
 
-from app.domain.game.use_cases.i_websocket_manager import IWebSocketManager
+from app.domain.core.i_websocket_manager import IWebSocketManager
 from app.domain.core.ref_types import TActiveConnections, TActiveGames, TExtras
 from app.domain.game.entities.game import Game
 

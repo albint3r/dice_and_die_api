@@ -1,5 +1,6 @@
 from json import JSONDecodeError
 from random import choice
+import copy
 
 from icecream import ic
 from pydantic import ValidationError
@@ -16,7 +17,6 @@ from app.domain.game.enums.game_event import GameEvent
 from app.domain.game.enums.game_state import GameState
 from app.domain.game.schemas.request import GamePlayerRequest
 from app.domain.game.use_cases.i_game_use_case import IGameUseCase
-from app.test.utils import create_fake_p1, create_fake_p2
 
 
 class GameUseCase(IGameUseCase):
@@ -51,6 +51,20 @@ class GameUseCase(IGameUseCase):
         user.user_level = self.repo.get_user_level(user.user_id)
         user.bank_account = self.repo.get_user_bank_account(user.user_id)
         return user
+
+    def _update_user_level_rank_and_bank_account(self, exp_points, winner_player):
+        """Update Winner level, rank and bank account.
+
+        This method is used after the game finished or when the usr disconnect.
+        Note: Only update the bank account if the user level up. We have a fix amount by the moment, but later
+        could change this for a dynamic formula.
+        """
+        old_user: User = copy.deepcopy(winner_player.user)
+        user = self.leveling_manager.update_user_level(winner_player.user, exp_points)
+        # Update user bank account if level up:
+        if old_user.user_level.level != user.user_level.level:
+            self.repo.update_user_bank_account_amount(user.user_id, 100.0)
+        self.repo.update_user_level(user.user_level)
 
     def verbose(self, game) -> None:  # noqa
         ic('*-' * 100)
@@ -169,16 +183,13 @@ class GameUseCase(IGameUseCase):
                 exp_points = self.leveling_manager.get_winner_earned_exp_points(game)
                 if tied_player:
                     # Update both players points and ranks
-                    tied_user = self.leveling_manager.update_user_level(tied_player.user, exp_points)
-                    self.repo.update_user_level(tied_user.user_level)
-                winner_user = self.leveling_manager.update_user_level(winner_player.user, exp_points)
-                self.repo.update_user_level(winner_user.user_level)
-                game.winner_player = winner_player, tied_player
+                    self._update_user_level_rank_and_bank_account(exp_points, tied_player)
+                self._update_user_level_rank_and_bank_account(exp_points, winner_player)
                 await self.websocket_manager.broadcast(game_id=game.game_id, message='finish_game', extras={})
 
             case GameState.DISCONNECT_PLAYER:
                 winner_player, _ = game.winner_player
                 exp_points = self.leveling_manager.get_winner_earned_exp_after_player_disconnect()
-                user = self.leveling_manager.update_user_level(winner_player.user, exp_points)
-                self.repo.update_user_level(user.user_level)
+                # Create a copy to compare if the user level up
+                self._update_user_level_rank_and_bank_account(exp_points, winner_player)
                 await self.websocket_manager.broadcast(game_id=game.game_id, message='player_disconnected', extras={})

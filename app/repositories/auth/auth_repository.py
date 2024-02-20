@@ -88,3 +88,8 @@ class AuthRepository(BaseModel):
         values = (user_level.level, user_level.exp_points, user_level.next_level_points, user_level.rank_id,
                   user_level.user_id)
         self.db.execute(query, values)
+
+    def update_user_bank_account_amount(self, user_id: str, amount: float) -> None:
+        query = """UPDATE bank_accounts SET amount=%s WHERE user_id=%s;"""
+        values = (amount, user_id)
+        self.db.execute(query, values)

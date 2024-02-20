@@ -3,7 +3,7 @@ import time
 
 from fastapi import Request
 
-from app.infrastructure.logs.logger import logger
+from app.infrastructure.logs.logger import logger_conf
 
 
 async def log_request_middleware(request: Request, call_next):
@@ -12,7 +12,7 @@ async def log_request_middleware(request: Request, call_next):
     E.g. log:
     0.0.0.0:1234 - GET /ping 200 OK 1.00ms
     """
-    logger.debug("middleware: log_request_middleware")
+    logger_conf.logger.debug("middleware: log_request_middleware")
     url = f"{request.url.path}?{request.query_params}" if request.query_params else request.url.path
     start_time = time.time()
     response = await call_next(request)
@@ -26,5 +26,5 @@ async def log_request_middleware(request: Request, call_next):
         status_phrase = ""
     # This is the final message that is display in the Terminal or display
     log_msg = f'{host}:{port} - "{request.method} {url}" {response.status_code} {status_phrase} {formatted_process_time}ms'
-    logger.info(log_msg)
+    logger_conf.logger.info(log_msg)
     return response

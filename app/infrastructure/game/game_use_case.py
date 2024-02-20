@@ -101,8 +101,8 @@ class GameUseCase(IGameUseCase):
 
     async def get_winner_after_player_disconnect(self, disconnected_player: Player, game: Game,
                                                  websocket: WebSocket) -> None:
-        # To avoid errors check if is not a winner and player 2 exist. Without this is not necessary
-        # to give it the winne point.
+        # There doesn't need to be a winner. Because after the winner player disconnect from the game will trigger this event.
+        # Also is necessary to have a player 2 in the match. Without him this means the match never started.
         if not game.winner_player and game.p2:
             await self.websocket_manager.disconnect(game_id=game.game_id, websocket=websocket)
             connection = self.websocket_manager.get_remained_player_websocket(game.game_id)

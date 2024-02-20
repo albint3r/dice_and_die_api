@@ -5,7 +5,7 @@ from app.infrastructure.game.game_websocket_manager import game_websocket_manger
 from app.infrastructure.lobby.lobby_use_case import LobbyUseCase
 from app.infrastructure.lobby.lobby_websocket_manager import lobby_websocket_manager
 
-router = APIRouter(prefix='/lobby/v1', tags=['lobby'])
+router = APIRouter(prefix='/v1/lobby', tags=['lobby'])
 
 
 @router.get('/check-connection')

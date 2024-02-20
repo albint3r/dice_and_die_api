@@ -9,7 +9,7 @@ from app.infrastructure.auth.auth_use_case import AuthUseCase
 from app.repositories.auth.auth_repository import AuthRepository
 
 router = APIRouter(
-    prefix='/auth/v1',
+    prefix='/v2/auth',
     tags=['auth'],
     responses={
         status.HTTP_201_CREATED: {"description": "Success Create User"},
@@ -21,7 +21,7 @@ router = APIRouter(
 
 
 @router.post('/signin', status_code=status.HTTP_201_CREATED)
-def signin_email_and_password(form_data: RequestAuthEmail) -> ResponseSignin:
+def signin_with_email_and_password(form_data: RequestAuthEmail) -> ResponseSignin:
     try:
         facade = AuthUseCase(repo=AuthRepository(db=db))
         return facade.signin(form_data.email, form_data.password.get_secret_value(), auth_handler)
@@ -30,7 +30,7 @@ def signin_email_and_password(form_data: RequestAuthEmail) -> ResponseSignin:
 
 
 @router.post('/login', status_code=status.HTTP_202_ACCEPTED)
-def login_email_and_password(form_data: RequestAuthEmail) -> ResponseLogIn:
+def login_with_email_and_password(form_data: RequestAuthEmail) -> ResponseLogIn:
     try:
         facade = AuthUseCase(repo=AuthRepository(db=db))
         return facade.login(form_data.email, form_data.password.get_secret_value(), auth_handler)
@@ -39,7 +39,7 @@ def login_email_and_password(form_data: RequestAuthEmail) -> ResponseLogIn:
 
 
 @router.post('/login/token', status_code=status.HTTP_202_ACCEPTED)
-def login_from_session_token(user_id: str = Depends(auth_handler.auth_wrapper)) -> ResponseLogIn:
+def login_with_session_token(user_id: str = Depends(auth_handler.auth_wrapper)) -> ResponseLogIn:
     try:
         facade = AuthUseCase(repo=AuthRepository(db=db))
         return facade.login_from_session_token(user_id, auth_handler)
@@ -47,15 +47,7 @@ def login_from_session_token(user_id: str = Depends(auth_handler.auth_wrapper)) 
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
 
 
-@router.post('/test', status_code=status.HTTP_200_OK)
-def test_route_token_session(user_id: str = Depends(auth_handler.auth_wrapper)):
-    try:
-        return user_id
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
-
-
-@router.put('/update', status_code=status.HTTP_201_CREATED)
+@router.put('/profile', status_code=status.HTTP_201_CREATED)
 def update_user_name_and_last_name(data: RequestNameAndLastName,
                                    user_id: str = Depends(
                                        auth_handler.auth_wrapper)) -> ResponseUpdateUserNameAndLastName:
@@ -66,10 +58,18 @@ def update_user_name_and_last_name(data: RequestNameAndLastName,
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
 
 
-@router.get('/ranks', status_code=status.HTTP_200_OK)
+@router.get('/user/ranks', status_code=status.HTTP_200_OK)
 def get_users_ranking(_: str = Depends(auth_handler.auth_wrapper)) -> ResponseUsersRanking:
     try:
         facade = AuthUseCase(repo=AuthRepository(db=db))
         return facade.get_users_ranking()
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')
+
+
+@router.post('/test', status_code=status.HTTP_200_OK)
+def test_route_token_session(user_id: str = Depends(auth_handler.auth_wrapper)):
+    try:
+        return user_id
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'{e}')

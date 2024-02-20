@@ -11,10 +11,10 @@ app = FastAPI()
 # Logs
 app.middleware("http")(log_request_middleware)
 # This show General Error in the app
-app.add_exception_handler(RequestValidationError, logger_conf.handle_request_validation_exception)
 app.add_exception_handler(HTTPException, logger_conf.handle_http_exception)
-app.add_exception_handler(Exception, logger_conf.handle_unhandled_exception)
 app.add_exception_handler(WebSocketException, logger_conf.handle_websocket_exception)
+app.add_exception_handler(RequestValidationError, logger_conf.handle_request_validation_exception)
+app.add_exception_handler(Exception, logger_conf.handle_unhandled_exception)
 # Routes
 app.include_router(auth.router)
 app.include_router(game.router)

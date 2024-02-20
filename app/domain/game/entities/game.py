@@ -18,7 +18,10 @@ class Game(BaseModel):
     @property
     def is_finished(self) -> bool:
         """Validate if the game is finished"""
-        return self.p1.board.is_full() or self.p2.board.is_full()
+        # Without Player two this function have None Type erro. Because that return False.
+        if self.p2:
+            return self.p1.board.is_full() or self.p2.board.is_full()
+        return False
 
     @property
     def is_waiting_opponent(self) -> bool:

@@ -31,7 +31,7 @@ async def play_game(websocket: WebSocket, game_id: str, user_id: str):
     game, player = await game_use_case.create_or_join_game(game_id=game_id, user_id=user_id, websocket=websocket)
     try:
         await game_use_case.execute(game)
-        while game.is_waiting_opponent or not game.is_finished:
+        while not game.is_finished or game.is_waiting_opponent:
             request = await game_use_case.get_player_request_event(websocket)
             ic(player.user.name)
             # game_use_case.verbose(game)

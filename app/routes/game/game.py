@@ -1,6 +1,7 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from icecream import ic
 
+from app.db.db import db
 from app.domain.game.enums.game_event import GameEvent
 from app.domain.game.enums.game_state import GameState
 from app.infrastructure.game.game_websocket_manager import game_websocket_manger
@@ -8,6 +9,7 @@ from app.infrastructure.game.game_use_case import GameUseCase
 from app.infrastructure.game.level_use_case import LevelUserCase
 from app.infrastructure.game.manager_leveling_use_case import ManagerLevelingUseCase
 from app.infrastructure.game.rank_use_case import RankUseCase
+from app.repositories.auth.auth_repository import AuthRepository
 
 router = APIRouter(tags=['game'], prefix='/v2')
 
@@ -24,7 +26,8 @@ async def check_connections():
 async def play_game(websocket: WebSocket, game_id: str, user_id: str):
     """This is the websocket endpoint to play the dice and die game"""
     leveling_manager = ManagerLevelingUseCase(leve_manager=LevelUserCase(), rank_manager=RankUseCase())
-    game_use_case = GameUseCase(websocket_manager=game_websocket_manger, leveling_manager=leveling_manager)
+    game_use_case = GameUseCase(websocket_manager=game_websocket_manger, leveling_manager=leveling_manager,
+                                repo=AuthRepository(db=db))
     game, player = await game_use_case.create_or_join_game(game_id=game_id, user_id=user_id, websocket=websocket)
     try:
         await game_use_case.execute(game)

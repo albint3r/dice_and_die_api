@@ -1,4 +1,4 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, HTTPException
 from icecream import ic
 
 from app.db.db import db
@@ -17,6 +17,14 @@ router = APIRouter(tags=['game'], prefix='/v2')
 @router.get('/check-connection')
 async def check_connections():
     ic(game_websocket_manger.active_connections)
+    print('\n\n')
+    ic(game_websocket_manger.active_games)
+    return {'ok': 200}
+
+
+@router.get('/error-http')
+async def check_connections():
+    raise HTTPException(status_code=500, detail='Another test')
     print('\n\n')
     ic(game_websocket_manger.active_games)
     return {'ok': 200}

@@ -124,3 +124,131 @@ Exception: This is Just a Test
 2024-02-20 16:00:13,261 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
 2024-02-20 16:00:13,261 - on - shutdown - line:76 - INFO - Application shutdown complete.
 2024-02-20 16:00:13,262 - server - serve - line:86 - INFO - Finished server process [15]
+2024-02-20 16:00:15,953 - server - serve - line:76 - INFO - Started server process [16]
+2024-02-20 16:00:15,953 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 16:00:15,954 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 16:00:15,956 - websockets_impl - asgi_send - line:276 - INFO - ('172.19.0.1', 43124) - "WebSocket /v2/error" [accepted]
+2024-02-20 16:00:15,957 - websockets_impl - run_asgi - line:251 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/protocols/websockets/websockets_impl.py", line 247, in run_asgi
+    result = await self.app(self.scope, self.asgi_receive, self.asgi_send)
+  File "/usr/local/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/applications.py", line 1106, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/applications.py", line 122, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/errors.py", line 149, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/base.py", line 26, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 79, in __call__
+    raise exc
+  File "/usr/local/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 20, in __call__
+    raise e
+  File "/usr/local/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 17, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 718, in __call__
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 341, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/site-packages/starlette/routing.py", line 82, in app
+    await func(session)
+  File "/usr/local/lib/python3.10/site-packages/fastapi/routing.py", line 325, in app
+    await dependant.call(**values)
+  File "/dice_and_die_api/app/routes/game/game.py", line 28, in errorweb
+    raise Exception('Websocket error')
+Exception: Websocket error
+2024-02-20 16:00:15,965 - server - handshake - line:642 - INFO - connection open
+2024-02-20 16:00:15,967 - server - handler - line:264 - INFO - connection closed
+2024-02-20 16:02:59,374 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 16:02:59,475 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 16:02:59,476 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 16:02:59,476 - server - serve - line:86 - INFO - Finished server process [16]
+2024-02-20 16:03:01,929 - server - serve - line:76 - INFO - Started server process [17]
+2024-02-20 16:03:01,934 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 16:03:01,935 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 16:03:33,264 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 16:03:33,364 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 16:03:33,365 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 16:03:33,365 - server - serve - line:86 - INFO - Finished server process [17]
+2024-02-20 16:03:35,746 - server - serve - line:76 - INFO - Started server process [18]
+2024-02-20 16:03:35,747 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 16:03:35,748 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 16:04:02,667 - middleware - log_request_middleware - line:29 - INFO - 172.19.0.1:51014 - "GET /v2/error-http" 500 Internal Server Error 0.75ms
+2024-02-20 16:04:31,310 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 16:04:31,411 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 16:04:31,412 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 16:04:31,413 - server - serve - line:86 - INFO - Finished server process [18]
+2024-02-20 16:04:34,273 - server - serve - line:76 - INFO - Started server process [19]
+2024-02-20 16:04:34,273 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 16:04:34,274 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 16:04:34,281 - exception_handlers - http_exception_handler - line:36 - ERROR - Our custom [http_exception_handler] was called
+2024-02-20 16:04:34,283 - middleware - log_request_middleware - line:29 - INFO - 172.19.0.1:47662 - "GET /v2/error-http" 500 Internal Server Error 1.37ms
+2024-02-20 16:05:37,140 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 16:05:37,241 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 16:05:37,242 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 16:05:37,244 - server - serve - line:86 - INFO - Finished server process [19]
+2024-02-20 16:05:39,632 - server - serve - line:76 - INFO - Started server process [20]
+2024-02-20 16:05:39,633 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 16:05:39,634 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 16:06:39,591 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 16:06:39,691 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 16:06:39,692 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 16:06:39,693 - server - serve - line:86 - INFO - Finished server process [20]
+2024-02-20 16:06:41,916 - server - serve - line:76 - INFO - Started server process [21]
+2024-02-20 16:06:41,916 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 16:06:41,917 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 16:06:44,753 - exception_handlers - http_exception_handler - line:44 - ERROR - 172.19.0.1:53794 - "GET /v2/error-http" 500 Internal Server Error => [HTTPException: ]
+2024-02-20 16:06:45,180 - middleware - log_request_middleware - line:29 - INFO - 172.19.0.1:53794 - "GET /v2/error-http" 500 Internal Server Error 427.18ms
+2024-02-20 16:07:45,535 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 16:07:45,637 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 16:07:45,638 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 16:07:45,638 - server - serve - line:86 - INFO - Finished server process [21]
+2024-02-20 16:07:48,426 - server - serve - line:76 - INFO - Started server process [22]
+2024-02-20 16:07:48,427 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 16:07:48,428 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 16:07:48,432 - exception_handlers - http_exception_handler - line:44 - ERROR - 172.19.0.1:41046 - "GET /v2/error-http" 500 Internal Server Error => [HTTPException: ] <traceback object at 0x7fe1f8115f80>
+2024-02-20 16:07:48,805 - middleware - log_request_middleware - line:29 - INFO - 172.19.0.1:41046 - "GET /v2/error-http" 500 Internal Server Error 372.70ms
+2024-02-20 16:10:55,578 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 16:10:55,679 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 16:10:55,680 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 16:10:55,681 - server - serve - line:86 - INFO - Finished server process [22]
+2024-02-20 16:10:58,468 - server - serve - line:76 - INFO - Started server process [23]
+2024-02-20 16:10:58,469 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 16:10:58,470 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 16:10:58,476 - exception_handlers - http_exception_handler - line:44 - ERROR - 172.19.0.1:60854 - "GET /v2/error-http" 500 Internal Server Error => [HTTPException: ]
+2024-02-20 16:10:59,004 - middleware - log_request_middleware - line:29 - INFO - 172.19.0.1:60854 - "GET /v2/error-http" 500 Internal Server Error 528.31ms
+2024-02-20 16:11:32,492 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 16:11:32,593 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 16:11:32,594 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 16:11:32,594 - server - serve - line:86 - INFO - Finished server process [23]
+2024-02-20 16:11:34,960 - server - serve - line:76 - INFO - Started server process [24]
+2024-02-20 16:11:34,961 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 16:11:34,962 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 16:11:36,223 - exception_handlers - http_exception_handler - line:46 - ERROR - 172.19.0.1:54550 - "GET /v2/error-http" 500 Internal Server Error => [HTTPException: ]
+2024-02-20 16:11:36,619 - middleware - log_request_middleware - line:29 - INFO - 172.19.0.1:54550 - "GET /v2/error-http" 500 Internal Server Error 1382.77ms
+2024-02-20 16:12:40,193 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 16:12:40,294 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 16:12:40,294 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 16:12:40,295 - server - serve - line:86 - INFO - Finished server process [24]
+2024-02-20 16:12:42,675 - server - serve - line:76 - INFO - Started server process [25]
+2024-02-20 16:12:42,677 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 16:12:42,679 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 16:12:43,466 - exception_handlers - http_exception_handler - line:47 - ERROR - 172.19.0.1:39878 - "GET /v2/error-http" 500 Internal Server Error => [HTTPException: ]
+2024-02-20 16:12:43,878 - middleware - log_request_middleware - line:29 - INFO - 172.19.0.1:39878 - "GET /v2/error-http" 500 Internal Server Error 1193.09ms
+2024-02-20 16:13:07,641 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 16:13:07,742 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 16:13:07,743 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 16:13:07,744 - server - serve - line:86 - INFO - Finished server process [25]
+2024-02-20 16:13:09,922 - server - serve - line:76 - INFO - Started server process [26]
+2024-02-20 16:13:09,923 - on - startup - line:46 - INFO - Waiting for application startup.
+2024-02-20 16:13:09,924 - on - startup - line:60 - INFO - Application startup complete.
+2024-02-20 16:13:13,233 - exception_handlers - http_exception_handler - line:47 - ERROR - 172.19.0.1:42872 - "GET /v2/error-http" 500 Internal Server Error => [HTTPException: Another test]
+2024-02-20 16:13:13,604 - middleware - log_request_middleware - line:29 - INFO - 172.19.0.1:42872 - "GET /v2/error-http" 500 Internal Server Error 1066.35ms
+2024-02-20 16:17:38,080 - server - shutdown - line:264 - INFO - Shutting down
+2024-02-20 16:17:38,180 - on - shutdown - line:65 - INFO - Waiting for application shutdown.
+2024-02-20 16:17:38,181 - on - shutdown - line:76 - INFO - Application shutdown complete.
+2024-02-20 16:17:38,182 - server - serve - line:86 - INFO - Finished server process [26]

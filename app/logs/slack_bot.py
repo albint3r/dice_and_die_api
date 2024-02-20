@@ -1,4 +1,4 @@
-from pydantic import BaseModel, validate_call
+from pydantic import BaseModel
 from slack import WebClient
 from slack.errors import SlackApiError
 

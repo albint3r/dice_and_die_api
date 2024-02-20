@@ -17,6 +17,10 @@ class ILobbyUseCase(BaseModel, ABC):
         """Connect user to the lobby pool connections"""
 
     @abstractmethod
+    async def unsubscribe_user(self, websocket: WebSocket) -> None:
+        """Disconnect user from the lobby pool connections"""
+
+    @abstractmethod
     async def update_lobby_information(self) -> None:
         """Broadcast the games to connected users"""
 

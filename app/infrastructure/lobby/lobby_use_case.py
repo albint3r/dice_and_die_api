@@ -5,6 +5,9 @@ from app.domain.lobby.use_cases.i_lobby_use_case import ILobbyUseCase
 
 class LobbyUseCase(ILobbyUseCase):
 
+    async def unsubscribe_user(self, websocket: WebSocket) -> None:
+        await self.lobby_websocket_manager.disconnect(websocket)
+
     async def subscribe_user(self, websocket: WebSocket) -> None:
         await self.lobby_websocket_manager.connect(websocket)
 

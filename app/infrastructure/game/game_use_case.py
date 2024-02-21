@@ -77,7 +77,7 @@ class GameUseCase(IGameUseCase):
         ic(f'Board:{game.p2.board}')
         ic('*-' * 100)
 
-    async def create_or_join_game(self, game_id: str, user_id: str, websocket: WebSocket) -> TGamePlayer:
+    async def create_or_join(self, game_id: str, user_id: str, websocket: WebSocket) -> TGamePlayer:
         game = self.websocket_manager.active_games.get(game_id)
         if not game:
             player = self._create_new_player(self._get_user(user_id))
@@ -90,7 +90,7 @@ class GameUseCase(IGameUseCase):
 
         return game, player
 
-    async def get_player_request_event(self, websocket: WebSocket) -> GamePlayerRequest:
+    async def get_user_request_event(self, websocket: WebSocket) -> GamePlayerRequest:
         try:
             json_str = await websocket.receive_json()
             return GamePlayerRequest(**json_str)

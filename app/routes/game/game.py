@@ -35,13 +35,13 @@ async def play_game(websocket: WebSocket, game_id: str, user_id: str):
     if game_use_case.websocket_manager.is_full(game_id):
         view_use_case = ViewUseCase(websocket_manager=game_websocket_manger,
                                     viewers_websocket_manager=viewers_websocket_manager)
-        await view_use_case.create_or_join(game_id=game_id, user_id=user_id, websocket=websocket)
+        await view_use_case.create_or_join(game_id, websocket)
         return
-    game, player = await game_use_case.create_or_join_game(game_id=game_id, user_id=user_id, websocket=websocket)
+    game, player = await game_use_case.create_or_join(game_id=game_id, user_id=user_id, websocket=websocket)
     try:
         await game_use_case.execute(game)
         while not game.is_finished or game.is_waiting_opponent:
-            request = await game_use_case.get_player_request_event(websocket)
+            request = await game_use_case.get_user_request_event(websocket)
             ic(player.user.name)
             # game_use_case.verbose(game)
             if game.current_player and game.current_player.is_player_turn(player) and request.event == GameEvent.ROLL:
@@ -51,7 +51,7 @@ async def play_game(websocket: WebSocket, game_id: str, user_id: str):
                     # In this part normally occur the next events: [SELECT_COLUMN], [ADD_DICE], [DESTROY_OPPONENT_COLUMN] AND
                     # [UPDATE_PLAYER_POINTS]. This while loop is mainly to check the user select a valid COLUMN.
                     game_use_case.verbose(game)
-                    request = await game_use_case.get_player_request_event(websocket)
+                    request = await game_use_case.get_user_request_event(websocket)
                     await game_use_case.execute(game, selected_column=request)
                     game_use_case.verbose(game)
                 # This last execute is mainly responsible from the [CHANGE_CURRENT_PLAYER] OR [FINISH_GAME] event

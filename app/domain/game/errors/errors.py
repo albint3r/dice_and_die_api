@@ -27,3 +27,7 @@ class NotRemainingActiveConnectionsErro(GameError):
 
 class NoneGameInResponseValidatorError(GameError):
     """Throw an error if the game response don't have a game instance"""
+
+
+class MissingBroadcastGameInPlayersMatch(GameError):
+    """Throw an error you want to broadcast the game and don't exit"""

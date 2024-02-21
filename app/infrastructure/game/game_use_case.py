@@ -17,6 +17,7 @@ from app.domain.game.entities.player import Player
 from app.domain.game.enums.game_event import GameEvent
 from app.domain.game.enums.game_state import GameState
 from app.domain.game.enums.viewer_event import ViewerEvent
+from app.domain.game.errors.errors import MissingBroadcastGameInPlayersMatch
 from app.domain.game.schemas.request import GamePlayerRequest, ViewerRequest
 from app.domain.game.use_cases.i_game_use_case import IGameUseCase
 
@@ -87,11 +88,16 @@ class GameUseCase(IGameUseCase):
         try:
             while True:
                 request = await self.get_viewer_request_event(websocket)
+                # Exist Game and is a valid input event?
+
                 if request.event != ViewerEvent.INVALID_INPUT_EVENT:
                     extras = {'viewer': request.event, 'time': datetime.now()}
                     # Broadcast Viewer event to Players and Viewers
                     await self.websocket_manager.broadcast(game_id=game.game_id, message='viewer_action', extras=extras)
                     await self.viewers_websocket_manager.broadcast(game=game, message='viewer_action', extras=extras)
+        except MissingBroadcastGameInPlayersMatch:
+            await websocket.close()
+            await self.viewers_websocket_manager.disconnect(game_id, websocket)
         except WebSocketDisconnect:
             await self.viewers_websocket_manager.disconnect(game_id, websocket)
             ic('disconnect viewer')

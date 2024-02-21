@@ -4,7 +4,7 @@ from starlette.websockets import WebSocket
 
 from app.domain.core.ref_types import TExtras
 from app.domain.game.entities.game import Game
-from app.domain.game.errors.errors import NotRemainingActiveConnectionsErro
+from app.domain.game.errors.errors import NotRemainingActiveConnectionsErro, MissingBroadcastGameInPlayersMatch
 from app.domain.game.schemas.response import ResponseGame
 from app.domain.game.use_cases.i_game_websocket_manager import IGameWebSocketManager
 
@@ -35,6 +35,11 @@ class _GameWebSocketManager(IGameWebSocketManager):
     async def broadcast(self, game_id: str, message: str = '', extras: TExtras | None = None) -> None:
         connections = self.active_connections.get(game_id, {})
         game = self.active_games.get(game_id)
+        if not game:
+            raise MissingBroadcastGameInPlayersMatch("You cant' broadcast to players if Game not longer exist. "
+                                                     f"Most probably the game with id: {game_id} is finished and your "
+                                                     "are trying to send message to a ended game.")
+
         response = ResponseGame(game=game, message=message, extras=extras)
         jsons_response = response.model_dump_json()
         for user_connection in connections:

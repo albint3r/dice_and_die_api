@@ -25,7 +25,6 @@ class ViewersWebSocketManager(IViewersWebSocketManager):
         if connections:
             response = ResponseGame(game=game, message=message, extras=extras)
             jsons_response = response.model_dump_json()
-            ic(connections)
             for viewer_connection in connections:
                 await viewer_connection.send_json(jsons_response)
 

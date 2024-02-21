@@ -9,6 +9,7 @@ from app.infrastructure.game.game_websocket_manager import game_websocket_manger
 from app.infrastructure.game.level_use_case import LevelUserCase
 from app.infrastructure.game.manager_leveling_use_case import ManagerLevelingUseCase
 from app.infrastructure.game.rank_use_case import RankUseCase
+from app.infrastructure.game.viewers_websocket_manager import viewers_websocket_manager
 from app.repositories.auth.auth_repository import AuthRepository
 
 router = APIRouter(tags=['game'], prefix='/v2')
@@ -17,7 +18,7 @@ router = APIRouter(tags=['game'], prefix='/v2')
 @router.get('/check-connections')
 async def check_active_connections():
     ic(game_websocket_manger.active_connections)
-    ic(game_websocket_manger.active_connections_viewers)
+    ic(viewers_websocket_manager.active_connections)
     ic(game_websocket_manger.active_games)
     return {"ok": 200}
 
@@ -26,7 +27,9 @@ async def check_active_connections():
 async def play_game(websocket: WebSocket, game_id: str, user_id: str):
     """This is the websocket endpoint to play the dice and die game"""
     leveling_manager = ManagerLevelingUseCase(leve_manager=LevelUserCase(), rank_manager=RankUseCase())
-    game_use_case = GameUseCase(websocket_manager=game_websocket_manger, leveling_manager=leveling_manager,
+    game_use_case = GameUseCase(websocket_manager=game_websocket_manger,
+                                viewers_websocket_manager=viewers_websocket_manager,
+                                leveling_manager=leveling_manager,
                                 repo=AuthRepository(db=db))
     if game_use_case.websocket_manager.is_full(game_id):
         await game_use_case.join_as_viewer(game_id=game_id, user_id=user_id, websocket=websocket)

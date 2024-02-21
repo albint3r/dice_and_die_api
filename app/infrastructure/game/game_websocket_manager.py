@@ -2,11 +2,11 @@ from typing import Final
 
 from starlette.websockets import WebSocket
 
-from app.domain.game.use_cases.i_game_websocket_manager import IGameWebSocketManager
 from app.domain.core.ref_types import TExtras
 from app.domain.game.entities.game import Game
 from app.domain.game.errors.errors import NotRemainingActiveConnectionsErro
 from app.domain.game.schemas.response import ResponseGame
+from app.domain.game.use_cases.i_game_websocket_manager import IGameWebSocketManager
 
 
 class _GameWebSocketManager(IGameWebSocketManager):
@@ -19,13 +19,6 @@ class _GameWebSocketManager(IGameWebSocketManager):
             self.active_games.setdefault(game_id, new_game)
         # Add user to game pool connections
         self.active_connections.setdefault(game_id, set()).add(websocket)
-
-    async def connect_viewer(self, game_id: str, websocket: WebSocket) -> None:
-        """Add user websocket to active connection as a viewer roll."""
-        await websocket.accept()
-        game = self.active_games.get(game_id)
-        if game:
-            self.active_connections_viewers.setdefault(game_id, list()).append(websocket)
 
     async def disconnect(self, game_id: str, websocket: WebSocket) -> None:
         if game_id in self.active_connections:

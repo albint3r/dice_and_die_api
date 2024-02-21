@@ -15,7 +15,8 @@ from app.domain.game.entities.game import Game
 from app.domain.game.entities.player import Player
 from app.domain.game.enums.game_event import GameEvent
 from app.domain.game.enums.game_state import GameState
-from app.domain.game.schemas.request import GamePlayerRequest
+from app.domain.game.enums.viewer_event import ViewerEvent
+from app.domain.game.schemas.request import GamePlayerRequest, ViewerRequest
 from app.domain.game.use_cases.i_game_use_case import IGameUseCase
 
 
@@ -79,13 +80,14 @@ class GameUseCase(IGameUseCase):
 
     async def join_as_viewer(self, game_id: str, user_id: str, websocket: WebSocket) -> None:
         """Joint the new user as a viewer. This occurs when the active connection is full (2 players max)."""
-        await self.websocket_manager.connect_viewer(game_id=game_id, websocket=websocket)
+        await self.viewers_websocket_manager.connect(game_id=game_id, websocket=websocket)
         game = self.websocket_manager.active_games.get(game_id)
         try:
             while True:
-                event = await self.get_player_request_event(websocket)
+                event = await self.get_viewer_request_event(websocket)
                 ic(event)
         except WebSocketDisconnect:
+            await self.viewers_websocket_manager.disconnect(game_id, websocket)
             ic('disconnect viewer')
 
     async def create_or_join_game(self, game_id: str, user_id: str, websocket: WebSocket) -> TGamePlayer:
@@ -109,6 +111,15 @@ class GameUseCase(IGameUseCase):
             return GamePlayerRequest(event=GameEvent.INVALID_INPUT_EVENT)
         except JSONDecodeError:
             return GamePlayerRequest(event=GameEvent.INVALID_INPUT_EVENT)
+
+    async def get_viewer_request_event(self, websocket: WebSocket) -> ViewerRequest:
+        try:
+            json_str = await websocket.receive_json()
+            return ViewerRequest(**json_str)
+        except ValidationError:
+            return ViewerRequest(event=ViewerEvent.INVALID_INPUT_EVENT)
+        except JSONDecodeError:
+            return ViewerRequest(event=ViewerEvent.INVALID_INPUT_EVENT)
 
     async def get_winner_after_player_disconnect(self, disconnected_player: Player, game: Game,
                                                  websocket: WebSocket) -> None:

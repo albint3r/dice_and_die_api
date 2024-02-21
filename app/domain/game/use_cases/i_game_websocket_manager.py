@@ -10,16 +10,11 @@ from app.domain.game.entities.game import Game
 class IGameWebSocketManager(IWebSocketManager, ABC):
     """This class handle the websocket game services"""
     active_connections: TActiveConnections = {}
-    active_connections_viewers: TActiveConnectionsViewers = {}
     active_games: TActiveGames = {}
 
     @abstractmethod
     async def connect(self, game_id: str, new_game: Game, websocket: WebSocket) -> None:
         """Add user websocket to active connection and add game to active games if not exist."""
-
-    @abstractmethod
-    async def connect_viewer(self, game_id: str, websocket: WebSocket) -> None:
-        """Add user websocket to active connection as a viewer roll."""
 
     @abstractmethod
     async def disconnect(self, game_id: str, websocket: WebSocket) -> None:

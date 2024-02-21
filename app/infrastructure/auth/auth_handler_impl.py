@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import Final
 
 import bcrypt
 import jwt
@@ -48,4 +49,4 @@ class _AuthHandlerImpl(IAuthHandler):
         return self.decode_token(auth.credentials)
 
 
-auth_handler = _AuthHandlerImpl()
+auth_handler: Final[IAuthHandler] = _AuthHandlerImpl()

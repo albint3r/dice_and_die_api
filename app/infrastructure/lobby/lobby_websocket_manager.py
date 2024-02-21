@@ -1,3 +1,5 @@
+from typing import Final
+
 from starlette.websockets import WebSocket
 
 from app.domain.core.ref_types import TActiveGames
@@ -25,4 +27,4 @@ class _LobbyWebSocketManager(ILobbyWebSocketManager):
         return len(self.active_connections)
 
 
-lobby_websocket_manager = _LobbyWebSocketManager()
+lobby_websocket_manager: Final[ILobbyWebSocketManager] = _LobbyWebSocketManager()

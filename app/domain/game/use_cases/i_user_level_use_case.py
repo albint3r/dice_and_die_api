@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 from app.domain.auth.entities.user import User
 from app.domain.game.entities.game import Game
-from app.domain.game.use_cases.i_leveling_use_case import ILevelUseCase, IRankUseCase
+from app.domain.game.use_cases.i_progress_use_case import ILevelUseCase, IRankUseCase
 
 
 class IManagerLevelingUseCase(BaseModel, ABC):

@@ -1,6 +1,6 @@
+import copy
 from json import JSONDecodeError
 from random import choice
-import copy
 
 from icecream import ic
 from pydantic import ValidationError
@@ -77,7 +77,7 @@ class GameUseCase(IGameUseCase):
         ic(f'Board:{game.p2.board}')
         ic('*-' * 100)
 
-    async def create_or_join_game(self, game_id: str, user_id: str, websocket: WebSocket) -> TGamePlayer:
+    async def create_or_join(self, game_id: str, user_id: str, websocket: WebSocket) -> TGamePlayer:
         game = self.websocket_manager.active_games.get(game_id)
         if not game:
             player = self._create_new_player(self._get_user(user_id))
@@ -90,7 +90,7 @@ class GameUseCase(IGameUseCase):
 
         return game, player
 
-    async def get_player_request_event(self, websocket: WebSocket) -> GamePlayerRequest:
+    async def get_user_request_event(self, websocket: WebSocket) -> GamePlayerRequest:
         try:
             json_str = await websocket.receive_json()
             return GamePlayerRequest(**json_str)
@@ -118,18 +118,27 @@ class GameUseCase(IGameUseCase):
         match game.state:
             case GameState.CREATE_NEW_GAME:
                 game.state = GameState.WAITING_OPPONENT
-                await self.websocket_manager.broadcast(game_id=game.game_id, message='player_1_connected', extras={})
+                extras = {}
+                message = 'player_1_connected'
+                await self.websocket_manager.broadcast(game_id=game.game_id, message=message, extras=extras)
+                await self.viewers_websocket_manager.broadcast(game=game, message=message, extras=extras)
 
             case GameState.WAITING_OPPONENT:
                 started_player = self._get_starter_player(game)
                 game.current_player = started_player
                 game.state = GameState.ROLL_DICE
-                await self.websocket_manager.broadcast(game_id=game.game_id, message='player_2_connected', extras={})
+                extras = {}
+                message = 'player_2_connected'
+                await self.websocket_manager.broadcast(game_id=game.game_id, message=message, extras=extras)
+                await self.viewers_websocket_manager.broadcast(game=game, message=message, extras=extras)
 
             case GameState.ROLL_DICE:
                 game.current_player.die.roll()
                 game.state = GameState.SELECT_COLUMN
-                await self.websocket_manager.broadcast(game_id=game.game_id, message='roll_dice', extras={})
+                extras = {}
+                message = 'roll_dice'
+                await self.websocket_manager.broadcast(game_id=game.game_id, message=message, extras=extras)
+                await self.viewers_websocket_manager.broadcast(game=game, message=message, extras=extras)
 
             case GameState.SELECT_COLUMN:
                 request: GamePlayerRequest = kwargs['selected_column']
@@ -148,12 +157,13 @@ class GameUseCase(IGameUseCase):
                 column_opponent_player = opponent_player.board.columns.get(column_index)
                 if column_opponent_player.can_remove_values(die_val):
                     game.state = GameState.DESTROY_OPPONENT_TARGET_COLUMN
-                    await self.execute(game,
-                                       column_opponent_player=column_opponent_player,
-                                       die_val=die_val)
+                    await self.execute(game, column_opponent_player=column_opponent_player, die_val=die_val)
                 else:
                     game.state = GameState.UPDATE_PLAYERS_POINTS
-                    await self.websocket_manager.broadcast(game_id=game.game_id, message='add_dice_to_colum', extras={})
+                    extras = {}
+                    message = 'add_dice'
+                    await self.websocket_manager.broadcast(game_id=game.game_id, message=message, extras=extras)
+                    await self.viewers_websocket_manager.broadcast(game=game, message=message, extras=extras)
                     await self.execute(game)
 
             case GameState.DESTROY_OPPONENT_TARGET_COLUMN:
@@ -161,8 +171,10 @@ class GameUseCase(IGameUseCase):
                 die_val: int = kwargs['die_val']
                 removed_indices = column_opponent_player.remove(die_val)
                 game.state = GameState.UPDATE_PLAYERS_POINTS
-                await self.websocket_manager.broadcast(game_id=game.game_id, message='destroy_opponent_target_column',
-                                                       extras={'removed_indices': removed_indices})
+                extras = {'removed_indices': removed_indices}
+                message = 'destroy_opponent_target_column'
+                await self.websocket_manager.broadcast(game_id=game.game_id, message=message, extras=extras)
+                await self.viewers_websocket_manager.broadcast(game=game, message=message, extras=extras)
                 await self.execute(game)
 
             case GameState.UPDATE_PLAYERS_POINTS:
@@ -171,12 +183,18 @@ class GameUseCase(IGameUseCase):
                     game.state = GameState.FINISH_GAME
                 else:
                     game.state = GameState.CHANGE_CURRENT_PLAYER
-                await self.websocket_manager.broadcast(game_id=game.game_id, message='update_players_points', extras={})
+                extras = {}
+                message = 'update_players_points'
+                await self.websocket_manager.broadcast(game_id=game.game_id, message=message, extras=extras)
+                await self.viewers_websocket_manager.broadcast(game=game, message=message, extras=extras)
 
             case GameState.CHANGE_CURRENT_PLAYER:
                 game.current_player = game.get_opponent_player()
                 game.state = GameState.ROLL_DICE
-                await self.websocket_manager.broadcast(game_id=game.game_id, message='update_players_points', extras={})
+                extras = {}
+                message = 'change_current_player'
+                await self.websocket_manager.broadcast(game_id=game.game_id, message=message, extras=extras)
+                await self.viewers_websocket_manager.broadcast(game=game, message=message, extras=extras)
 
             case GameState.FINISH_GAME:
                 winner_player, tied_player = game.get_winner()
@@ -185,11 +203,17 @@ class GameUseCase(IGameUseCase):
                     # Update both players points and ranks
                     self._update_user_level_rank_and_bank_account(exp_points, tied_player)
                 self._update_user_level_rank_and_bank_account(exp_points, winner_player)
-                await self.websocket_manager.broadcast(game_id=game.game_id, message='finish_game', extras={})
+                extras = {}
+                message = 'finish_game'
+                await self.websocket_manager.broadcast(game_id=game.game_id, message=message, extras=extras)
+                await self.viewers_websocket_manager.broadcast(game=game, message=message, extras=extras)
 
             case GameState.DISCONNECT_PLAYER:
                 winner_player, _ = game.winner_player
                 exp_points = self.leveling_manager.get_winner_earned_exp_after_player_disconnect()
                 # Create a copy to compare if the user level up
                 self._update_user_level_rank_and_bank_account(exp_points, winner_player)
-                await self.websocket_manager.broadcast(game_id=game.game_id, message='player_disconnected', extras={})
+                extras = {}
+                message = 'player_disconnected'
+                await self.websocket_manager.broadcast(game_id=game.game_id, message=message, extras=extras)
+                await self.viewers_websocket_manager.broadcast(game=game, message=message, extras=extras)

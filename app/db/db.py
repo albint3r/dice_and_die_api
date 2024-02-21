@@ -1,4 +1,5 @@
 import time
+from typing import Final
 
 import mysql.connector as connector
 from mysql.connector import Error as DBError, MySQLConnection
@@ -66,6 +67,6 @@ class _DataBase(BaseModel):
             raise e
 
 
-db = _DataBase(user=credentials_provider.user,
-               password=credentials_provider.password,
-               host='db', database='dice_and_die', port='3306')
+db: Final[_DataBase] = _DataBase(user=credentials_provider.user,
+                                 password=credentials_provider.password,
+                                 host='db', database='dice_and_die', port='3306')

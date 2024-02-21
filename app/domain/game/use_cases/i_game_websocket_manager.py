@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 
 from starlette.websockets import WebSocket
 
-from app.domain.game.use_cases.i_websocket_manager import IWebSocketManager
-from app.domain.core.ref_types import TActiveConnections, TActiveGames, TExtras
+from app.domain.core.i_websocket_manager import IWebSocketManager
+from app.domain.core.ref_types import TActiveConnections, TActiveGames, TExtras, TActiveConnectionsViewers
 from app.domain.game.entities.game import Game
 
 
@@ -30,3 +30,7 @@ class IGameWebSocketManager(IWebSocketManager, ABC):
     @abstractmethod
     def get_remained_player_websocket(self, game_id: str) -> WebSocket:
         """Return the Remained player. This is useful after a user disconnect from the match"""
+
+    @abstractmethod
+    def is_full(self, game_id: str) -> bool:
+        """Check if the game have 2 active connections (p1 and p2). This is helpful to assign the user to a viewer role."""

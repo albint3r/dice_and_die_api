@@ -6,18 +6,25 @@ from pydantic import ValidationError
 from starlette.websockets import WebSocket, WebSocketDisconnect
 
 from app.domain.game.entities.game import Game
+from app.domain.game.entities.viewer import Viewer
 from app.domain.game.enums.viewer_event import ViewerEvent
 from app.domain.game.errors.errors import MissingBroadcastGameInPlayersMatch
 from app.domain.game.schemas.request import ViewerRequest
 from app.domain.game.use_cases.i_view_use_case import IViewUseCase
+from app.repositories.auth.auth_repository import AuthRepository
 
 
 class ViewUseCase(IViewUseCase):
+    repo: AuthRepository
 
-    async def create_or_join(self, game_id: str, websocket: WebSocket) -> None:
-        await self.viewers_websocket_manager.connect(game_id=game_id, websocket=websocket)
+    async def create_or_join(self, game_id: str, user_id: str, websocket: WebSocket) -> None:
+        user = self.repo.get_user_by_id(user_id)
+        viewer = Viewer(user=user)
         game = self.websocket_manager.active_games.get(game_id)
-        await self.viewers_websocket_manager.broadcast(game, message='join_viewer', extras={})
+        extras = {'viewer': viewer.model_dump_json()}
+        await self.viewers_websocket_manager.connect(game_id, websocket)
+        await self.viewers_websocket_manager.broadcast(game, message='join_viewer', extras=extras)
+        ic(viewer)
         try:
             while True:
                 await self.execute(game, websocket)
@@ -42,6 +49,7 @@ class ViewUseCase(IViewUseCase):
         # Exist Game and is a valid input event?
         if request.event != ViewerEvent.INVALID_INPUT_EVENT:
             extras = {'viewer': request.event, 'time': datetime.now()}
+            message = 'viewer_action'
             # Broadcast Viewer event to Players and Viewers
-            await self.websocket_manager.broadcast(game_id=game.game_id, message='viewer_action', extras=extras)
-            await self.viewers_websocket_manager.broadcast(game=game, message='viewer_action', extras=extras)
+            await self.websocket_manager.broadcast(game_id=game.game_id, message=message, extras=extras)
+            await self.viewers_websocket_manager.broadcast(game=game, message=message, extras=extras)

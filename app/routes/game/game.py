@@ -4,6 +4,7 @@ from icecream import ic
 from app.db.db import db
 from app.domain.game.enums.game_event import GameEvent
 from app.domain.game.enums.game_state import GameState
+from app.infrastructure.game.chat_observer import ChatObserver
 from app.infrastructure.game.game_use_case import GameUseCase
 from app.infrastructure.game.game_websocket_manager import game_websocket_manger
 from app.infrastructure.game.level_use_case import LevelUserCase
@@ -27,21 +28,26 @@ async def check_active_connections():
 @router.websocket('/game/{game_id}/{user_id}')
 async def play_game(websocket: WebSocket, game_id: str, user_id: str):
     """This is the websocket endpoint to play the dice and die game"""
+    repo = AuthRepository(db=db)
     leveling_manager = ManagerLevelingUseCase(leve_manager=LevelUserCase(), rank_manager=RankUseCase())
     game_use_case = GameUseCase(websocket_manager=game_websocket_manger,
                                 viewers_websocket_manager=viewers_websocket_manager,
-                                leveling_manager=leveling_manager,
-                                repo=AuthRepository(db=db))
+                                leveling_manager=leveling_manager, repo=repo)
+
     if game_use_case.websocket_manager.is_full(game_id):
         view_use_case = ViewUseCase(websocket_manager=game_websocket_manger,
-                                    viewers_websocket_manager=viewers_websocket_manager)
-        await view_use_case.create_or_join(game_id, websocket)
+                                    viewers_websocket_manager=viewers_websocket_manager, repo=repo)
+
+        await view_use_case.create_or_join(game_id, user_id, websocket)
         return
     game, player = await game_use_case.create_or_join(game_id=game_id, user_id=user_id, websocket=websocket)
+    chat_observer = ChatObserver(viewers_websockets_manager=viewers_websocket_manager,
+                                 websockets_manager=game_websocket_manger)
     try:
         await game_use_case.execute(game)
         while not game.is_finished or game.is_waiting_opponent:
             request = await game_use_case.get_user_request_event(websocket)
+            await chat_observer.listen_request_event(request, game=game, player=player)
             ic(player.user.name)
             # game_use_case.verbose(game)
             if game.current_player and game.current_player.is_player_turn(player) and request.event == GameEvent.ROLL:
@@ -52,6 +58,7 @@ async def play_game(websocket: WebSocket, game_id: str, user_id: str):
                     # [UPDATE_PLAYER_POINTS]. This while loop is mainly to check the user select a valid COLUMN.
                     game_use_case.verbose(game)
                     request = await game_use_case.get_user_request_event(websocket)
+                    await chat_observer.listen_request_event(request, game=game, player=player)
                     await game_use_case.execute(game, selected_column=request)
                     game_use_case.verbose(game)
                 # This last execute is mainly responsible from the [CHANGE_CURRENT_PLAYER] OR [FINISH_GAME] event

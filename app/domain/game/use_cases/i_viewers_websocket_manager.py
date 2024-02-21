@@ -4,6 +4,8 @@ from app.domain.core.i_websocket_manager import IWebSocketManager
 from app.domain.core.ref_types import TActiveConnectionsViewers, TExtras
 from abc import ABC, abstractmethod
 
+from app.domain.game.entities.game import Game
+
 
 class IViewersWebSocketManager(IWebSocketManager, ABC):
     active_connections: TActiveConnectionsViewers = {}
@@ -17,5 +19,5 @@ class IViewersWebSocketManager(IWebSocketManager, ABC):
         """Disconnect viewer of the match"""
 
     @abstractmethod
-    async def broadcast(self, game_id: str, message: str = '', extras: TExtras | None = None) -> None:
+    async def broadcast(self, game: Game, message: str = '', extras: TExtras | None = None) -> None:
         """Broadcast Cheering to the players"""

@@ -82,10 +82,13 @@ class GameUseCase(IGameUseCase):
         """Joint the new user as a viewer. This occurs when the active connection is full (2 players max)."""
         await self.viewers_websocket_manager.connect(game_id=game_id, websocket=websocket)
         game = self.websocket_manager.active_games.get(game_id)
+        await self.viewers_websocket_manager.broadcast(game, extras={})
         try:
             while True:
-                event = await self.get_viewer_request_event(websocket)
-                ic(event)
+                request = await self.get_viewer_request_event(websocket)
+                if request.event != ViewerEvent.INVALID_INPUT_EVENT:
+                    extras = {'viewer': request.event}
+                    await self.websocket_manager.broadcast(game_id=game.game_id, message='viewer_action', extras=extras)
         except WebSocketDisconnect:
             await self.viewers_websocket_manager.disconnect(game_id, websocket)
             ic('disconnect viewer')

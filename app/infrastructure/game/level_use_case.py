@@ -1,7 +1,7 @@
 from typing import Callable
 
 from app.domain.auth.entities.user_level import UserLevel
-from app.domain.game.use_cases.i_leveling_use_case import ILevelUseCase
+from app.domain.game.use_cases.i_progress_use_case import ILevelUseCase
 
 
 class LevelUserCase(ILevelUseCase):

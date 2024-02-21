@@ -7,7 +7,7 @@ from app.domain.auth.entities.user_level import UserLevel
 from app.domain.auth.enums.rank import Rank
 
 
-class ILeveling(BaseModel, ABC):
+class IProgress(BaseModel, ABC):
 
     @abstractmethod
     def next_stage(self, *args, **kwargs) -> int:
@@ -24,7 +24,7 @@ class ILeveling(BaseModel, ABC):
         """Progress the user to the next stage"""
 
 
-class IRankUseCase(ILeveling, ABC):
+class IRankUseCase(IProgress, ABC):
     @abstractmethod
     def next_stage(self, rank: Rank) -> int:
         """Get the Level the user need to rank up.
@@ -40,7 +40,7 @@ class IRankUseCase(ILeveling, ABC):
         """Add experience level """
 
 
-class ILevelUseCase(ILeveling, ABC):
+class ILevelUseCase(IProgress, ABC):
 
     @abstractmethod
     def next_stage(self, user_level: UserLevel, *,

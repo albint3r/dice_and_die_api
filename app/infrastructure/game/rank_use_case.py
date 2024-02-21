@@ -1,6 +1,6 @@
 from app.domain.auth.entities.user_level import UserLevel
 from app.domain.auth.enums.rank import Rank
-from app.domain.game.use_cases.i_leveling_use_case import IRankUseCase
+from app.domain.game.use_cases.i_progress_use_case import IRankUseCase
 
 
 class RankUseCase(IRankUseCase):

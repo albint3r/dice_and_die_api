@@ -28,16 +28,8 @@ class IGameUseCase(BaseModel, ABC):
         """Player Create or join to an existed game."""
 
     @abstractmethod
-    async def join_as_viewer(self, game_id: str, user_id: str, websocket: WebSocket) -> None:
-        """Joint the new user as a viewer. This occurs when the active connection is full (2 players max)."""
-
-    @abstractmethod
     async def get_player_request_event(self, websocket: WebSocket) -> GamePlayerRequest:
         """Get the player message event from the client"""
-
-    @abstractmethod
-    async def get_viewer_request_event(self, websocket: WebSocket) -> ViewerRequest:
-        """Get the viewer event from the client"""
 
     @abstractmethod
     async def get_winner_after_player_disconnect(self, disconnected_player: Player, game: Game,

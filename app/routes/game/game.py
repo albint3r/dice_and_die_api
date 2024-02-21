@@ -9,6 +9,7 @@ from app.infrastructure.game.game_websocket_manager import game_websocket_manger
 from app.infrastructure.game.level_use_case import LevelUserCase
 from app.infrastructure.game.manager_leveling_use_case import ManagerLevelingUseCase
 from app.infrastructure.game.rank_use_case import RankUseCase
+from app.infrastructure.game.view_user_cases import ViewUseCase
 from app.infrastructure.game.viewers_websocket_manager import viewers_websocket_manager
 from app.repositories.auth.auth_repository import AuthRepository
 
@@ -32,7 +33,9 @@ async def play_game(websocket: WebSocket, game_id: str, user_id: str):
                                 leveling_manager=leveling_manager,
                                 repo=AuthRepository(db=db))
     if game_use_case.websocket_manager.is_full(game_id):
-        await game_use_case.join_as_viewer(game_id=game_id, user_id=user_id, websocket=websocket)
+        view_use_case = ViewUseCase(websocket_manager=game_websocket_manger,
+                                    viewers_websocket_manager=viewers_websocket_manager)
+        await view_use_case.create_or_join(game_id=game_id, user_id=user_id, websocket=websocket)
         return
     game, player = await game_use_case.create_or_join_game(game_id=game_id, user_id=user_id, websocket=websocket)
     try:

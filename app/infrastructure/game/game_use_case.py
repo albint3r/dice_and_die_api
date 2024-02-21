@@ -80,28 +80,6 @@ class GameUseCase(IGameUseCase):
         ic(f'Board:{game.p2.board}')
         ic('*-' * 100)
 
-    async def join_as_viewer(self, game_id: str, user_id: str, websocket: WebSocket) -> None:
-        """Joint the new user as a viewer. This occurs when the active connection is full (2 players max)."""
-        await self.viewers_websocket_manager.connect(game_id=game_id, websocket=websocket)
-        game = self.websocket_manager.active_games.get(game_id)
-        await self.viewers_websocket_manager.broadcast(game, extras={})
-        try:
-            while True:
-                request = await self.get_viewer_request_event(websocket)
-                # Exist Game and is a valid input event?
-
-                if request.event != ViewerEvent.INVALID_INPUT_EVENT:
-                    extras = {'viewer': request.event, 'time': datetime.now()}
-                    # Broadcast Viewer event to Players and Viewers
-                    await self.websocket_manager.broadcast(game_id=game.game_id, message='viewer_action', extras=extras)
-                    await self.viewers_websocket_manager.broadcast(game=game, message='viewer_action', extras=extras)
-        except MissingBroadcastGameInPlayersMatch:
-            await websocket.close()
-            await self.viewers_websocket_manager.disconnect(game_id, websocket)
-        except WebSocketDisconnect:
-            await self.viewers_websocket_manager.disconnect(game_id, websocket)
-            ic('disconnect viewer')
-
     async def create_or_join_game(self, game_id: str, user_id: str, websocket: WebSocket) -> TGamePlayer:
         game = self.websocket_manager.active_games.get(game_id)
         if not game:
@@ -123,15 +101,6 @@ class GameUseCase(IGameUseCase):
             return GamePlayerRequest(event=GameEvent.INVALID_INPUT_EVENT)
         except JSONDecodeError:
             return GamePlayerRequest(event=GameEvent.INVALID_INPUT_EVENT)
-
-    async def get_viewer_request_event(self, websocket: WebSocket) -> ViewerRequest:
-        try:
-            json_str = await websocket.receive_json()
-            return ViewerRequest(**json_str)
-        except ValidationError:
-            return ViewerRequest(event=ViewerEvent.INVALID_INPUT_EVENT)
-        except JSONDecodeError:
-            return ViewerRequest(event=ViewerEvent.INVALID_INPUT_EVENT)
 
     async def get_winner_after_player_disconnect(self, disconnected_player: Player, game: Game,
                                                  websocket: WebSocket) -> None:

@@ -1,5 +1,6 @@
 from typing import Final
 
+from icecream import ic
 from starlette.websockets import WebSocket
 
 from app.domain.core.ref_types import TExtras
@@ -20,10 +21,13 @@ class ViewersWebSocketManager(IViewersWebSocketManager):
 
     async def broadcast(self, game: Game, message: str = '', extras: TExtras | None = None) -> None:
         connections = self.active_connections.get(game.game_id)
-        response = ResponseGame(game=game, message=message, extras=extras)
-        jsons_response = response.model_dump_json()
-        for viewer_connection in connections:
-            await viewer_connection.send_json(jsons_response)
+        # Are viewer in the game?
+        if connections:
+            response = ResponseGame(game=game, message=message, extras=extras)
+            jsons_response = response.model_dump_json()
+            ic(connections)
+            for viewer_connection in connections:
+                await viewer_connection.send_json(jsons_response)
 
 
 viewers_websocket_manager: Final[IViewersWebSocketManager] = ViewersWebSocketManager()

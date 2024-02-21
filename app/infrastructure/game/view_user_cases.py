@@ -17,7 +17,7 @@ class ViewUseCase(IViewUseCase):
     async def create_or_join(self, game_id: str, user_id: str, websocket: WebSocket) -> None:
         await self.viewers_websocket_manager.connect(game_id=game_id, websocket=websocket)
         game = self.websocket_manager.active_games.get(game_id)
-        await self.viewers_websocket_manager.broadcast(game, extras={})
+        await self.viewers_websocket_manager.broadcast(game, message='join_viewer', extras={})
         try:
             while True:
                 await self.execute(game, websocket)

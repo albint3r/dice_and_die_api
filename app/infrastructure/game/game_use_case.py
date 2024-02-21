@@ -1,11 +1,10 @@
-from datetime import datetime
+import copy
 from json import JSONDecodeError
 from random import choice
-import copy
 
 from icecream import ic
 from pydantic import ValidationError
-from starlette.websockets import WebSocket, WebSocketDisconnect
+from starlette.websockets import WebSocket
 
 from app.domain.auth.entities.user import User
 from app.domain.core.ref_types import TGamePlayer
@@ -16,9 +15,7 @@ from app.domain.game.entities.game import Game
 from app.domain.game.entities.player import Player
 from app.domain.game.enums.game_event import GameEvent
 from app.domain.game.enums.game_state import GameState
-from app.domain.game.enums.viewer_event import ViewerEvent
-from app.domain.game.errors.errors import MissingBroadcastGameInPlayersMatch
-from app.domain.game.schemas.request import GamePlayerRequest, ViewerRequest
+from app.domain.game.schemas.request import GamePlayerRequest
 from app.domain.game.use_cases.i_game_use_case import IGameUseCase
 
 

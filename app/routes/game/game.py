@@ -28,15 +28,17 @@ async def check_active_connections():
 @router.websocket('/game/{game_id}/{user_id}')
 async def play_game(websocket: WebSocket, game_id: str, user_id: str):
     """This is the websocket endpoint to play the dice and die game"""
+    repo = AuthRepository(db=db)
     leveling_manager = ManagerLevelingUseCase(leve_manager=LevelUserCase(), rank_manager=RankUseCase())
     game_use_case = GameUseCase(websocket_manager=game_websocket_manger,
                                 viewers_websocket_manager=viewers_websocket_manager,
-                                leveling_manager=leveling_manager,
-                                repo=AuthRepository(db=db))
+                                leveling_manager=leveling_manager, repo=repo)
+
     if game_use_case.websocket_manager.is_full(game_id):
         view_use_case = ViewUseCase(websocket_manager=game_websocket_manger,
-                                    viewers_websocket_manager=viewers_websocket_manager)
-        await view_use_case.create_or_join(game_id, websocket)
+                                    viewers_websocket_manager=viewers_websocket_manager, repo=repo)
+
+        await view_use_case.create_or_join(game_id, user_id, websocket)
         return
     game, player = await game_use_case.create_or_join(game_id=game_id, user_id=user_id, websocket=websocket)
     chat_observer = ChatObserver(viewers_websockets_manager=viewers_websocket_manager,

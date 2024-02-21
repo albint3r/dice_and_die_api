@@ -19,7 +19,7 @@ class IViewUseCase(BaseModel, ABC):
         """Viewers mian process"""
 
     @abstractmethod
-    async def create_or_join(self, game_id: str, websocket: WebSocket) -> None:
+    async def create_or_join(self, game_id: str, user_id: str, websocket: WebSocket) -> None:
         """Create or join view room"""
 
     @abstractmethod

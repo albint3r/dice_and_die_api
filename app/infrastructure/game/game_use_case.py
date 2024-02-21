@@ -119,9 +119,9 @@ class GameUseCase(IGameUseCase):
             case GameState.CREATE_NEW_GAME:
                 game.state = GameState.WAITING_OPPONENT
                 extras = {}
-                await self.websocket_manager.broadcast(game_id=game.game_id, message='player_1_connected',
-                                                       extras=extras)
-                await self.viewers_websocket_manager.broadcast(game=game, message='player_1_connected', extras=extras)
+                message = 'player_1_connected'
+                await self.websocket_manager.broadcast(game_id=game.game_id, message=message, extras=extras)
+                await self.viewers_websocket_manager.broadcast(game=game, message=message, extras=extras)
 
             case GameState.WAITING_OPPONENT:
                 started_player = self._get_starter_player(game)
@@ -161,7 +161,7 @@ class GameUseCase(IGameUseCase):
                 else:
                     game.state = GameState.UPDATE_PLAYERS_POINTS
                     extras = {}
-                    message = 'roll_dice'
+                    message = 'add_dice'
                     await self.websocket_manager.broadcast(game_id=game.game_id, message=message, extras=extras)
                     await self.viewers_websocket_manager.broadcast(game=game, message=message, extras=extras)
                     await self.execute(game)
@@ -192,7 +192,7 @@ class GameUseCase(IGameUseCase):
                 game.current_player = game.get_opponent_player()
                 game.state = GameState.ROLL_DICE
                 extras = {}
-                message = 'update_players_points'
+                message = 'change_current_player'
                 await self.websocket_manager.broadcast(game_id=game.game_id, message=message, extras=extras)
                 await self.viewers_websocket_manager.broadcast(game=game, message=message, extras=extras)
 
@@ -204,7 +204,7 @@ class GameUseCase(IGameUseCase):
                     self._update_user_level_rank_and_bank_account(exp_points, tied_player)
                 self._update_user_level_rank_and_bank_account(exp_points, winner_player)
                 extras = {}
-                message = 'update_players_points'
+                message = 'finish_game'
                 await self.websocket_manager.broadcast(game_id=game.game_id, message=message, extras=extras)
                 await self.viewers_websocket_manager.broadcast(game=game, message=message, extras=extras)
 

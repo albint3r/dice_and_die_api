@@ -3,6 +3,7 @@ from typing import Final
 from starlette.websockets import WebSocket
 
 from app.domain.core.ref_types import TActiveGames
+from app.domain.lobby.entities.lobby import Lobby
 from app.domain.lobby.schemas.response import ResponseLobbyInformation
 from app.domain.lobby.use_cases.i_lobby_websocket_manager import ILobbyWebSocketManager
 
@@ -18,7 +19,8 @@ class _LobbyWebSocketManager(ILobbyWebSocketManager):
             self.active_connections.remove(websocket)
 
     async def broadcast(self, active_games: TActiveGames) -> None:
-        response = ResponseLobbyInformation(active_games=active_games, total_players=self.get_total_connected_users())
+        lobby = Lobby(active_games=active_games)
+        response = ResponseLobbyInformation(lobby=lobby, total_players=self.get_total_connected_users())
         json_response = response.model_dump_json()
         for connection in self.active_connections:
             await connection.send_json(json_response)

@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from fastapi import status
 from app.domain.core.ref_types import TActiveGames
+from app.domain.lobby.entities.lobby import Lobby
 
 
 class ResponseActiveGames(BaseModel):
@@ -14,5 +15,5 @@ class ResponseTotalConnectedUsers(BaseModel):
 
 
 class ResponseLobbyInformation(BaseModel):
-    active_games: TActiveGames
+    lobby: Lobby
     total_players: int

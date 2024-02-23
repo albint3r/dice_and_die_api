@@ -8,7 +8,7 @@ from app.domain.auth.entities.user_level import UserLevel
 
 class User(BaseModel):
     creation_date: datetime
-    user_id: str = Field(exclude=True)
+    user_id: str
     email: EmailStr = Field(exclude=True)
     password: SecretStr = Field(exclude=True)
     name: str

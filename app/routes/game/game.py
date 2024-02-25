@@ -1,9 +1,10 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
 from icecream import ic
 
 from app.db.db import db
 from app.domain.game.enums.game_event import GameEvent
 from app.domain.game.enums.game_state import GameState
+from app.infrastructure.auth.auth_handler_impl import auth_handler
 from app.infrastructure.game.chat_observer import ChatObserver
 from app.infrastructure.game.game_use_case import GameUseCase
 from app.infrastructure.game.game_websocket_manager import game_websocket_manger
@@ -25,8 +26,8 @@ async def check_active_connections():
     return {"ok": 200}
 
 
-@router.websocket('/game/{game_id}/{user_id}')
-async def play_game(websocket: WebSocket, game_id: str, user_id: str):
+@router.websocket('/game/{game_id}')
+async def play_game(websocket: WebSocket, game_id: str, user_id: str = Depends(auth_handler.auth_websocket)):
     """This is the websocket endpoint to play the dice and die game"""
     repo = AuthRepository(db=db)
     leveling_manager = ManagerLevelingUseCase(leve_manager=LevelUserCase(), rank_manager=RankUseCase())

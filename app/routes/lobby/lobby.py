@@ -18,9 +18,8 @@ async def check_connections():
 
 
 @router.websocket('/games')
-async def get_lobby_games(websocket: WebSocket, user_id: str = Depends(auth_handler.auth_websocket)):
+async def get_lobby_games(websocket: WebSocket, _: str = Depends(auth_handler.auth_websocket)):
     """This creates a connection with the current playing games"""
-    ic(user_id)
     lobby_use_case = LobbyUseCase(lobby_websocket_manager=lobby_websocket_manager,
                                   game_websocket_manager=game_websocket_manger)
 

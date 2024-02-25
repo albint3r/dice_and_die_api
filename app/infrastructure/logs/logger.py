@@ -12,6 +12,7 @@ from fastapi.exceptions import RequestValidationError, HTTPException, WebSocketR
 from fastapi.responses import JSONResponse
 from fastapi.responses import PlainTextResponse
 from fastapi.responses import Response
+from icecream import ic
 from starlette.websockets import WebSocket
 
 from app.domain.logs.i_logger_configurator import ILoggerConfigurator
@@ -72,7 +73,10 @@ class LoggerConfigurator(ILoggerConfigurator):
     async def handle_http_exception(self, request: Request, exc: HTTPException) -> JSONResponse | Response:
         log_msg = "Our custom [http_exception_handler] was called"
         exception_name, exception_value, host, port, url = await self._collect_error_data(request, log_msg)
-        log_msg = f'{host}:{port} - "{request.method} {url}" {exception_value.status_code} Internal Server Error => [{exception_name}: {exception_value.detail}]'
+        try:
+            log_msg = f'{host}:{port} - "{request.method} {url}" {exception_value.status_code} Internal Server Error => [{exception_name}: {exception_value.detail}]'
+        except AttributeError:
+            log_msg = f'{host}:{port} -Problem capturing the error message: {exception_value.status_code} Internal Server Error => [{exception_name}: {exception_value.detail}]'
         self._logger.error(log_msg)
         self.storage_logger.store_log_msg(log_msg)
         return await _http_exception_handler(request, exc)

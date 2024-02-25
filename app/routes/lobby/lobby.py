@@ -1,6 +1,9 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from typing import Annotated
+
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query, Depends
 from icecream import ic
 
+from app.infrastructure.auth.auth_handler_impl import auth_handler
 from app.infrastructure.game.game_websocket_manager import game_websocket_manger
 from app.infrastructure.lobby.lobby_use_case import LobbyUseCase
 from app.infrastructure.lobby.lobby_websocket_manager import lobby_websocket_manager
@@ -15,8 +18,9 @@ async def check_connections():
 
 
 @router.websocket('/games')
-async def get_lobby_games(websocket: WebSocket):
+async def get_lobby_games(websocket: WebSocket, user_id: str = Depends(auth_handler.auth_websocket)):
     """This creates a connection with the current playing games"""
+    ic(user_id)
     lobby_use_case = LobbyUseCase(lobby_websocket_manager=lobby_websocket_manager,
                                   game_websocket_manager=game_websocket_manger)
 

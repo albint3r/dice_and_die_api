@@ -1,14 +1,14 @@
 from datetime import datetime, timedelta
-from typing import Final
+from typing import Final, Annotated
 
 import bcrypt
 import jwt
-from fastapi import HTTPException, status, Security
+from fastapi import HTTPException, status, Security, Query
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from icecream import ic
 
 from app.domain.auth.use_cases.i_auth_handler import IAuthHandler
 from credentials_provider import credentials_provider
-
 
 encode = "utf-8"
 
@@ -47,6 +47,9 @@ class _AuthHandlerImpl(IAuthHandler):
 
     def auth_wrapper(self, auth: HTTPAuthorizationCredentials = Security(security)) -> str:
         return self.decode_token(auth.credentials)
+
+    async def auth_websocket(self, token: Annotated[str | None, Query()] = None, ) -> str:
+        return self.decode_token(token)
 
 
 auth_handler: Final[IAuthHandler] = _AuthHandlerImpl()

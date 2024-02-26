@@ -60,7 +60,10 @@ class GameUseCase(IGameUseCase):
         could change this for a dynamic formula.
         """
         old_user: User = copy.deepcopy(winner_player.user)
+        ic(old_user)
         user = self.leveling_manager.update_user_level(winner_player.user, exp_points)
+        ic(user)
+        ic(user)
         # Update user bank account if level up:
         if old_user.user_level.level != user.user_level.level:
             self.repo.update_user_bank_account_amount(user.user_id, 100.0)

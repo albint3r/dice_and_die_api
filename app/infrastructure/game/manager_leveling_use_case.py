@@ -36,6 +36,6 @@ class ManagerLevelingUseCase(IManagerLevelingUseCase):
             # User can upgrade rank?
             ready_to_rank_up = self.rank_manager.ready_to_progress(user_level=user.user_level)
             if ready_to_rank_up:
-                user.user_level = self.rank_manager.ready_to_progress(user.user_level)
+                user.user_level = self.rank_manager.progress(user.user_level)
 
         return user

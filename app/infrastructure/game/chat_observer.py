@@ -15,10 +15,10 @@ from app.domain.game.use_cases.i_chat_observer import IChatObserver
 class ChatObserver(IChatObserver):
     async def execute(self, emote_msg: EmoteMessage, game: Game, player: Player) -> None:
         """ Execute the events emotes"""
-        sender_player = player.id
+        player_id = player.id
         emote = emote_msg.emote.value
         if not game.is_finished and emote_msg.emote != Emote.INVALID_INPUT_EVENT:
-            extras = {"sender": sender_player, "emote": emote, "time": datetime.now()}
+            extras = {"player_id": player_id, "emote": emote, "time": datetime.now()}
             message = 'emote'
             await self.websockets_manager.broadcast(game_id=game.game_id, message=message, extras=extras)
             await self.viewers_websockets_manager.broadcast(game, message=message, extras=extras)

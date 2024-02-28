@@ -2,10 +2,12 @@ from enum import Enum
 
 
 class Emote(Enum):
+    haha: str = 'haha'  # noqa
     HELLO: str = 'hello'
-    HELP: str = 'help'
-    INVALID_INPUT_EVENT: str = 'invalid_input_event'
-    JAJAJA: str = 'jajaja'  # noqa
     NICE: str = 'nice'
+    OMG: str = 'omg'
+    INVALID_INPUT_EVENT: str = 'invalid_input_event'
     SORRY: str = 'sorry'
-    THINKING: str = 'thinking'
+    WOW: str = 'wow'
+    WTF: str = 'wtf'
+    YES: str = 'yes'

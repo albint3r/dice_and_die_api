@@ -105,7 +105,7 @@ class GameUseCase(IGameUseCase):
         game = self.websocket_manager.active_games.get(game_id)
         if game_id == 'new_game':
             return str(uuid.uuid4())
-        if game:
+        if game and game.p1.user.user_id != user_id:
             return game_id
         else:
             raise WebSocketException(code=status.WS_1014_BAD_GATEWAY, reason='You are already in the match.')

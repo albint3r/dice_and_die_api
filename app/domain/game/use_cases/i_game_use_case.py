@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from pydantic import BaseModel
 from starlette.websockets import WebSocket
 
+from app.domain.auth.entities.user import User
 from app.domain.core.ref_types import TGamePlayer
 from app.domain.game.entities.game import Game
 from app.domain.game.entities.player import Player
@@ -35,3 +36,9 @@ class IGameUseCase(BaseModel, ABC):
     async def get_winner_after_player_disconnect(self, disconnected_player: Player, game: Game,
                                                  websocket: WebSocket) -> None:
         """Get the winner after a user disconnect before the game ends."""
+
+    @abstractmethod
+    def get_valid_game_id(self, user_id: str, game_id: str) -> str:
+        """Validate if the user is already in the match.
+        This avoids bugs and player play with him self.
+        """

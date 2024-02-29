@@ -1,4 +1,4 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, WebSocketException, status
 from icecream import ic
 
 from app.db.db import db
@@ -34,6 +34,8 @@ async def play_game(websocket: WebSocket, game_id: str, user_id: str = Depends(a
     game_use_case = GameUseCase(websocket_manager=game_websocket_manger,
                                 viewers_websocket_manager=viewers_websocket_manager,
                                 leveling_manager=leveling_manager, repo=repo)
+    # This validates if the user is creating or joining. If the game not exist is a dead game ID.
+    game_id = game_use_case.get_valid_game_id(user_id, game_id)
 
     if game_use_case.websocket_manager.is_full(game_id):
         view_use_case = ViewUseCase(websocket_manager=game_websocket_manger,

@@ -1,4 +1,5 @@
 import copy
+import uuid
 from json import JSONDecodeError
 from random import choice
 
@@ -17,6 +18,7 @@ from app.domain.game.enums.game_event import GameEvent
 from app.domain.game.enums.game_state import GameState
 from app.domain.game.schemas.request import GamePlayerRequest
 from app.domain.game.use_cases.i_game_use_case import IGameUseCase
+from fastapi import WebSocketException, status
 
 
 class GameUseCase(IGameUseCase):
@@ -98,6 +100,15 @@ class GameUseCase(IGameUseCase):
             return GamePlayerRequest(event=GameEvent.INVALID_INPUT_EVENT)
         except JSONDecodeError:
             return GamePlayerRequest(event=GameEvent.INVALID_INPUT_EVENT)
+
+    def get_valid_game_id(self, user_id: str, game_id: str) -> str:
+        game = self.websocket_manager.active_games.get(game_id)
+        if game_id == 'new_game':
+            return str(uuid.uuid4())
+        if game:
+            return game_id
+        else:
+            raise WebSocketException(code=status.WS_1014_BAD_GATEWAY, reason='You are already in the match.')
 
     async def get_winner_after_player_disconnect(self, disconnected_player: Player, game: Game,
                                                  websocket: WebSocket) -> None:

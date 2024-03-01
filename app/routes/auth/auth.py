@@ -21,7 +21,7 @@ router = APIRouter(
 
 
 @router.post('/signin', status_code=status.HTTP_201_CREATED)
-def signin_with_email_and_password(form_data: RequestAuthEmail) -> ResponseSignin:
+async def signin_with_email_and_password(form_data: RequestAuthEmail) -> ResponseSignin:
     try:
         facade = AuthUseCase(repo=AuthRepository(db=db))
         return facade.signin(form_data.email, form_data.password.get_secret_value(), auth_handler)
@@ -30,7 +30,7 @@ def signin_with_email_and_password(form_data: RequestAuthEmail) -> ResponseSigni
 
 
 @router.post('/login', status_code=status.HTTP_202_ACCEPTED)
-def login_with_email_and_password(form_data: RequestAuthEmail) -> ResponseLogIn:
+async def login_with_email_and_password(form_data: RequestAuthEmail) -> ResponseLogIn:
     try:
         facade = AuthUseCase(repo=AuthRepository(db=db))
         return facade.login(form_data.email, form_data.password.get_secret_value(), auth_handler)
@@ -39,7 +39,7 @@ def login_with_email_and_password(form_data: RequestAuthEmail) -> ResponseLogIn:
 
 
 @router.post('/login/token', status_code=status.HTTP_202_ACCEPTED)
-def login_with_session_token(user_id: str = Depends(auth_handler.auth_wrapper)) -> ResponseLogIn:
+async def login_with_session_token(user_id: str = Depends(auth_handler.auth_wrapper)) -> ResponseLogIn:
     try:
         facade = AuthUseCase(repo=AuthRepository(db=db))
         return facade.login_from_session_token(user_id, auth_handler)
@@ -48,7 +48,7 @@ def login_with_session_token(user_id: str = Depends(auth_handler.auth_wrapper)) 
 
 
 @router.put('/profile', status_code=status.HTTP_201_CREATED)
-def update_user_name_and_last_name(data: RequestNameAndLastName,
+async def update_user_name_and_last_name(data: RequestNameAndLastName,
                                    user_id: str = Depends(
                                        auth_handler.auth_wrapper)) -> ResponseUpdateUserNameAndLastName:
     try:
@@ -59,7 +59,7 @@ def update_user_name_and_last_name(data: RequestNameAndLastName,
 
 
 @router.get('/ranks', status_code=status.HTTP_200_OK)
-def get_users_ranking(_: str = Depends(auth_handler.auth_wrapper)) -> ResponseUsersRanking:
+async def get_users_ranking(_: str = Depends(auth_handler.auth_wrapper)) -> ResponseUsersRanking:
     try:
         facade = AuthUseCase(repo=AuthRepository(db=db))
         return facade.get_users_ranking()
@@ -68,7 +68,7 @@ def get_users_ranking(_: str = Depends(auth_handler.auth_wrapper)) -> ResponseUs
 
 
 @router.get('/ranks/user', status_code=status.HTTP_200_OK)
-def get_user_ranking(user_id: str = Depends(auth_handler.auth_wrapper)) -> ResponseUserRank:
+async def get_user_ranking(user_id: str = Depends(auth_handler.auth_wrapper)) -> ResponseUserRank:
     try:
         facade = AuthUseCase(repo=AuthRepository(db=db))
         return facade.get_user_ranking(user_id)
@@ -77,7 +77,7 @@ def get_user_ranking(user_id: str = Depends(auth_handler.auth_wrapper)) -> Respo
 
 
 @router.get('/ranks/category/{rank_id}', status_code=status.HTTP_200_OK)
-def get_users_ranking_by_rank(rank_id: int, _: str = Depends(auth_handler.auth_wrapper)) -> ResponseUsersRanking:
+async def get_users_ranking_by_rank(rank_id: int, _: str = Depends(auth_handler.auth_wrapper)) -> ResponseUsersRanking:
     try:
         facade = AuthUseCase(repo=AuthRepository(db=db))
         return facade.get_users_ranking_by_rank(rank_id)
@@ -86,7 +86,7 @@ def get_users_ranking_by_rank(rank_id: int, _: str = Depends(auth_handler.auth_w
 
 
 @router.get('/ranks/category/{rank_id}/user', status_code=status.HTTP_200_OK)
-def get_user_ranking_by_rank(rank_id: int, user_id: str = Depends(auth_handler.auth_wrapper)) -> ResponseUserRank:
+async def get_user_ranking_by_rank(rank_id: int, user_id: str = Depends(auth_handler.auth_wrapper)) -> ResponseUserRank:
     try:
         facade = AuthUseCase(repo=AuthRepository(db=db))
         return facade.get_user_ranking_by_rank(rank_id=rank_id, user_id=user_id)
@@ -95,7 +95,7 @@ def get_user_ranking_by_rank(rank_id: int, user_id: str = Depends(auth_handler.a
 
 
 @router.post('/test', status_code=status.HTTP_200_OK)
-def test_route_token_session(user_id: str = Depends(auth_handler.auth_wrapper)):
+async def test_route_token_session(user_id: str = Depends(auth_handler.auth_wrapper)):
     try:
         return user_id
     except Exception as e:

@@ -27,3 +27,9 @@ class ResponseUsersRanking(BaseModel):
     """Schema SignIn Responses"""
     users_ranks: list[UserRank]
     status_code: int = status.HTTP_200_OK
+
+
+class ResponseUserRank(BaseModel):
+    """Schema SignIn Responses"""
+    user_rank: UserRank
+    status_code: int = status.HTTP_200_OK

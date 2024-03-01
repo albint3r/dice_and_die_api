@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from pydantic import BaseModel
 
 from app.domain.auth.schemas.response import ResponseLogIn, ResponseSignin, ResponseUpdateUserNameAndLastName, \
-    ResponseUsersRanking
+    ResponseUsersRanking, ResponseUserRank
 from src.domain.auth.i_auth_handler import IAuthHandler
 
 
@@ -31,3 +31,15 @@ class IAuthUseCase(BaseModel, ABC):
     @abstractmethod
     def get_users_ranking(self) -> ResponseUsersRanking:
         """Get the user sort by the user level and exp points"""
+
+    @abstractmethod
+    def get_user_ranking(self, user_id: str) -> ResponseUserRank:
+        """Get the User Ranking"""
+
+    @abstractmethod
+    def get_users_ranking_by_rank(self, rank_id: int) -> ResponseUsersRanking:
+        """Get the user ranking by the Rank Category."""
+
+    @abstractmethod
+    def get_user_ranking_by_rank(self, rank_id: int, user_id: str) -> ResponseUserRank:
+        """Get the user single ranking by the Rank Category."""

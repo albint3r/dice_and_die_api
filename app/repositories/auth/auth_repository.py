@@ -106,7 +106,7 @@ class AuthRepository(BaseModel):
             return UserRank(**result)
         raise NoUserInRanking('There is not user in the ranking leader. Crear user first')
 
-    def get_users_ranking_by_rank(self, rank_id: str) -> UserRank:
+    def get_users_ranking_by_rank(self, rank_id: int) -> list[UserRank]:
         query = """
                 SELECT 
                     ROW_NUMBER() OVER (ORDER BY us.exp_points DESC, us.level DESC) AS ranking,
@@ -121,12 +121,12 @@ class AuthRepository(BaseModel):
                 WHERE rank_id=%s;
             """
         values = (rank_id,)
-        result = self.db.query(query, values)
-        if result:
-            return UserRank(**result)
+        results = self.db.query(query, values, fetch_all=True)
+        if results:
+            return [UserRank(**result) for result in results]
         raise NoUserInRanking('There is not user in the ranking leader. Crear user first')
 
-    def get_user_ranking_by_rank(self, rank_id: str, user_id: str) -> UserRank:
+    def get_user_ranking_by_rank(self, rank_id: int, user_id: str) -> UserRank:
         query = """
                 SELECT * FROM(SELECT 
                     ROW_NUMBER() OVER (ORDER BY us.exp_points DESC, us.level DESC) AS ranking,

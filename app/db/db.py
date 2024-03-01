@@ -19,7 +19,7 @@ class _DataBase(BaseModel):
     class Config:
         arbitrary_types_allowed = True
 
-    def _execute_query(self, query: str, values: list | tuple, fetch_all: bool = False) -> list[dict] | dict:
+    def _execute_query(self, query: str, values: tuple, fetch_all: bool = False) -> list[dict] | dict:
         cursor = self.connection.cursor(dictionary=True)
         cursor.execute(query, values)
         result = cursor.fetchall() if fetch_all else cursor.fetchone()
@@ -45,7 +45,7 @@ class _DataBase(BaseModel):
         if self.connection:
             self.connection.close()
 
-    def query(self, query: str, values: list | tuple, fetch_all: bool = False) -> list[dict] | dict:
+    def query(self, query: str, values: tuple, fetch_all: bool = False) -> list[dict] | dict:
         try:
             self.connect()
             result = self._execute_query(query, values, fetch_all)

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, WebSocketException, status
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
 from icecream import ic
 
 from app.db.db import db

@@ -2,7 +2,8 @@ from pydantic import BaseModel
 
 
 class UserRank(BaseModel):
-    name: str
+    ranking: int
+    name: str = ''
     last_name: str
     level: int
     exp_points: int

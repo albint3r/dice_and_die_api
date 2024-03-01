@@ -1,7 +1,7 @@
 from fastapi import HTTPException, status
 
 from app.domain.auth.schemas.response import (ResponseSignin, ResponseLogIn, ResponseUsersRanking,
-                                              ResponseUpdateUserNameAndLastName)
+                                              ResponseUpdateUserNameAndLastName, ResponseUserRank)
 from app.domain.auth.use_cases.i_auth_handler import IAuthHandler
 from app.domain.auth.use_cases.i_auth_use_case import IAuthUseCase
 from app.repositories.auth.auth_repository import AuthRepository
@@ -65,3 +65,15 @@ class AuthUseCase(IAuthUseCase):
     def get_users_ranking(self) -> ResponseUsersRanking:
         users_ranks = self.repo.get_users_ranking()
         return ResponseUsersRanking(users_ranks=users_ranks)
+
+    def get_user_ranking(self, user_id: str) -> ResponseUserRank:
+        user_rank = self.repo.get_user_ranking(user_id)
+        return ResponseUserRank(user_rank=user_rank)
+
+    def get_users_ranking_by_rank(self, rank_id: int) -> ResponseUsersRanking:
+        users_ranks = self.repo.get_users_ranking_by_rank(rank_id)
+        return ResponseUsersRanking(users_ranks=users_ranks)
+
+    def get_user_ranking_by_rank(self, rank_id: int, user_id: str) -> ResponseUserRank:
+        user_rank = self.repo.get_user_ranking_by_rank(rank_id, user_id)
+        return ResponseUserRank(user_rank=user_rank)

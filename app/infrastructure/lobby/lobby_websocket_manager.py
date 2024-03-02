@@ -1,5 +1,5 @@
 import asyncio
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Final
 
 from icecream import ic
@@ -37,10 +37,19 @@ class _LobbyWebSocketManager(ILobbyWebSocketManager):
         return len(self.active_connections)
 
     async def check_inactive_connections(self) -> None:
-        while True:
-            await asyncio.sleep(5)  # Revisar conexiones inactivas cada minuto
-            current_time = datetime.now()
-            ic(f'Hola mundo ->{current_time}')
+        current_time = datetime.now()
+        inactive_connections: list[tuple[str, WebSocket]] = []
+        for user_id, socket_and_time in self.active_connections.items():
+            ws = list(socket_and_time.keys())[0]
+            ic(ws)
+            last_activity = list(socket_and_time.values())[0]
+            ic(last_activity)
+            if current_time - last_activity > timedelta(seconds=10):
+                inactive_connections.append((user_id, ws))
+            for uid, websocket in inactive_connections:
+                await websocket.close()
+                del self.active_connections[uid]
+                ic('Connection succefully disconnected for inactivity.')
 
 
 lobby_websocket_manager: Final[ILobbyWebSocketManager] = _LobbyWebSocketManager()

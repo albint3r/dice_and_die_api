@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query, Depends
@@ -7,8 +8,17 @@ from app.infrastructure.auth.auth_handler_impl import auth_handler
 from app.infrastructure.game.game_websocket_manager import game_websocket_manger
 from app.infrastructure.lobby.lobby_use_case import LobbyUseCase
 from app.infrastructure.lobby.lobby_websocket_manager import lobby_websocket_manager
+from fastapi_utilities import repeat_every
+
 
 router = APIRouter(prefix='/v1/lobby', tags=['lobby'])
+
+
+@router.on_event('startup')
+@repeat_every(seconds=3)
+async def print_hello():
+    ic(f"check_inactive_connections {datetime.now()}")
+    await lobby_websocket_manager.check_inactive_connections()
 
 
 @router.get('/check-connection')

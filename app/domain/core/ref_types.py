@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any
 
 from starlette.websockets import WebSocket
@@ -11,6 +12,6 @@ TCurrentScore: dict[int, int]
 TActiveConnections = dict[str, set[WebSocket]]
 TActiveConnectionsViewers = dict[str, set[WebSocket]]
 TActiveGames = dict[str, Game]
-TLobbyActiveConnections = dict[str, WebSocket]
+TLobbyActiveConnections = dict[str, dict[WebSocket, datetime]]
 TExtras = dict[str, Any]
 TGamePlayer = tuple[Game, Player]

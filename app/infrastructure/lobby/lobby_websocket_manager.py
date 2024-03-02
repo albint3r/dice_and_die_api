@@ -17,8 +17,9 @@ class _LobbyWebSocketManager(ILobbyWebSocketManager):
         """This connection assure the user only have one connection."""
         await websocket.accept()
         if self.active_connections.get(user_id):
-            await self.active_connections[user_id].close()
-        self.active_connections[user_id] = websocket
+            ws = list(self.active_connections[user_id].keys())[0]
+            await ws.close()
+        self.active_connections[user_id] = {websocket: datetime.now()}
 
     async def disconnect(self, user_id: str, websocket: WebSocket) -> None:
         if user_id in self.active_connections:
@@ -29,7 +30,8 @@ class _LobbyWebSocketManager(ILobbyWebSocketManager):
         response = ResponseLobbyInformation(lobby=lobby, total_players=self.get_total_connected_users())
         json_response = response.model_dump_json()
         for connection in self.active_connections.values():
-            await connection.send_json(json_response)
+            ws = list(connection.keys())[0]
+            await ws.send_json(json_response)
 
     def get_total_connected_users(self) -> int:
         return len(self.active_connections)

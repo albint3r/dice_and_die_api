@@ -1,4 +1,3 @@
-from icecream import ic
 from pydantic import ValidationError
 from starlette.websockets import WebSocket
 

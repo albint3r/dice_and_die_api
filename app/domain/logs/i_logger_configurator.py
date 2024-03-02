@@ -50,3 +50,7 @@ class ILoggerConfigurator(BaseModel, ABC):
     @abstractmethod
     async def log_inactive_connections(self, user_id: str) -> None:
         """Get the log of the cleaned inactive connections."""
+
+    @abstractmethod
+    def log_send_websocket_json(self, *args, **kwargs) -> None:
+        """Log the error in when can send json."""

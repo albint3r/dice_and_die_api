@@ -12,7 +12,6 @@ from fastapi.exceptions import RequestValidationError, HTTPException, WebSocketR
 from fastapi.responses import JSONResponse
 from fastapi.responses import PlainTextResponse
 from fastapi.responses import Response
-from icecream import ic
 from starlette.websockets import WebSocket
 
 from app.domain.logs.i_logger_configurator import ILoggerConfigurator
@@ -90,8 +89,14 @@ class LoggerConfigurator(ILoggerConfigurator):
         return PlainTextResponse(str(exc), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     async def log_inactive_connections(self, user_id: str) -> None:
-        self._logger.debug("Our custom [request_validation_exception_handler] was called")
+        self._logger.debug("Our custom [log_inactive_connections] was called")
         log_msg = f'[Inactive Connection]: {user_id}'
+        self._logger.error(log_msg)
+        self.storage_logger.store_log_msg(log_msg)
+
+    def log_send_websocket_json(self, json, error) -> None:
+        self._logger.debug("Our custom [log_inactive_connections] was called")
+        log_msg = f'[Error sending json]->: {json}, this is your error:{error}'
         self._logger.error(log_msg)
         self.storage_logger.store_log_msg(log_msg)
 

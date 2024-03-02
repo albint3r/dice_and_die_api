@@ -1,4 +1,3 @@
-import asyncio
 from datetime import datetime, timedelta
 from typing import Final
 
@@ -31,8 +30,11 @@ class _LobbyWebSocketManager(ILobbyWebSocketManager):
         response = ResponseLobbyInformation(lobby=lobby, total_players=self.get_total_connected_users())
         json_response = response.model_dump_json()
         for connection in self.active_connections.values():
-            ws = list(connection.keys())[0]
-            await ws.send_json(json_response)
+            try:
+                ws = list(connection.keys())[0]
+                await ws.send_json(json_response)
+            except Exception as e:
+                logger_conf.log_send_websocket_json(json_response, e)
 
     def get_total_connected_users(self) -> int:
         return len(self.active_connections)
@@ -45,11 +47,11 @@ class _LobbyWebSocketManager(ILobbyWebSocketManager):
             last_activity = list(socket_and_time.values())[0]
             if current_time - last_activity > timedelta(hours=1):
                 inactive_connections.append((user_id, ws))
-            for uid, websocket in inactive_connections:
-                await websocket.close()
-                del self.active_connections[uid]
-                await logger_conf.log_inactive_connections(uid)
-                ic('Connection succefully disconnected for inactivity.')
+        for uid, websocket in inactive_connections:
+            await websocket.close()
+            del self.active_connections[uid]
+            await logger_conf.log_inactive_connections(uid)
+            ic('Connection succefully disconnected for inactivity.')
 
 
 lobby_websocket_manager: Final[ILobbyWebSocketManager] = _LobbyWebSocketManager()

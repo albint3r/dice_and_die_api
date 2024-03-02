@@ -10,19 +10,22 @@ from app.domain.lobby.use_cases.i_lobby_websocket_manager import ILobbyWebSocket
 
 class _LobbyWebSocketManager(ILobbyWebSocketManager):
 
-    async def connect(self, websocket: WebSocket) -> None:
+    async def connect(self, user_id: str, websocket: WebSocket) -> None:
+        """This connection assure the user only have one connection."""
         await websocket.accept()
-        self.active_connections.append(websocket)
+        if self.active_connections.get(user_id):
+            await self.active_connections[user_id].close()
+        self.active_connections[user_id] = websocket
 
-    async def disconnect(self, websocket: WebSocket) -> None:
-        if websocket in self.active_connections:
-            self.active_connections.remove(websocket)
+    async def disconnect(self, user_id: str, websocket: WebSocket) -> None:
+        if user_id in self.active_connections:
+            del self.active_connections[user_id]
 
     async def broadcast(self, active_games: TActiveGames) -> None:
         lobby = Lobby(active_games=active_games)
         response = ResponseLobbyInformation(lobby=lobby, total_players=self.get_total_connected_users())
         json_response = response.model_dump_json()
-        for connection in self.active_connections:
+        for connection in self.active_connections.values():
             await connection.send_json(json_response)
 
     def get_total_connected_users(self) -> int:

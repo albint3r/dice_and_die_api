@@ -8,14 +8,14 @@ from app.domain.core.ref_types import TActiveGames, TLobbyActiveConnections
 
 class ILobbyWebSocketManager(IWebSocketManager, ABC):
     """This is the Base Class to the Lobby WebSockets Manager"""
-    active_connections: TLobbyActiveConnections = []
+    active_connections: TLobbyActiveConnections = {}
 
     @abstractmethod
-    async def connect(self, websocket: WebSocket) -> None:
+    async def connect(self, user_id: str, websocket: WebSocket) -> None:
         """Connect User to pool connections"""
 
     @abstractmethod
-    async def disconnect(self, websocket: WebSocket) -> None:
+    async def disconnect(self, user_id: str, websocket: WebSocket) -> None:
         """Disconnect user from pool connections"""
 
     @abstractmethod

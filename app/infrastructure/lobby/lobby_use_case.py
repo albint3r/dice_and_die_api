@@ -9,11 +9,11 @@ from app.domain.lobby.use_cases.i_lobby_use_case import ILobbyUseCase
 
 class LobbyUseCase(ILobbyUseCase):
 
-    async def unsubscribe_user(self, websocket: WebSocket) -> None:
-        await self.lobby_websocket_manager.disconnect(websocket)
+    async def unsubscribe_user(self, user_id: str, websocket: WebSocket) -> None:
+        await self.lobby_websocket_manager.disconnect(user_id, websocket)
 
-    async def subscribe_user(self, websocket: WebSocket) -> None:
-        await self.lobby_websocket_manager.connect(websocket)
+    async def subscribe_user(self, user_id: str, websocket: WebSocket) -> None:
+        await self.lobby_websocket_manager.connect(user_id, websocket)
 
     async def update_lobby_information(self) -> None:
         active_games = self.game_websocket_manager.active_games

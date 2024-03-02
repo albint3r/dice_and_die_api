@@ -14,11 +14,11 @@ class ILobbyUseCase(BaseModel, ABC):
     lobby_websocket_manager: ILobbyWebSocketManager
 
     @abstractmethod
-    async def subscribe_user(self, websocket: WebSocket) -> None:
+    async def subscribe_user(self, user_id: str, websocket: WebSocket) -> None:
         """Connect user to the lobby pool connections"""
 
     @abstractmethod
-    async def unsubscribe_user(self, websocket: WebSocket) -> None:
+    async def unsubscribe_user(self, user_id: str, websocket: WebSocket) -> None:
         """Disconnect user from the lobby pool connections"""
 
     @abstractmethod

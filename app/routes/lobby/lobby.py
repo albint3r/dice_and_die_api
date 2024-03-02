@@ -33,7 +33,7 @@ async def get_lobby_games(websocket: WebSocket, user_id: str = Depends(auth_hand
         await lobby_use_case.subscribe_user(user_id, websocket)
         await lobby_use_case.update_lobby_information()
         while True:
-            await lobby_use_case.get_player_request_event(websocket)
+            await lobby_use_case.get_player_request_event(user_id, websocket)
             await lobby_use_case.update_lobby_information()
     except WebSocketDisconnect:
         await lobby_use_case.unsubscribe_user(user_id, websocket)

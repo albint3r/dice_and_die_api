@@ -18,12 +18,12 @@ class LobbyUseCase(ILobbyUseCase):
         active_games = self.game_websocket_manager.active_games
         await self.lobby_websocket_manager.broadcast(active_games)
 
-    async def get_player_request_event(self, websocket: WebSocket) -> RequestLobbyEvent:
+    async def get_player_request_event(self, user_id: str, websocket: WebSocket) -> RequestLobbyEvent:
         try:
             response = await websocket.receive_json()
             return RequestLobbyEvent(**response)
         except ValidationError as e:
             msg = (f'Request User Lobby Error Validator. User Client send invalid json request. '
                    f'Disconnect user to prevent malicious behavior: {e}')
-            await self.lobby_websocket_manager.disconnect(websocket)
+            await self.lobby_websocket_manager.disconnect(user_id, websocket)
             raise InvalidRequestUserLobby(msg)

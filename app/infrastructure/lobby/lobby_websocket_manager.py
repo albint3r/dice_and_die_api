@@ -29,10 +29,12 @@ class _LobbyWebSocketManager(ILobbyWebSocketManager):
         lobby = Lobby(active_games=active_games)
         response = ResponseLobbyInformation(lobby=lobby, total_players=self.get_total_connected_users())
         json_response = response.model_dump_json()
-        for connection in self.active_connections.values():
+        for user_id, connection in self.active_connections.items():
             try:
                 ws = list(connection.keys())[0]
                 await ws.send_json(json_response)
+                # Update the time of the user after create or join a game.
+                self.active_connections[user_id] = {ws: datetime.now()}
             except Exception as e:
                 logger_conf.log_send_websocket_json(json_response, e)
 
@@ -45,7 +47,7 @@ class _LobbyWebSocketManager(ILobbyWebSocketManager):
         for user_id, socket_and_time in self.active_connections.items():
             ws = list(socket_and_time.keys())[0]
             last_activity = list(socket_and_time.values())[0]
-            if current_time - last_activity > timedelta(hours=1):
+            if current_time - last_activity > timedelta(seconds=3):
                 inactive_connections.append((user_id, ws))
         for uid, websocket in inactive_connections:
             await websocket.close()

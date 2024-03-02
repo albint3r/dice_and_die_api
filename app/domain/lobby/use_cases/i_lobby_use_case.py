@@ -26,5 +26,5 @@ class ILobbyUseCase(BaseModel, ABC):
         """Broadcast the games to connected users"""
 
     @abstractmethod
-    async def get_player_request_event(self, websocket: WebSocket) -> RequestLobbyEvent:
+    async def get_player_request_event(self, user_id: str, websocket: WebSocket) -> RequestLobbyEvent:
         """Broadcast the games to connected users"""

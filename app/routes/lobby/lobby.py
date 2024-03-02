@@ -15,9 +15,8 @@ router = APIRouter(prefix='/v1/lobby', tags=['lobby'])
 
 
 @router.on_event('startup')
-@repeat_every(seconds=3)
-async def print_hello():
-    ic(f"check_inactive_connections {datetime.now()}")
+@repeat_every(seconds=60)
+async def check_inactive_connections():
     await lobby_websocket_manager.check_inactive_connections()
 
 

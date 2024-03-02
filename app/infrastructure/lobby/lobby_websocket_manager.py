@@ -9,6 +9,7 @@ from app.domain.core.ref_types import TActiveGames
 from app.domain.lobby.entities.lobby import Lobby
 from app.domain.lobby.schemas.response import ResponseLobbyInformation
 from app.domain.lobby.use_cases.i_lobby_websocket_manager import ILobbyWebSocketManager
+from app.infrastructure.logs.logger import logger_conf
 
 
 class _LobbyWebSocketManager(ILobbyWebSocketManager):
@@ -41,14 +42,13 @@ class _LobbyWebSocketManager(ILobbyWebSocketManager):
         inactive_connections: list[tuple[str, WebSocket]] = []
         for user_id, socket_and_time in self.active_connections.items():
             ws = list(socket_and_time.keys())[0]
-            ic(ws)
             last_activity = list(socket_and_time.values())[0]
-            ic(last_activity)
-            if current_time - last_activity > timedelta(seconds=10):
+            if current_time - last_activity > timedelta(hours=1):
                 inactive_connections.append((user_id, ws))
             for uid, websocket in inactive_connections:
                 await websocket.close()
                 del self.active_connections[uid]
+                await logger_conf.log_inactive_connections(uid)
                 ic('Connection succefully disconnected for inactivity.')
 
 

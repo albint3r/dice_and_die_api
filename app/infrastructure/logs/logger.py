@@ -89,6 +89,12 @@ class LoggerConfigurator(ILoggerConfigurator):
         self.storage_logger.store_log_msg(log_msg)
         return PlainTextResponse(str(exc), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    async def log_inactive_connections(self, user_id: str) -> None:
+        self._logger.debug("Our custom [request_validation_exception_handler] was called")
+        log_msg = f'[Inactive Connection]: {user_id}'
+        self._logger.error(log_msg)
+        self.storage_logger.store_log_msg(log_msg)
+
 
 logger_conf: Final[ILoggerConfigurator] = LoggerConfigurator(storage_logger=slack_bot)
 logger_conf.set_up()

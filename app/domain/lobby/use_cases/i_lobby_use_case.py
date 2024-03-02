@@ -14,11 +14,11 @@ class ILobbyUseCase(BaseModel, ABC):
     lobby_websocket_manager: ILobbyWebSocketManager
 
     @abstractmethod
-    async def subscribe_user(self, websocket: WebSocket) -> None:
+    async def subscribe_user(self, user_id: str, websocket: WebSocket) -> None:
         """Connect user to the lobby pool connections"""
 
     @abstractmethod
-    async def unsubscribe_user(self, websocket: WebSocket) -> None:
+    async def unsubscribe_user(self, user_id: str, websocket: WebSocket) -> None:
         """Disconnect user from the lobby pool connections"""
 
     @abstractmethod
@@ -26,5 +26,5 @@ class ILobbyUseCase(BaseModel, ABC):
         """Broadcast the games to connected users"""
 
     @abstractmethod
-    async def get_player_request_event(self, websocket: WebSocket) -> RequestLobbyEvent:
+    async def get_player_request_event(self, user_id: str, websocket: WebSocket) -> RequestLobbyEvent:
         """Broadcast the games to connected users"""

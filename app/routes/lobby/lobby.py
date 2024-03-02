@@ -1,6 +1,5 @@
-from typing import Annotated
-
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query, Depends
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
+from fastapi_utilities import repeat_every
 from icecream import ic
 
 from app.infrastructure.auth.auth_handler_impl import auth_handler
@@ -11,6 +10,12 @@ from app.infrastructure.lobby.lobby_websocket_manager import lobby_websocket_man
 router = APIRouter(prefix='/v1/lobby', tags=['lobby'])
 
 
+@router.on_event('startup')
+@repeat_every(seconds=60)
+async def check_inactive_connections():
+    await lobby_websocket_manager.check_inactive_connections()
+
+
 @router.get('/check-connection')
 async def check_connections():
     ic(lobby_websocket_manager.active_connections)
@@ -18,19 +23,19 @@ async def check_connections():
 
 
 @router.websocket('/games')
-async def get_lobby_games(websocket: WebSocket, _: str = Depends(auth_handler.auth_websocket)):
+async def get_lobby_games(websocket: WebSocket, user_id: str = Depends(auth_handler.auth_websocket)):
     """This creates a connection with the current playing games"""
     lobby_use_case = LobbyUseCase(lobby_websocket_manager=lobby_websocket_manager,
                                   game_websocket_manager=game_websocket_manger)
 
-    await lobby_use_case.subscribe_user(websocket)
     # After the user connect to the pool connections update their game status broadcasting the active games.
-    await lobby_use_case.update_lobby_information()
     try:
+        await lobby_use_case.subscribe_user(user_id, websocket)
+        await lobby_use_case.update_lobby_information()
         while True:
-            await lobby_use_case.get_player_request_event(websocket)
+            await lobby_use_case.get_player_request_event(user_id, websocket)
             await lobby_use_case.update_lobby_information()
     except WebSocketDisconnect:
-        await lobby_use_case.unsubscribe_user(websocket)
+        await lobby_use_case.unsubscribe_user(user_id, websocket)
         await lobby_use_case.update_lobby_information()
-        ic('Disconnect user')
+        ic('Disconnect user from lobby')

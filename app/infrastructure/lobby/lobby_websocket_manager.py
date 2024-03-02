@@ -12,14 +12,19 @@ from app.infrastructure.logs.logger import logger_conf
 
 
 class _LobbyWebSocketManager(ILobbyWebSocketManager):
+    INACTIVE_TIME_HOURS: Final[int] = 1
+
+    def _refresh_user_time_connection(self, user_id: str, websocket: WebSocket) -> None:
+        """Refresh the time of the user or created."""
+        self.active_connections[user_id] = {websocket: datetime.now()}
 
     async def connect(self, user_id: str, websocket: WebSocket) -> None:
         """This connection assure the user only have one connection."""
         await websocket.accept()
         if self.active_connections.get(user_id):
-            ws = list(self.active_connections[user_id].keys())[0]
-            await ws.close()
-        self.active_connections[user_id] = {websocket: datetime.now()}
+            old_websocket = list(self.active_connections[user_id].keys())[0]
+            await old_websocket.close()
+        self._refresh_user_time_connection(user_id, websocket)
 
     async def disconnect(self, user_id: str, websocket: WebSocket) -> None:
         if user_id in self.active_connections:
@@ -33,8 +38,7 @@ class _LobbyWebSocketManager(ILobbyWebSocketManager):
             try:
                 ws = list(connection.keys())[0]
                 await ws.send_json(json_response)
-                # Update the time of the user after create or join a game.
-                self.active_connections[user_id] = {ws: datetime.now()}
+                self._refresh_user_time_connection(user_id, ws)
             except Exception as e:
                 logger_conf.log_send_websocket_json(json_response, e)
 
@@ -47,8 +51,9 @@ class _LobbyWebSocketManager(ILobbyWebSocketManager):
         for user_id, socket_and_time in self.active_connections.items():
             ws = list(socket_and_time.keys())[0]
             last_activity = list(socket_and_time.values())[0]
-            if current_time - last_activity > timedelta(seconds=3):
+            if current_time - last_activity > timedelta(hours=self.INACTIVE_TIME_HOURS):
                 inactive_connections.append((user_id, ws))
+        # Disconnect all the inactive connections.
         for uid, websocket in inactive_connections:
             await websocket.close()
             del self.active_connections[uid]

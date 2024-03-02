@@ -23,10 +23,10 @@ async def get_lobby_games(websocket: WebSocket, user_id: str = Depends(auth_hand
     lobby_use_case = LobbyUseCase(lobby_websocket_manager=lobby_websocket_manager,
                                   game_websocket_manager=game_websocket_manger)
 
-    await lobby_use_case.subscribe_user(user_id, websocket)
     # After the user connect to the pool connections update their game status broadcasting the active games.
-    await lobby_use_case.update_lobby_information()
     try:
+        await lobby_use_case.subscribe_user(user_id, websocket)
+        await lobby_use_case.update_lobby_information()
         while True:
             await lobby_use_case.get_player_request_event(websocket)
             await lobby_use_case.update_lobby_information()

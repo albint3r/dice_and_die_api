@@ -1,5 +1,8 @@
+import asyncio
+from datetime import datetime
 from typing import Final
 
+from icecream import ic
 from starlette.websockets import WebSocket
 
 from app.domain.core.ref_types import TActiveGames
@@ -30,6 +33,12 @@ class _LobbyWebSocketManager(ILobbyWebSocketManager):
 
     def get_total_connected_users(self) -> int:
         return len(self.active_connections)
+
+    async def check_inactive_connections(self) -> None:
+        while True:
+            await asyncio.sleep(5)  # Revisar conexiones inactivas cada minuto
+            current_time = datetime.now()
+            ic(f'Hola mundo ->{current_time}')
 
 
 lobby_websocket_manager: Final[ILobbyWebSocketManager] = _LobbyWebSocketManager()

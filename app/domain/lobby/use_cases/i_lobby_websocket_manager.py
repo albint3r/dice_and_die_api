@@ -25,3 +25,7 @@ class ILobbyWebSocketManager(IWebSocketManager, ABC):
     @abstractmethod
     def get_total_connected_users(self) -> int:
         """Get the total connect users"""
+
+    @abstractmethod
+    async def check_inactive_connections(self) -> None:
+        """Check if a connections is unused."""

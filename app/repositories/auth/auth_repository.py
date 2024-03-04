@@ -72,6 +72,7 @@ class AuthRepository(BaseModel):
         query = """
                 SELECT 
                     ROW_NUMBER() OVER (ORDER BY us.level DESC, us.exp_points DESC) AS ranking,
+                    u.user_id,
                     u.name, 
                     u.last_name, 
                     us.level, 
@@ -112,6 +113,7 @@ class AuthRepository(BaseModel):
         query = """
                 SELECT 
                     ROW_NUMBER() OVER (ORDER BY us.level DESC, us.exp_points DESC) AS ranking,
+                    u.user_id,
                     u.name, 
                     u.last_name, 
                     us.level, 

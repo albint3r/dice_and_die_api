@@ -71,7 +71,8 @@ class AuthRepository(BaseModel):
         """Update in the db the name and last name of the user id."""
         query = """
                 SELECT 
-                    ROW_NUMBER() OVER (ORDER BY us.level DESC, us.exp_points DESC) AS ranking,
+                    ROW_NUMBER() OVER (ORDER BY us.level DESC, us.exp_points DESC, u.name ASC) AS ranking,
+                    u.user_id,
                     u.name, 
                     u.last_name, 
                     us.level, 
@@ -79,7 +80,8 @@ class AuthRepository(BaseModel):
                     us.rank_id
                 FROM users AS u
                 JOIN users_levels AS us ON us.user_id = u.user_id
-                ORDER BY us.level DESC, us.exp_points DESC;
+                ORDER BY us.level DESC, us.exp_points DESC, u.name ASC
+                limit 20;
             """
         result = self.db.query(query, (), fetch_all=True)
         if result:
@@ -89,7 +91,7 @@ class AuthRepository(BaseModel):
     def get_user_ranking(self, user_id: str) -> UserRank:
         query = """
                 SELECT * FROM(SELECT 
-                        ROW_NUMBER() OVER (ORDER BY us.level DESC, us.exp_points DESC) AS ranking,
+                        ROW_NUMBER() OVER (ORDER BY us.level DESC, us.exp_points DESC, u.name ASC) AS ranking,
                         u.name, 
                         u.user_id,
                         u.last_name, 
@@ -98,7 +100,7 @@ class AuthRepository(BaseModel):
                         us.rank_id
                     FROM users AS u
                     JOIN users_levels AS us ON us.user_id = u.user_id
-                    ORDER BY us.level DESC, us.exp_points DESC
+                    ORDER BY us.level DESC, us.exp_points DESC, u.name ASC
                     ) AS subquery_alias
                 WHERE user_id=%s;
             """
@@ -111,7 +113,8 @@ class AuthRepository(BaseModel):
     def get_users_ranking_by_rank(self, rank_id: int) -> list[UserRank]:
         query = """
                 SELECT 
-                    ROW_NUMBER() OVER (ORDER BY us.level DESC, us.exp_points DESC) AS ranking,
+                    ROW_NUMBER() OVER (ORDER BY us.level DESC, us.exp_points DESC, u.name ASC) AS ranking,
+                    u.user_id,
                     u.name, 
                     u.last_name, 
                     us.level, 
@@ -119,7 +122,9 @@ class AuthRepository(BaseModel):
                     us.rank_id
                 FROM users AS u
                 JOIN users_levels AS us ON us.user_id = u.user_id
-                WHERE rank_id=%s;
+                WHERE rank_id=%s
+                ORDER BY us.level DESC, us.exp_points DESC, u.name ASC
+                limit 20;
             """
         values = (rank_id,)
         results = self.db.query(query, values, fetch_all=True)
@@ -130,7 +135,7 @@ class AuthRepository(BaseModel):
     def get_user_ranking_by_rank(self, rank_id: int, user_id: str) -> UserRank:
         query = """
                 SELECT * FROM(SELECT 
-                    ROW_NUMBER() OVER (ORDER BY us.level DESC, us.exp_points DESC) AS ranking,
+                    ROW_NUMBER() OVER (ORDER BY us.level DESC, us.exp_points DESC, u.name ASC) AS ranking,
                     u.name, 
                     u.user_id,
                     u.last_name, 
@@ -140,6 +145,7 @@ class AuthRepository(BaseModel):
                 FROM users AS u
                 JOIN users_levels AS us ON us.user_id = u.user_id
                 WHERE rank_id=%s
+                ORDER BY us.level DESC, us.exp_points DESC, u.name ASC
                 ) AS subquery_alias
                 WHERE user_id=%s;
             """

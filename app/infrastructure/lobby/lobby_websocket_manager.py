@@ -12,7 +12,7 @@ from app.infrastructure.logs.logger import logger_conf
 
 
 class _LobbyWebSocketManager(ILobbyWebSocketManager):
-    INACTIVE_TIME_HOURS: Final[int] = 1
+    INACTIVE_TIME_MINUTES: Final[int] = 10
 
     def _refresh_user_time_connection(self, user_id: str, websocket: WebSocket) -> None:
         """Refresh the time of the user or created."""
@@ -51,7 +51,7 @@ class _LobbyWebSocketManager(ILobbyWebSocketManager):
         for user_id, socket_and_time in self.active_connections.items():
             ws = list(socket_and_time.keys())[0]
             last_activity = list(socket_and_time.values())[0]
-            if current_time - last_activity > timedelta(hours=self.INACTIVE_TIME_HOURS):
+            if current_time - last_activity > timedelta(minutes=self.INACTIVE_TIME_MINUTES):
                 inactive_connections.append((user_id, ws))
         # Disconnect all the inactive connections.
         for uid, websocket in inactive_connections:

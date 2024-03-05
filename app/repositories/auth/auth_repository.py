@@ -81,7 +81,7 @@ class AuthRepository(BaseModel):
                 FROM users AS u
                 JOIN users_levels AS us ON us.user_id = u.user_id
                 ORDER BY us.level DESC, us.exp_points DESC, u.name ASC
-                limit 20;
+                limit 100;
             """
         result = self.db.query(query, (), fetch_all=True)
         if result:
@@ -124,7 +124,7 @@ class AuthRepository(BaseModel):
                 JOIN users_levels AS us ON us.user_id = u.user_id
                 WHERE rank_id=%s
                 ORDER BY us.level DESC, us.exp_points DESC, u.name ASC
-                limit 20;
+                limit 100;
             """
         values = (rank_id,)
         results = self.db.query(query, values, fetch_all=True)

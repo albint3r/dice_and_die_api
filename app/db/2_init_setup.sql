@@ -21,7 +21,6 @@ INSERT INTO users (user_id,email, password, name, last_name) VALUES ("I009","fak
 INSERT INTO users_levels (user_id, exp_points, next_level_points) VALUES ("I009", 0, 50);
 INSERT INTO bank_accounts (user_id) VALUES ("I009");
 
--- Insertando 30 usuarios aleatorios con niveles variados del 1 al 15 y direcciones de correo electrónico de Outlook
 INSERT INTO users (user_id, email, password, name, last_name) VALUES
     ("FAKE001", "fake_user1@outlook.com", "FAKE_PASSWORD", "John", "Smith"),
     ("FAKE002", "fake_user2@outlook.com", "FAKE_PASSWORD", "Jane", "Doe"),
@@ -120,6 +119,19 @@ VALUES
     ("FAKE028"),
     ("FAKE029"),
     ("FAKE030");
+
+UPDATE users_levels
+SET rank_id = (SELECT rank_id FROM ranks WHERE name = 'stone')
+WHERE level < 5;
+
+UPDATE users_levels
+SET rank_id = (SELECT rank_id FROM ranks WHERE name = 'iron')
+WHERE level >= 5 AND level < 10;
+
+UPDATE users_levels
+SET rank_id = (SELECT rank_id FROM ranks WHERE name = 'bronze')
+WHERE level >= 10 AND level < 20;
+
 
 
 

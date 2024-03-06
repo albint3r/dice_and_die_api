@@ -15,7 +15,7 @@ class ILobbyWebSocketManager(IWebSocketManager, ABC):
         """Connect User to pool connections"""
 
     @abstractmethod
-    async def disconnect(self, user_id: str, websocket: WebSocket) -> None:
+    async def disconnect(self, user_id: str) -> None:
         """Disconnect user from pool connections"""
 
     @abstractmethod

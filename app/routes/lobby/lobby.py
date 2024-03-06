@@ -1,6 +1,7 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
 from fastapi_utilities import repeat_every
 from icecream import ic
+from starlette.websockets import WebSocketState
 
 from app.infrastructure.auth.auth_handler_impl import auth_handler
 from app.infrastructure.game.game_websocket_manager import game_websocket_manger
@@ -20,6 +21,12 @@ async def check_inactive_connections():
 async def check_connections():
     ic(lobby_websocket_manager.active_connections)
     return {'ok': 200}
+
+
+@router.get('/kill-connections')
+async def kill_connections():
+    lobby_websocket_manager.active_connections = {}
+    return {'ok': 200, 'connections': lobby_websocket_manager.active_connections}
 
 
 @router.websocket('/games')

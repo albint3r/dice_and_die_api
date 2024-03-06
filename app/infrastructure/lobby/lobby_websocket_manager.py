@@ -35,11 +35,14 @@ class _LobbyWebSocketManager(ILobbyWebSocketManager):
         response = ResponseLobbyInformation(lobby=lobby, total_players=self.get_total_connected_users())
         json_response = response.model_dump_json()
         for user_id, connection in self.active_connections.items():
+            ws = list(connection.keys())[0]
             try:
-                ws = list(connection.keys())[0]
                 await ws.send_json(json_response)
                 self._refresh_user_time_connection(user_id, ws)
             except Exception as e:
+                ic('Error [broadcast] msg in lobby:')
+                await self.disconnect(user_id, ws)
+                ic('Disconnect player error connexion')
                 logger_conf.log_send_websocket_json(json_response, e)
 
     def get_total_connected_users(self) -> int:

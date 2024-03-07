@@ -9,7 +9,7 @@ from app.domain.lobby.use_cases.i_lobby_use_case import ILobbyUseCase
 class LobbyUseCase(ILobbyUseCase):
 
     async def unsubscribe_user(self, user_id: str, websocket: WebSocket) -> None:
-        await self.lobby_websocket_manager.disconnect(user_id, websocket)
+        await self.lobby_websocket_manager.disconnect(user_id)
 
     async def subscribe_user(self, user_id: str, websocket: WebSocket) -> None:
         await self.lobby_websocket_manager.connect(user_id, websocket)
@@ -25,5 +25,5 @@ class LobbyUseCase(ILobbyUseCase):
         except ValidationError as e:
             msg = (f'Request User Lobby Error Validator. User Client send invalid json request. '
                    f'Disconnect user to prevent malicious behavior: {e}')
-            await self.lobby_websocket_manager.disconnect(user_id, websocket)
+            await self.lobby_websocket_manager.disconnect(user_id)
             raise InvalidRequestUserLobby(msg)

@@ -29,9 +29,8 @@ class _LobbyWebSocketManager(ILobbyWebSocketManager):
                 await old_websocket.close()
             except Exception as _:
                 ic('User was already close.')
-        ic(websocket)
         await websocket.accept()
-        await asyncio.sleep(2)
+        await asyncio.sleep(1)
         self._refresh_user_time_connection(user_id, websocket)
 
     async def disconnect(self, user_id: str) -> None:

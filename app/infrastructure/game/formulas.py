@@ -1,4 +1,4 @@
-from src.domain.auth.user_level import UserLevel
+from app.domain.auth.entities.user_level import UserLevel
 
 
 def next_level_basic_formula(user_level: UserLevel) -> int:

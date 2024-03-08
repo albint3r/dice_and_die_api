@@ -7,6 +7,7 @@ from app.domain.auth.entities.user import User
 from app.domain.auth.entities.user_level import UserLevel
 from app.domain.auth.entities.user_rank import UserRank
 from app.domain.auth.errors.errors import UserLevelNotExist, NoUserInRanking
+from app.domain.game.entities.play_history import PlayHistory
 
 
 class AuthRepository(BaseModel):
@@ -171,3 +172,50 @@ class AuthRepository(BaseModel):
         query = """UPDATE bank_accounts SET amount=%s WHERE user_id=%s;"""
         values = (amount, user_id)
         self.db.execute(query, values)
+
+    def save_user_play_history(self, user: User, play_history: PlayHistory) -> None:
+        query = """INSERT INTO users_play_history (user_id, play_history_id) VALUES (%s, %s);"""
+        values = (user.user_id, str(play_history.play_history_id))
+        self.db.execute(query, values)
+
+    def save_game_history(self, play_history: PlayHistory) -> None:
+        """Save the game match result"""
+        query = """INSERT INTO play_history 
+                        (creation_date, play_history_id, duration, p1, p1_score, 
+                        p1_col_1_0, p1_col_1_1, p1_col_1_2, p1_col_2_0, p1_col_2_1, p1_col_2_2, 
+                        p1_col_3_0, p1_col_3_1, p1_col_3_2, p2, p2_score, p2_col_1_0, p2_col_1_1, 
+                        p2_col_1_2, p2_col_2_0, p2_col_2_1, p2_col_2_2, p2_col_3_0, p2_col_3_1, p2_col_3_2) 
+                        VALUES (%s, %s, %s, %s, %s, 
+                                %s, %s, %s, %s, %s, %s, 
+                                %s, %s, %s, %s, %s, %s, 
+                                %s, %s, %s, %s, %s, %s, 
+                                %s, %s);"""
+        values = (
+            play_history.creation_date,
+            str(play_history.play_history_id),
+            play_history.duration,
+            play_history.p1,
+            play_history.p1_score,
+            play_history.p1_col_1_0,
+            play_history.p1_col_1_1,
+            play_history.p1_col_1_2,
+            play_history.p1_col_2_0,
+            play_history.p1_col_2_1,
+            play_history.p1_col_2_2,
+            play_history.p1_col_3_0,
+            play_history.p1_col_3_1,
+            play_history.p1_col_3_2,
+            play_history.p2,
+            play_history.p2_score,
+            play_history.p2_col_1_0,
+            play_history.p2_col_1_1,
+            play_history.p2_col_1_2,
+            play_history.p2_col_2_0,
+            play_history.p2_col_2_1,
+            play_history.p2_col_2_2,
+            play_history.p2_col_3_0,
+            play_history.p2_col_3_1,
+            play_history.p2_col_3_2
+        )
+        self.db.execute(query, values)
+        ic('Save Users')

@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 from app.domain.auth.schemas.response import ResponseLogIn, ResponseSignin, ResponseUpdateUserNameAndLastName, \
     ResponseUsersRanking, ResponseUserRank
-from src.domain.auth.i_auth_handler import IAuthHandler
+from app.domain.auth.use_cases.i_auth_handler import IAuthHandler
 
 
 class IAuthUseCase(BaseModel, ABC):

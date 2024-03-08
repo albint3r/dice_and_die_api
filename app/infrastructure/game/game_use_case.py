@@ -129,7 +129,6 @@ class GameUseCase(IGameUseCase):
     def save_game_history(self, game: Game) -> None:
         """Save the game match result"""
         play_history = PlayHistory.from_game(game)
-        ic(play_history)
         self.repo.save_game_history(play_history)
         self.repo.save_user_play_history(game.p1.user, play_history)
         self.repo.save_user_play_history(game.p2.user, play_history)

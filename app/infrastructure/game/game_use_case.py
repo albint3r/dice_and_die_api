@@ -15,6 +15,7 @@ from app.domain.game.entities.die import Die
 from app.domain.game.entities.game import Game
 from app.domain.game.entities.play_history import PlayHistory
 from app.domain.game.entities.player import Player
+from app.domain.game.entities.single_play_history import SinglePlayHistory
 from app.domain.game.enums.game_event import GameEvent
 from app.domain.game.enums.game_state import GameState
 from app.domain.game.schemas.request import GamePlayerRequest
@@ -133,6 +134,11 @@ class GameUseCase(IGameUseCase):
         self.repo.save_user_play_history(game.p1.user, play_history)
         self.repo.save_user_play_history(game.p2.user, play_history)
 
+    def save_single_game_history(self, game: Game, column_index: int) -> None:
+        """Save single game history player column selection"""
+        single_game_history = SinglePlayHistory.from_game(game, column_index)
+        self.repo.save_single_play_history(single_game_history)
+
     async def execute(self, game: Game, **kwargs):
         match game.state:
             case GameState.CREATE_NEW_GAME:
@@ -164,6 +170,8 @@ class GameUseCase(IGameUseCase):
                 column_index = self._select_column(request)
                 column = game.current_player.board.columns.get(column_index)
                 if column_index and not column.is_full():
+                    # This save the result move from the user. This table helps to the machine learning model.
+                    self.save_single_game_history(game, column_index)
                     game.state = GameState.ADD_DICE_TO_COLUMN
                     await self.execute(game, column_index=column_index)
 

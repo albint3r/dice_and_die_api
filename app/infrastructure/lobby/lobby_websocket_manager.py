@@ -17,7 +17,6 @@ class _LobbyWebSocketManager(ILobbyWebSocketManager):
 
     def _refresh_user_time_connection(self, user_id: str, websocket: WebSocket) -> None:
         """Refresh the time of the user or created."""
-        ic('_refresh_user_time_connection')
         self.active_connections[user_id] = {websocket: datetime.now()}
 
     async def connect(self, user_id: str, websocket: WebSocket) -> None:

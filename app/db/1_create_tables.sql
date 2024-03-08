@@ -73,6 +73,34 @@ CREATE TABLE users_play_history (
     FOREIGN KEY (play_history_id) REFERENCES play_history(play_history_id)
 );
 
+CREATE TABLE single_play_history (
+    creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    game_id CHAR(36),
+    p1_score INT NOT NULL,
+    p1_col_1_0 INT DEFAULT 0,
+    p1_col_1_1 INT DEFAULT 0,
+    p1_col_1_2 INT DEFAULT 0,
+    p1_col_2_0 INT DEFAULT 0,
+    p1_col_2_1 INT DEFAULT 0,
+    p1_col_2_2 INT DEFAULT 0,
+    p1_col_3_0 INT DEFAULT 0,
+    p1_col_3_1 INT DEFAULT 0,
+    p1_col_3_2 INT DEFAULT 0,
+    p2_score INT NOT NULL,
+    p2_col_1_0 INT DEFAULT 0,
+    p2_col_1_1 INT DEFAULT 0,
+    p2_col_1_2 INT DEFAULT 0,
+    p2_col_2_0 INT DEFAULT 0,
+    p2_col_2_1 INT DEFAULT 0,
+    p2_col_2_2 INT DEFAULT 0,
+    p2_col_3_0 INT DEFAULT 0,
+    p2_col_3_1 INT DEFAULT 0,
+    p2_col_3_2 INT DEFAULT 0,
+    dice_result INT,
+    column_index INT
+);
+
+
 
 
 

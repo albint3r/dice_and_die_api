@@ -8,6 +8,7 @@ from app.domain.auth.entities.user_level import UserLevel
 from app.domain.auth.entities.user_rank import UserRank
 from app.domain.auth.errors.errors import UserLevelNotExist, NoUserInRanking
 from app.domain.game.entities.play_history import PlayHistory
+from app.domain.game.entities.single_play_history import SinglePlayHistory
 
 
 class AuthRepository(BaseModel):
@@ -219,3 +220,45 @@ class AuthRepository(BaseModel):
         )
         self.db.execute(query, values)
         ic('Save Users')
+
+    def save_single_play_history(self, single_game_history: SinglePlayHistory) -> None:
+        """Save the game match result"""
+        query = """INSERT single_play_history 
+                        (creation_date, game_id, p1_score, 
+                        p1_col_1_0, p1_col_1_1, p1_col_1_2, p1_col_2_0, p1_col_2_1, p1_col_2_2, 
+                        p1_col_3_0, p1_col_3_1, p1_col_3_2, p2_score, p2_col_1_0, p2_col_1_1, 
+                        p2_col_1_2, p2_col_2_0, p2_col_2_1, p2_col_2_2, p2_col_3_0, p2_col_3_1, p2_col_3_2,
+                        dice_result, column_index) 
+                        VALUES (%s, %s, %s, %s, %s, %s, 
+                                %s, %s, %s, %s, %s, %s, 
+                                %s, %s, %s, %s, %s, %s, 
+                                %s, %s, %s, %s, %s, %s 
+                                );"""
+        values = (
+            single_game_history.creation_date,
+            single_game_history.game_id,
+            single_game_history.p1_score,
+            single_game_history.p1_col_1_0,
+            single_game_history.p1_col_1_1,
+            single_game_history.p1_col_1_2,
+            single_game_history.p1_col_2_0,
+            single_game_history.p1_col_2_1,
+            single_game_history.p1_col_2_2,
+            single_game_history.p1_col_3_0,
+            single_game_history.p1_col_3_1,
+            single_game_history.p1_col_3_2,
+            single_game_history.p2_score,
+            single_game_history.p2_col_1_0,
+            single_game_history.p2_col_1_1,
+            single_game_history.p2_col_1_2,
+            single_game_history.p2_col_2_0,
+            single_game_history.p2_col_2_1,
+            single_game_history.p2_col_2_2,
+            single_game_history.p2_col_3_0,
+            single_game_history.p2_col_3_1,
+            single_game_history.p2_col_3_2,
+            single_game_history.dice_result,
+            single_game_history.column_index
+        )
+        self.db.execute(query, values)
+        ic('Save Single Play History')

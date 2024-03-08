@@ -13,6 +13,7 @@ from app.domain.game.entities.board import Board
 from app.domain.game.entities.column import Column
 from app.domain.game.entities.die import Die
 from app.domain.game.entities.game import Game
+from app.domain.game.entities.play_history import PlayHistory
 from app.domain.game.entities.player import Player
 from app.domain.game.enums.game_event import GameEvent
 from app.domain.game.enums.game_state import GameState
@@ -125,6 +126,14 @@ class GameUseCase(IGameUseCase):
         else:
             await self.websocket_manager.disconnect(game_id=game.game_id, websocket=websocket)
 
+    def save_game_history(self, game: Game) -> None:
+        """Save the game match result"""
+        play_history = PlayHistory.from_game(game)
+        ic(play_history)
+        self.repo.save_game_history(play_history)
+        self.repo.save_user_play_history(game.p1.user, play_history)
+        self.repo.save_user_play_history(game.p2.user, play_history)
+
     async def execute(self, game: Game, **kwargs):
         match game.state:
             case GameState.CREATE_NEW_GAME:
@@ -218,6 +227,7 @@ class GameUseCase(IGameUseCase):
                 message = 'finish_game'
                 await self.websocket_manager.broadcast(game_id=game.game_id, message=message, extras=extras)
                 await self.viewers_websocket_manager.broadcast(game=game, message=message, extras=extras)
+                self.save_game_history(game)
 
             case GameState.DISCONNECT_PLAYER:
                 winner_player, _ = game.winner_player

@@ -1,2 +1,11 @@
+src/
 .pytest_cache
-env/
+.env
+venv/
+server.log
+.git
+.gitignore
+Dockerfile
+docker-compose
+__pycache__
+

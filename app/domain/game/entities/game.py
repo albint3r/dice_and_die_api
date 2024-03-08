@@ -1,4 +1,6 @@
-from pydantic import BaseModel
+from datetime import datetime
+
+from pydantic import BaseModel, Field
 
 from app.domain.game.entities.player import Player
 from app.domain.game.enums.game_state import GameState
@@ -7,6 +9,7 @@ TWinner = tuple[Player, Player | None]
 
 
 class Game(BaseModel):
+    create_date: datetime = Field(default_factory=datetime.now)
     game_id: str
     p1: Player
     p2: Player | None = None

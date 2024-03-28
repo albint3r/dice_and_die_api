@@ -15,7 +15,7 @@ from app.domain.game.entities.die import Die
 from app.domain.game.entities.game import Game
 from app.domain.game.entities.play_history import PlayHistory
 from app.domain.game.entities.player import Player
-from app.domain.game.entities.single_play_history import SinglePlayHistory
+from app.domain.analytics.entities.single_play_history import SinglePlayHistory
 from app.domain.game.enums.game_event import GameEvent
 from app.domain.game.enums.game_state import GameState
 from app.domain.game.schemas.request import GamePlayerRequest

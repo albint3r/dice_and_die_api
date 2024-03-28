@@ -8,7 +8,7 @@ from app.domain.auth.entities.user_level import UserLevel
 from app.domain.auth.entities.user_rank import UserRank
 from app.domain.auth.errors.errors import UserLevelNotExist, NoUserInRanking
 from app.domain.game.entities.play_history import PlayHistory
-from app.domain.game.entities.single_play_history import SinglePlayHistory
+from app.domain.analytics.entities.single_play_history import SinglePlayHistory
 
 
 class AuthRepository(BaseModel):

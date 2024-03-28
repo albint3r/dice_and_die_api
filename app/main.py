@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routes.auth import auth
 from app.routes.game import game
 from app.routes.lobby import lobby
+from app.routes.analytics import analytics
 
 app = FastAPI()
 
@@ -21,3 +22,4 @@ app.add_exception_handler(Exception, logger_conf.handle_unhandled_exception)
 app.include_router(auth.router)
 app.include_router(game.router)
 app.include_router(lobby.router)
+app.include_router(analytics.router)

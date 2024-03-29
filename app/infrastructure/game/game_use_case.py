@@ -22,8 +22,17 @@ from app.domain.game.schemas.request import GamePlayerRequest
 from app.domain.game.use_cases.i_game_use_case import IGameUseCase
 from fastapi import WebSocketException, status
 
+from app.domain.game.use_cases.i_game_websocket_manager import IGameWebSocketManager
+from app.domain.game.use_cases.i_user_level_use_case import IManagerLevelingUseCase
+from app.domain.game.use_cases.i_viewers_websocket_manager import IViewersWebSocketManager
+from app.repositories.auth.auth_repository import AuthRepository
+
 
 class GameUseCase(IGameUseCase):
+    websocket_manager: IGameWebSocketManager
+    viewers_websocket_manager: IViewersWebSocketManager
+    leveling_manager: IManagerLevelingUseCase
+    repo: AuthRepository
 
     def _create_new_player(self, user: User) -> Player:  # noqa
         """Create a new player from an existing user."""

@@ -3,22 +3,13 @@ from abc import ABC, abstractmethod
 from pydantic import BaseModel
 from starlette.websockets import WebSocket
 
-from app.domain.auth.entities.user import User
 from app.domain.core.ref_types import TGamePlayer
 from app.domain.game.entities.game import Game
 from app.domain.game.entities.player import Player
 from app.domain.game.schemas.request import GamePlayerRequest
-from app.domain.game.use_cases.i_game_websocket_manager import IGameWebSocketManager
-from app.domain.game.use_cases.i_user_level_use_case import IManagerLevelingUseCase
-from app.domain.game.use_cases.i_viewers_websocket_manager import IViewersWebSocketManager
-from app.repositories.auth.auth_repository import AuthRepository
 
 
 class IGameUseCase(BaseModel, ABC):
-    websocket_manager: IGameWebSocketManager
-    viewers_websocket_manager: IViewersWebSocketManager
-    leveling_manager: IManagerLevelingUseCase
-    repo: AuthRepository
 
     @abstractmethod
     async def execute(self, game: Game):

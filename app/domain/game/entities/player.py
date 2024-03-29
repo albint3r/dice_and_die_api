@@ -5,6 +5,7 @@ from pydantic import BaseModel, field_validator, Field
 from app.domain.auth.entities.user import User
 from app.domain.game.entities.board import Board
 from app.domain.game.entities.die import Die
+from app.domain.game.entities.player_rol import PlayerRol
 from app.domain.game.errors.errors import InvalidNewBoardInstance, InvalidNewDieInstance
 
 
@@ -13,6 +14,7 @@ class Player(BaseModel):
     user: User
     board: Board
     die: Die
+    rol: PlayerRol = PlayerRol.HUMAN
 
     @field_validator("board")
     def is_new_board(cls, board):

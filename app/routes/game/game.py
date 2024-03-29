@@ -10,6 +10,7 @@ from app.infrastructure.game.game_use_case import GameUseCase
 from app.infrastructure.game.game_websocket_manager import game_websocket_manger
 from app.infrastructure.game.level_use_case import LevelUserCase
 from app.infrastructure.game.manager_leveling_use_case import ManagerLevelingUseCase
+from app.infrastructure.game.pve_game_use_case import PVEGameUseCase
 from app.infrastructure.game.rank_use_case import RankUseCase
 from app.infrastructure.game.view_user_cases import ViewUseCase
 from app.infrastructure.game.viewers_websocket_manager import viewers_websocket_manager
@@ -26,8 +27,18 @@ async def check_active_connections():
     return {"ok": 200}
 
 
+@router.websocket('/game/ai')
+async def play_game_pvp(websocket: WebSocket, user_id: str = Depends(auth_handler.auth_websocket)):
+    repo = AuthRepository(db=db)
+    game_use_case = PVEGameUseCase(websocket_manager=game_websocket_manger, repo=repo)
+    # We are going to use always a new game because we wanted the game is visible in the lobby but no playable for
+    # other players. This creates a new room but because we are going to fill it with the AI  nobody would be entering.
+    game_id = game_use_case.get_valid_game_id(user_id, 'new_game')
+    game, player = await game_use_case.create_or_join(game_id=game_id, user_id=user_id, websocket=websocket)
+
+
 @router.websocket('/game/{game_id}')
-async def play_game(websocket: WebSocket, game_id: str, user_id: str = Depends(auth_handler.auth_websocket)):
+async def play_game_pvp(websocket: WebSocket, game_id: str, user_id: str = Depends(auth_handler.auth_websocket)):
     """This is the websocket endpoint to play the dice and die game"""
     repo = AuthRepository(db=db)
     leveling_manager = ManagerLevelingUseCase(leve_manager=LevelUserCase(), rank_manager=RankUseCase())

@@ -4,6 +4,7 @@ from icecream import ic
 from app.db.db import db
 from app.domain.game.enums.game_event import GameEvent
 from app.domain.game.enums.game_state import GameState
+from app.domain.game.schemas.request import GamePlayerRequest
 from app.infrastructure.auth.auth_handler_impl import auth_handler
 from app.infrastructure.game.chat_observer import ChatObserver
 from app.infrastructure.game.game_use_case import GameUseCase
@@ -28,13 +29,44 @@ async def check_active_connections():
 
 
 @router.websocket('/game/ai')
-async def play_game_pvp(websocket: WebSocket, user_id: str = Depends(auth_handler.auth_websocket)):
+async def play_game_ai(websocket: WebSocket, user_id: str = Depends(auth_handler.auth_websocket)):
     repo = AuthRepository(db=db)
     game_use_case = PVEGameUseCase(websocket_manager=game_websocket_manger, repo=repo)
     # We are going to use always a new game because we wanted the game is visible in the lobby but no playable for
     # other players. This creates a new room but because we are going to fill it with the AI  nobody would be entering.
-    game_id = game_use_case.get_valid_game_id(user_id, 'new_game')
+    game_id = game_use_case.get_valid_game_id('', '')
     game, player = await game_use_case.create_or_join(game_id=game_id, user_id=user_id, websocket=websocket)
+
+    try:
+        await game_use_case.execute(game)
+        while not game.is_finished or game.is_waiting_opponent:
+            request = await game_use_case.get_user_request_event(websocket)
+
+            if game.current_player and game.current_player.is_player_turn(player) and request.event == GameEvent.ROLL:
+                # This part execute the [ROLL_DICE] event
+                await game_use_case.execute(game)
+                while game.state != GameState.CHANGE_CURRENT_PLAYER and game.state != GameState.FINISH_GAME:
+                    # In this part normally occur the next events: [SELECT_COLUMN], [ADD_DICE], [DESTROY_OPPONENT_COLUMN] AND
+                    # [UPDATE_PLAYER_POINTS]. This while loop is mainly to check the user select a valid COLUMN.
+                    game_use_case.verbose(game)
+                    request = await game_use_case.get_user_request_event(websocket)
+                    await game_use_case.execute(game, selected_column=request)
+                    game_use_case.verbose(game)
+                # This last execute is mainly responsible from the [CHANGE_CURRENT_PLAYER] OR [FINISH_GAME] event
+                await game_use_case.execute(game)
+                game_use_case.verbose(game)
+            ic('AI TURN...')
+            ic(game.state)
+            await game_use_case.execute(game)
+            await game_use_case.execute(game, selected_column=GamePlayerRequest(event=GameEvent.COL1))
+            ic(game.p2)
+            game_use_case.verbose(game)
+
+        ic(game)
+        await websocket.close()
+        await game_use_case.websocket_manager.disconnect(game_id=game_id, websocket=websocket)
+    except WebSocketDisconnect:
+        ic(f'Player: {player.user.name} is disconnected.')
 
 
 @router.websocket('/game/{game_id}')

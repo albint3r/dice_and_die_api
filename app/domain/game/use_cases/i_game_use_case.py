@@ -12,7 +12,7 @@ from app.domain.game.schemas.request import GamePlayerRequest
 class IGameUseCase(BaseModel, ABC):
 
     @abstractmethod
-    async def execute(self, game: Game):
+    async def execute(self, game: Game, **kwargs):
         """Depends on the [GameState] execute a function that provide the values to continue the [game] flow"""
 
     @abstractmethod

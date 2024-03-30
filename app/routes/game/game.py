@@ -4,6 +4,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
 from icecream import ic
 
 from app.db.db import db
+from app.domain.game.entities.player_rol import PlayerRol
 from app.domain.game.enums.game_event import GameEvent
 from app.domain.game.enums.game_state import GameState
 from app.domain.game.schemas.request import GamePlayerRequest
@@ -64,7 +65,7 @@ async def play_game_ai(websocket: WebSocket, user_id: str = Depends(auth_handler
                 game_use_case.verbose(game)
 
             # This run the AI Part
-            if game.current_player == game.p2:
+            if game.current_player.rol == PlayerRol.AI:
                 await sleep(1)
                 await game_use_case.execute(game)
                 ai_event = game_use_case.get_ai_selected_column(game)

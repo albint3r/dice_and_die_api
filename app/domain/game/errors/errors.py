@@ -31,3 +31,7 @@ class NoneGameInResponseValidatorError(GameError):
 
 class MissingBroadcastGameInPlayersMatch(GameError):
     """Throw an error you want to broadcast the game and don't exit"""
+
+
+class InvalidAIPathModel(GameError):
+    """Throw when don't find the AI ml model"""

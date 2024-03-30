@@ -4,6 +4,8 @@ from pydantic import BaseModel, Field
 
 from app.domain.game.entities.game import Game
 
+import numpy as np
+
 
 class SinglePlayHistory(BaseModel):
     creation_date: datetime = Field(default_factory=datetime.now)
@@ -64,3 +66,13 @@ class SinglePlayHistory(BaseModel):
     @staticmethod
     def get_score_value(column: list[int], i: int) -> int:
         return column[i] if i < len(column) else 0
+
+    def to_array(self) -> np.ndarray:
+        return np.array([
+            self.p1_score, self.p1_col_1_0, self.p1_col_1_1, self.p1_col_1_2,
+            self.p1_col_2_0, self.p1_col_2_1, self.p1_col_2_2, self.p1_col_3_0,
+            self.p1_col_3_1, self.p1_col_3_2, self.p2_score, self.p2_col_1_0,
+            self.p2_col_1_1, self.p2_col_1_2, self.p2_col_2_0, self.p2_col_2_1,
+            self.p2_col_2_2, self.p2_col_3_0, self.p2_col_3_1, self.p2_col_3_2,
+            self.dice_result
+        ]).reshape(1, -1)

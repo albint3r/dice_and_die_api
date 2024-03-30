@@ -3,14 +3,18 @@ from random import choice
 
 import joblib
 from icecream import ic
+from sklearn.ensemble import RandomForestClassifier
 from starlette.websockets import WebSocket
 
+from app.domain.analytics.entities.single_play_history import SinglePlayHistory
 from app.domain.core.ref_types import TGamePlayer
 from app.domain.game.entities.game import Game
 from app.domain.game.entities.player import Player
 from app.domain.game.entities.player_rol import PlayerRol
 from app.domain.game.enums.game_state import GameState
+from app.domain.game.errors.errors import InvalidAIPathModel
 from app.infrastructure.game.game_use_case import GameUseCase
+import os
 
 
 class PVEGameUseCase(GameUseCase):
@@ -41,18 +45,20 @@ class PVEGameUseCase(GameUseCase):
 
     def get_ai_selected_column(self, game: Game) -> str:  # noqa
         """Return the index integer of the column to select by the AI"""
-        import os
 
         model_file = 'best_estimator.pkl'
-        if os.path.exists(model_file):
-            best_rf_model_loaded = joblib.load(model_file)
-            ic(best_rf_model_loaded)
-            # Resto del código para utilizar el modelo cargado
-        else:
-            ic("El archivo del modelo no existe. Asegúrate de haber guardado el modelo previamente.")
+        ic(model_file)
+        if not os.path.exists(model_file):
+            raise InvalidAIPathModel('Not AI model path.')
+
+        best_rf_model_loaded: RandomForestClassifier = joblib.load(model_file)
+        single_play_history = SinglePlayHistory.from_game(game, 0)
+        X = single_play_history.to_array()
+        y_pred = best_rf_model_loaded.predict(X)
+        index_column = str(y_pred[0])
         columns = game.p2.board.columns
         available_columns = [str(i) for i, col in columns.items() if not col.is_full()]
+        if index_column in available_columns:
+            ic('It was used the ML model')
+            return index_column
         return choice(available_columns)
-
-
-

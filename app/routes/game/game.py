@@ -56,13 +56,10 @@ async def play_game_ai(websocket: WebSocket, user_id: str = Depends(auth_handler
                 while game.state != GameState.CHANGE_CURRENT_PLAYER and game.state != GameState.FINISH_GAME:
                     # In this part normally occur the next events: [SELECT_COLUMN], [ADD_DICE], [DESTROY_OPPONENT_COLUMN] AND
                     # [UPDATE_PLAYER_POINTS]. This while loop is mainly to check the user select a valid COLUMN.
-                    game_use_case.verbose(game)
                     request = await game_use_case.get_user_request_event(websocket)
                     await game_use_case.execute(game, selected_column=request)
-                    game_use_case.verbose(game)
                 # This last execute is mainly responsible from the [CHANGE_CURRENT_PLAYER] OR [FINISH_GAME] event
                 await game_use_case.execute(game)
-                game_use_case.verbose(game)
 
             # This run the AI Part
             if game.current_player.rol == PlayerRol.AI:
@@ -71,10 +68,7 @@ async def play_game_ai(websocket: WebSocket, user_id: str = Depends(auth_handler
                 ai_event = game_use_case.get_ai_selected_column(game)
                 await sleep(1)
                 await game_use_case.execute(game, selected_column=GamePlayerRequest(event=GameEvent(ai_event)))
-                ic(game.p2)
                 await game_use_case.execute(game)
-                game_use_case.verbose(game)
-        ic(game)
         await game_use_case.websocket_manager.disconnect(game_id=game_id, websocket=websocket)
         await websocket.close()
     except WebSocketDisconnect:

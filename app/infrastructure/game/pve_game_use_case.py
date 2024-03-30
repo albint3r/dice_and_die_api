@@ -1,6 +1,8 @@
 import uuid
 from random import choice
 
+import joblib
+from icecream import ic
 from starlette.websockets import WebSocket
 
 from app.domain.core.ref_types import TGamePlayer
@@ -39,6 +41,18 @@ class PVEGameUseCase(GameUseCase):
 
     def get_ai_selected_column(self, game: Game) -> str:  # noqa
         """Return the index integer of the column to select by the AI"""
+        import os
+
+        model_file = 'best_estimator.pkl'
+        if os.path.exists(model_file):
+            best_rf_model_loaded = joblib.load(model_file)
+            ic(best_rf_model_loaded)
+            # Resto del código para utilizar el modelo cargado
+        else:
+            ic("El archivo del modelo no existe. Asegúrate de haber guardado el modelo previamente.")
         columns = game.p2.board.columns
         available_columns = [str(i) for i, col in columns.items() if not col.is_full()]
         return choice(available_columns)
+
+
+

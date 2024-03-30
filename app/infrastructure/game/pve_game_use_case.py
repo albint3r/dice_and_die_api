@@ -1,3 +1,4 @@
+import copy
 import uuid
 from json import JSONDecodeError
 from random import choice
@@ -12,6 +13,7 @@ from app.domain.game.entities.board import Board
 from app.domain.game.entities.column import Column
 from app.domain.game.entities.die import Die
 from app.domain.game.entities.game import Game
+from app.domain.game.entities.play_history import PlayHistory
 from app.domain.game.entities.player import Player
 from app.domain.game.entities.player_rol import PlayerRol
 from app.domain.game.enums.game_event import GameEvent
@@ -19,6 +21,7 @@ from app.domain.game.enums.game_state import GameState
 from app.domain.game.schemas.request import GamePlayerRequest
 from app.domain.game.use_cases.i_game_use_case import IGameUseCase
 from app.domain.game.use_cases.i_game_websocket_manager import IGameWebSocketManager
+from app.domain.game.use_cases.i_user_level_use_case import IManagerLevelingUseCase
 from app.repositories.auth.auth_repository import AuthRepository
 from app.domain.auth.entities.user import User
 
@@ -26,6 +29,7 @@ from app.domain.auth.entities.user import User
 class PVEGameUseCase(IGameUseCase):
     websocket_manager: IGameWebSocketManager
     repo: AuthRepository
+    leveling_manager: IManagerLevelingUseCase
 
     def _get_starter_player(self, game: Game) -> Player:  # noqa
         """Select randomly witch player would start the game."""
@@ -77,7 +81,7 @@ class PVEGameUseCase(IGameUseCase):
 
     async def get_winner_after_player_disconnect(self, disconnected_player: Player, game: Game,
                                                  websocket: WebSocket) -> None:
-        pass
+        return NotImplemented('[get_winner_after_player_disconnect] IS NOT IMPLEMENTED')
 
     def get_valid_game_id(self, _: str, __: str) -> str:
         return str(uuid.uuid4())
@@ -99,11 +103,32 @@ class PVEGameUseCase(IGameUseCase):
         single_game_history = SinglePlayHistory.from_game(game, column_index)
         self.repo.save_single_play_history(single_game_history)
 
+    def _update_user_level_rank_and_bank_account(self, exp_points, winner_player):
+        """Update Winner level, rank and bank account.
+
+        This method is used after the game finished or when the usr disconnect.
+        Note: Only update the bank account if the user level up. We have a fix amount by the moment, but later
+        could change this for a dynamic formula.
+        """
+        old_user: User = copy.deepcopy(winner_player.user)
+        user = self.leveling_manager.update_user_level(winner_player.user, exp_points)
+        # Update user bank account if level up:
+        if old_user.user_level.level != user.user_level.level:
+            self.repo.update_user_bank_account_amount(user.user_id, 100.0)
+        self.repo.update_user_level(user.user_level)
+
     def get_ai_selected_column(self, game: Game) -> str:
         """Return the index integer of the column to select by the AI"""
         columns = game.p2.board.columns
         available_columns = [str(i) for i, col in columns.items() if not col.is_full()]
         return choice(available_columns)
+
+    def save_game_history(self, game: Game) -> None:
+        """Save the game match result"""
+        play_history = PlayHistory.from_game(game)
+        self.repo.save_game_history(play_history)
+        self.repo.save_user_play_history(game.p1.user, play_history)
+        self.repo.save_user_play_history(game.p2.user, play_history)
 
     async def execute(self, game: Game, **kwargs):
         match game.state:

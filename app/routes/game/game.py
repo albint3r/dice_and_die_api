@@ -1,3 +1,5 @@
+from asyncio import sleep
+
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
 from icecream import ic
 
@@ -31,7 +33,11 @@ async def check_active_connections():
 @router.websocket('/game/ai')
 async def play_game_ai(websocket: WebSocket, user_id: str = Depends(auth_handler.auth_websocket)):
     repo = AuthRepository(db=db)
-    game_use_case = PVEGameUseCase(websocket_manager=game_websocket_manger, repo=repo)
+    leveling_manager = ManagerLevelingUseCase(leve_manager=LevelUserCase(), rank_manager=RankUseCase())
+    leveling_manager._base_win_points = 0
+
+    game_use_case = PVEGameUseCase(websocket_manager=game_websocket_manger, repo=repo,
+                                   leveling_manager=leveling_manager, )
     # We are going to use always a new game because we wanted the game is visible in the lobby but no playable for
     # other players. This creates a new room but because we are going to fill it with the AI  nobody would be entering.
     game_id = game_use_case.get_valid_game_id('', '')
@@ -56,21 +62,22 @@ async def play_game_ai(websocket: WebSocket, user_id: str = Depends(auth_handler
                 await game_use_case.execute(game)
                 game_use_case.verbose(game)
 
+            # This run the AI Part
             if game.current_player == game.p2:
-                ic('AI TURN...')
-                ic(game.state)
+                await sleep(1)
                 await game_use_case.execute(game)
                 ai_event = game_use_case.get_ai_selected_column(game)
-                ic(ai_event)
+                await sleep(1)
                 await game_use_case.execute(game, selected_column=GamePlayerRequest(event=GameEvent(ai_event)))
                 ic(game.p2)
                 await game_use_case.execute(game)
                 game_use_case.verbose(game)
 
         ic(game)
-        await websocket.close()
         await game_use_case.websocket_manager.disconnect(game_id=game_id, websocket=websocket)
+        await websocket.close()
     except WebSocketDisconnect:
+        await game_use_case.websocket_manager.disconnect(game_id=game_id, websocket=websocket)
         ic(f'Player: {player.user.name} is disconnected.')
 
 

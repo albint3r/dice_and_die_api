@@ -36,8 +36,9 @@ async def play_game_ai(websocket: WebSocket, user_id: str = Depends(auth_handler
     leveling_manager = ManagerLevelingUseCase(leve_manager=LevelUserCase(), rank_manager=RankUseCase())
     leveling_manager._base_win_points = 0
 
-    game_use_case = PVEGameUseCase(websocket_manager=game_websocket_manger, repo=repo,
-                                   leveling_manager=leveling_manager, )
+    game_use_case = PVEGameUseCase(websocket_manager=game_websocket_manger,
+                                   viewers_websocket_manager=viewers_websocket_manager,
+                                   leveling_manager=leveling_manager, repo=repo)
     # We are going to use always a new game because we wanted the game is visible in the lobby but no playable for
     # other players. This creates a new room but because we are going to fill it with the AI  nobody would be entering.
     game_id = game_use_case.get_valid_game_id('', '')

@@ -1,65 +1,27 @@
-import copy
 import uuid
-from json import JSONDecodeError
 from random import choice
 
-from icecream import ic
-from pydantic import ValidationError
 from starlette.websockets import WebSocket
 
-from app.domain.analytics.entities.single_play_history import SinglePlayHistory
 from app.domain.core.ref_types import TGamePlayer
-from app.domain.game.entities.board import Board
 from app.domain.game.entities.column import Column
-from app.domain.game.entities.die import Die
 from app.domain.game.entities.game import Game
-from app.domain.game.entities.play_history import PlayHistory
 from app.domain.game.entities.player import Player
 from app.domain.game.entities.player_rol import PlayerRol
-from app.domain.game.enums.game_event import GameEvent
 from app.domain.game.enums.game_state import GameState
 from app.domain.game.schemas.request import GamePlayerRequest
-from app.domain.game.use_cases.i_game_use_case import IGameUseCase
-from app.domain.game.use_cases.i_game_websocket_manager import IGameWebSocketManager
-from app.domain.game.use_cases.i_user_level_use_case import IManagerLevelingUseCase
-from app.repositories.auth.auth_repository import AuthRepository
-from app.domain.auth.entities.user import User
+from app.infrastructure.game.game_use_case import GameUseCase
 
 
-class PVEGameUseCase(IGameUseCase):
-    websocket_manager: IGameWebSocketManager
-    repo: AuthRepository
-    leveling_manager: IManagerLevelingUseCase
+class PVEGameUseCase(GameUseCase):
 
     def _get_starter_player(self, game: Game) -> Player:  # noqa
         """Select randomly witch player would start the game."""
         return game.p1
 
-    def _get_user(self, user_id: str) -> User:
-        """Create an instance of the user by the user id"""
-        user = self.repo.get_user_by_id(user_id)
-        user.user_level = self.repo.get_user_level(user.user_id)
-        user.bank_account = self.repo.get_user_bank_account(user.user_id)
-        return user
-
-    def _create_new_player(self, user: User) -> Player:  # noqa
-        """Create a new player from an existing user."""
-        return Player(user=user, board=Board(), die=Die())
-
     def _create_new_game(self, game_id: str, player: Player, player_ai: Player) -> Game:  # noqa
         """Create a new Game."""
         return Game(game_id=game_id, p1=player, p2=player_ai, state=GameState.WAITING_OPPONENT)
-
-    def verbose(self, game) -> None:  # noqa
-        ic('*-' * 100)
-        ic(f'Current player: {game.current_player.user.name} | Die:{game.current_player.die.current_number}')
-        ic(f'GameState: {game.state}')
-        ic('*-' * 100)
-        ic(f'Player 1:{game.p1.user.name}')
-        ic(f'Board:{game.p1.board}')
-        ic(f'Player 2:{game.p2.user.name}')
-        ic(f'Board:{game.p2.board}')
-        ic('*-' * 100)
 
     async def create_or_join(self, game_id: str, user_id: str, websocket: WebSocket) -> TGamePlayer:
         """Create a room for the player and an AI."""
@@ -70,15 +32,6 @@ class PVEGameUseCase(IGameUseCase):
         await self.websocket_manager.connect(game_id=game_id, new_game=game, websocket=websocket)
         return game, player
 
-    async def get_user_request_event(self, websocket: WebSocket) -> GamePlayerRequest:
-        try:
-            json_str = await websocket.receive_json()
-            return GamePlayerRequest(**json_str)
-        except ValidationError:
-            return GamePlayerRequest(event=GameEvent.INVALID_INPUT_EVENT)
-        except JSONDecodeError:
-            return GamePlayerRequest(event=GameEvent.INVALID_INPUT_EVENT)
-
     async def get_winner_after_player_disconnect(self, disconnected_player: Player, game: Game,
                                                  websocket: WebSocket) -> None:
         return NotImplemented('[get_winner_after_player_disconnect] IS NOT IMPLEMENTED')
@@ -86,49 +39,11 @@ class PVEGameUseCase(IGameUseCase):
     def get_valid_game_id(self, _: str, __: str) -> str:
         return str(uuid.uuid4())
 
-    def _update_player_scores(self, game: Game) -> None:  # noqa
-        """Update the current players scores"""
-        game.p1.board.get_score()
-        game.p2.board.get_score()
-
-    def _select_column(self, request: GamePlayerRequest) -> int:  # noqa
-        """Convert the event string in a number column index. In case is not a valid number return [False]"""
-        try:
-            return int(request.event.value)
-        except ValueError:
-            return 0
-
-    def _save_single_game_history(self, game: Game, column_index: int) -> None:
-        """Save single game history player column selection"""
-        single_game_history = SinglePlayHistory.from_game(game, column_index)
-        self.repo.save_single_play_history(single_game_history)
-
-    def _update_user_level_rank_and_bank_account(self, exp_points, winner_player):
-        """Update Winner level, rank and bank account.
-
-        This method is used after the game finished or when the usr disconnect.
-        Note: Only update the bank account if the user level up. We have a fix amount by the moment, but later
-        could change this for a dynamic formula.
-        """
-        old_user: User = copy.deepcopy(winner_player.user)
-        user = self.leveling_manager.update_user_level(winner_player.user, exp_points)
-        # Update user bank account if level up:
-        if old_user.user_level.level != user.user_level.level:
-            self.repo.update_user_bank_account_amount(user.user_id, 100.0)
-        self.repo.update_user_level(user.user_level)
-
     def get_ai_selected_column(self, game: Game) -> str:
         """Return the index integer of the column to select by the AI"""
         columns = game.p2.board.columns
         available_columns = [str(i) for i, col in columns.items() if not col.is_full()]
         return choice(available_columns)
-
-    def save_game_history(self, game: Game) -> None:
-        """Save the game match result"""
-        play_history = PlayHistory.from_game(game)
-        self.repo.save_game_history(play_history)
-        self.repo.save_user_play_history(game.p1.user, play_history)
-        self.repo.save_user_play_history(game.p2.user, play_history)
 
     async def execute(self, game: Game, **kwargs):
         match game.state:
@@ -155,7 +70,7 @@ class PVEGameUseCase(IGameUseCase):
                 if column_index and not column.is_full():
                     # This save the result move from the user. This table helps to the machine learning model.
                     if game.current_player == game.p1:
-                        self._save_single_game_history(game, column_index)
+                        self.save_single_game_history(game, column_index)
                     game.state = GameState.ADD_DICE_TO_COLUMN
                     await self.execute(game, column_index=column_index)
 

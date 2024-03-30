@@ -16,6 +16,7 @@ from app.domain.game.entities.game import Game
 from app.domain.game.entities.play_history import PlayHistory
 from app.domain.game.entities.player import Player
 from app.domain.analytics.entities.single_play_history import SinglePlayHistory
+from app.domain.game.entities.player_rol import PlayerRol
 from app.domain.game.enums.game_event import GameEvent
 from app.domain.game.enums.game_state import GameState
 from app.domain.game.schemas.request import GamePlayerRequest
@@ -180,7 +181,9 @@ class GameUseCase(IGameUseCase):
                 column = game.current_player.board.columns.get(column_index)
                 if column_index and not column.is_full():
                     # This save the result move from the user. This table helps to the machine learning model.
-                    self.save_single_game_history(game, column_index)
+                    # Only save the Human inputs to train the model.
+                    if game.current_player.rol == PlayerRol.HUMAN:
+                        self.save_single_game_history(game, column_index)
                     game.state = GameState.ADD_DICE_TO_COLUMN
                     await self.execute(game, column_index=column_index)
 

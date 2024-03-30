@@ -73,7 +73,6 @@ async def play_game_ai(websocket: WebSocket, user_id: str = Depends(auth_handler
                 ic(game.p2)
                 await game_use_case.execute(game)
                 game_use_case.verbose(game)
-
         ic(game)
         await game_use_case.websocket_manager.disconnect(game_id=game_id, websocket=websocket)
         await websocket.close()

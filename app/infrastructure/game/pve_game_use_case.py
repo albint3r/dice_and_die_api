@@ -99,6 +99,12 @@ class PVEGameUseCase(IGameUseCase):
         single_game_history = SinglePlayHistory.from_game(game, column_index)
         self.repo.save_single_play_history(single_game_history)
 
+    def get_ai_selected_column(self, game: Game) -> str:
+        """Return the index integer of the column to select by the AI"""
+        columns = game.p2.board.columns
+        available_columns = [str(i) for i, col in columns.items() if not col.is_full()]
+        return choice(available_columns)
+
     async def execute(self, game: Game, **kwargs):
         match game.state:
             case GameState.WAITING_OPPONENT:

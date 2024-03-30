@@ -55,12 +55,17 @@ async def play_game_ai(websocket: WebSocket, user_id: str = Depends(auth_handler
                 # This last execute is mainly responsible from the [CHANGE_CURRENT_PLAYER] OR [FINISH_GAME] event
                 await game_use_case.execute(game)
                 game_use_case.verbose(game)
-            ic('AI TURN...')
-            ic(game.state)
-            await game_use_case.execute(game)
-            await game_use_case.execute(game, selected_column=GamePlayerRequest(event=GameEvent.COL1))
-            ic(game.p2)
-            game_use_case.verbose(game)
+
+            if game.current_player == game.p2:
+                ic('AI TURN...')
+                ic(game.state)
+                await game_use_case.execute(game)
+                ai_event = game_use_case.get_ai_selected_column(game)
+                ic(ai_event)
+                await game_use_case.execute(game, selected_column=GamePlayerRequest(event=GameEvent(ai_event)))
+                ic(game.p2)
+                await game_use_case.execute(game)
+                game_use_case.verbose(game)
 
         ic(game)
         await websocket.close()

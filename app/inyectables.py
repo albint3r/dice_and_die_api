@@ -34,4 +34,4 @@ class AuthUseCaseDependency(Inyectables):
         return AuthUseCase(repo=repo)
 
 
-auth_use_case_depend = Annotated[AuthRepository, Depends(AuthUseCaseDependency.get)]
+auth_use_case_depend = Annotated[IAuthUseCase, Depends(AuthUseCaseDependency.get)]

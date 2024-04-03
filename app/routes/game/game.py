@@ -1,6 +1,6 @@
 from asyncio import sleep
 
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from icecream import ic
 
 from app.db.db import db
@@ -8,7 +8,7 @@ from app.domain.game.entities.player_rol import PlayerRol
 from app.domain.game.enums.game_event import GameEvent
 from app.domain.game.enums.game_state import GameState
 from app.domain.game.schemas.request import GamePlayerRequest
-from app.infrastructure.auth.auth_handler_impl import auth_handler
+from app.infrastructure.auth.auth_handler_impl import token_ws_dependency
 from app.infrastructure.game.chat_observer import ChatObserver
 from app.infrastructure.game.game_use_case import GameUseCase
 from app.infrastructure.game.game_websocket_manager import game_websocket_manger
@@ -32,7 +32,7 @@ async def check_active_connections():
 
 
 @router.websocket('/game/ai')
-async def play_game_ai(websocket: WebSocket, user_id: str = Depends(auth_handler.auth_websocket)):
+async def play_game_ai(websocket: WebSocket, user_id: token_ws_dependency):
     repo = AuthRepository(db=db)
     leveling_manager = ManagerLevelingUseCase(leve_manager=LevelUserCase(), rank_manager=RankUseCase())
     leveling_manager._base_win_points = 0
@@ -49,7 +49,6 @@ async def play_game_ai(websocket: WebSocket, user_id: str = Depends(auth_handler
         await game_use_case.execute(game)
         while not game.is_finished or game.is_waiting_opponent:
             request = await game_use_case.get_user_request_event(websocket)
-
             if game.current_player and game.current_player.is_player_turn(player) and request.event == GameEvent.ROLL:
                 # This part execute the [ROLL_DICE] event
                 await game_use_case.execute(game)
@@ -60,7 +59,6 @@ async def play_game_ai(websocket: WebSocket, user_id: str = Depends(auth_handler
                     await game_use_case.execute(game, selected_column=request)
                 # This last execute is mainly responsible from the [CHANGE_CURRENT_PLAYER] OR [FINISH_GAME] event
                 await game_use_case.execute(game)
-
             # This run the AI Part
             if game.current_player.rol == PlayerRol.AI:
                 await sleep(1)
@@ -73,11 +71,10 @@ async def play_game_ai(websocket: WebSocket, user_id: str = Depends(auth_handler
         await websocket.close()
     except WebSocketDisconnect:
         await game_use_case.websocket_manager.disconnect(game_id=game_id, websocket=websocket)
-        ic(f'Player: {player.user.name} is disconnected.')
 
 
 @router.websocket('/game/{game_id}')
-async def play_game_pvp(websocket: WebSocket, game_id: str, user_id: str = Depends(auth_handler.auth_websocket)):
+async def play_game_pvp(websocket: WebSocket, game_id: str, user_id: token_ws_dependency):
     """This is the websocket endpoint to play the dice and die game"""
     repo = AuthRepository(db=db)
     leveling_manager = ManagerLevelingUseCase(leve_manager=LevelUserCase(), rank_manager=RankUseCase())
@@ -101,8 +98,6 @@ async def play_game_pvp(websocket: WebSocket, game_id: str, user_id: str = Depen
         while not game.is_finished or game.is_waiting_opponent:
             request = await game_use_case.get_user_request_event(websocket)
             await chat_observer.listen_request_event(request, game=game, player=player)
-            ic(player.user.name)
-            # game_use_case.verbose(game)
             if game.current_player and game.current_player.is_player_turn(player) and request.event == GameEvent.ROLL:
                 # This part execute the [ROLL_DICE] event
                 await game_use_case.execute(game)
@@ -117,11 +112,8 @@ async def play_game_pvp(websocket: WebSocket, game_id: str, user_id: str = Depen
                 # This last execute is mainly responsible from the [CHANGE_CURRENT_PLAYER] OR [FINISH_GAME] event
                 await game_use_case.execute(game)
                 game_use_case.verbose(game)
-        ic(game)
         await websocket.close()
         await game_use_case.websocket_manager.disconnect(game_id=game_id, websocket=websocket)
     except WebSocketDisconnect:
         await game_use_case.get_winner_after_player_disconnect(disconnected_player=player,
                                                                game=game, websocket=websocket)
-        ic(f'Player: {player.user.name} is disconnected.')
-        ic(game.winner_player)

@@ -1,10 +1,10 @@
-from fastapi import APIRouter, status, Depends, HTTPException
+from fastapi import APIRouter, status, HTTPException
 
 from app.db.db import db
 from app.domain.auth.schemas.request import RequestAuthEmail, RequestNameAndLastName
 from app.domain.auth.schemas.response import (ResponseLogIn, ResponseSignin, ResponseUpdateUserNameAndLastName,
                                               ResponseUsersRanking, ResponseUserRank)
-from app.infrastructure.auth.auth_handler_impl import auth_handler
+from app.infrastructure.auth.auth_handler_impl import auth_handler, token_http_dependency
 from app.infrastructure.auth.auth_use_case import AuthUseCase
 from app.repositories.auth.auth_repository import AuthRepository
 
@@ -39,7 +39,7 @@ async def login_with_email_and_password(form_data: RequestAuthEmail) -> Response
 
 
 @router.post('/login/token', status_code=status.HTTP_202_ACCEPTED)
-async def login_with_session_token(user_id: str = Depends(auth_handler.auth_wrapper)) -> ResponseLogIn:
+async def login_with_session_token(user_id: token_http_dependency) -> ResponseLogIn:
     try:
         facade = AuthUseCase(repo=AuthRepository(db=db))
         return facade.login_from_session_token(user_id, auth_handler)
@@ -49,8 +49,7 @@ async def login_with_session_token(user_id: str = Depends(auth_handler.auth_wrap
 
 @router.put('/profile', status_code=status.HTTP_201_CREATED)
 async def update_user_name_and_last_name(data: RequestNameAndLastName,
-                                   user_id: str = Depends(
-                                       auth_handler.auth_wrapper)) -> ResponseUpdateUserNameAndLastName:
+                                         user_id: token_http_dependency) -> ResponseUpdateUserNameAndLastName:
     try:
         facade = AuthUseCase(repo=AuthRepository(db=db))
         return facade.update_user_name_and_last_name(user_id, data.name, data.last_name)
@@ -59,7 +58,7 @@ async def update_user_name_and_last_name(data: RequestNameAndLastName,
 
 
 @router.get('/ranks', status_code=status.HTTP_200_OK)
-async def get_users_ranking(_: str = Depends(auth_handler.auth_wrapper)) -> ResponseUsersRanking:
+async def get_users_ranking(_: token_http_dependency) -> ResponseUsersRanking:
     try:
         facade = AuthUseCase(repo=AuthRepository(db=db))
         return facade.get_users_ranking()
@@ -68,7 +67,7 @@ async def get_users_ranking(_: str = Depends(auth_handler.auth_wrapper)) -> Resp
 
 
 @router.get('/ranks/user', status_code=status.HTTP_200_OK)
-async def get_user_ranking(user_id: str = Depends(auth_handler.auth_wrapper)) -> ResponseUserRank:
+async def get_user_ranking(user_id: token_http_dependency) -> ResponseUserRank:
     try:
         facade = AuthUseCase(repo=AuthRepository(db=db))
         return facade.get_user_ranking(user_id)
@@ -77,7 +76,7 @@ async def get_user_ranking(user_id: str = Depends(auth_handler.auth_wrapper)) ->
 
 
 @router.get('/ranks/category/{rank_id}', status_code=status.HTTP_200_OK)
-async def get_users_ranking_by_rank(rank_id: int, _: str = Depends(auth_handler.auth_wrapper)) -> ResponseUsersRanking:
+async def get_users_ranking_by_rank(rank_id: int, _: token_http_dependency) -> ResponseUsersRanking:
     try:
         facade = AuthUseCase(repo=AuthRepository(db=db))
         return facade.get_users_ranking_by_rank(rank_id)
@@ -86,7 +85,7 @@ async def get_users_ranking_by_rank(rank_id: int, _: str = Depends(auth_handler.
 
 
 @router.get('/ranks/category/{rank_id}/user', status_code=status.HTTP_200_OK)
-async def get_user_ranking_by_rank(rank_id: int, user_id: str = Depends(auth_handler.auth_wrapper)) -> ResponseUserRank:
+async def get_user_ranking_by_rank(rank_id: int, user_id: token_http_dependency) -> ResponseUserRank:
     try:
         facade = AuthUseCase(repo=AuthRepository(db=db))
         return facade.get_user_ranking_by_rank(rank_id=rank_id, user_id=user_id)
@@ -95,7 +94,7 @@ async def get_user_ranking_by_rank(rank_id: int, user_id: str = Depends(auth_han
 
 
 @router.post('/test', status_code=status.HTTP_200_OK)
-async def test_route_token_session(user_id: str = Depends(auth_handler.auth_wrapper)):
+async def test_route_token_session(user_id: token_http_dependency):
     try:
         return user_id
     except Exception as e:

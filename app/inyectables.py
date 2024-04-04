@@ -7,9 +7,12 @@ from pydantic import BaseModel
 from app.db.db import db
 from app.domain.analytics.use_cases.i_analytics_use_case import IAnalyticsUseCase
 from app.domain.auth.use_cases.i_auth_use_case import IAuthUseCase
+from app.domain.game.entities.game_config import GameConfig
+from app.domain.game.enums.game_mode import GameMode
 from app.domain.game.use_cases.i_chat_observer import IChatObserver
 from app.domain.game.use_cases.i_game_use_case import IGameUseCase
 from app.domain.game.use_cases.i_game_websocket_manager import IGameWebSocketManager
+from app.domain.game.use_cases.i_games_mode_runner import IGamesModeRunner
 from app.domain.game.use_cases.i_progress_use_case import ILevelUseCase, IRankUseCase
 from app.domain.game.use_cases.i_user_level_use_case import IManagerLevelingUseCase
 from app.domain.game.use_cases.i_view_use_case import IViewUseCase
@@ -18,6 +21,7 @@ from app.domain.lobby.use_cases.i_lobby_use_case import ILobbyUseCase
 from app.domain.lobby.use_cases.i_lobby_websocket_manager import ILobbyWebSocketManager
 from app.infrastructure.analytics.analytics_use_case import AnalyticsUseCase
 from app.infrastructure.auth.auth_use_case import AuthUseCase
+from app.infrastructure.game.adventure_game_mode_runner import AdventureGameModeRunner
 from app.infrastructure.game.chat_observer import ChatObserver
 from app.infrastructure.game.game_use_case import GameUseCase
 from app.infrastructure.game.game_websocket_manager import game_websocket_manger
@@ -205,3 +209,14 @@ class ChatObserverDependency(Inyectables):
 
 
 chat_observer_dependency = Annotated[IChatObserver, Depends(ChatObserverDependency.inject)]
+
+
+class AdventureGameModeRunnerDependency(Inyectables):
+    @staticmethod
+    def inject(ws_game: game_websocket_dependency, repo: auth_repository_dependency) -> IGamesModeRunner:
+        return AdventureGameModeRunner(config=GameConfig(mode=GameMode.ADVENTURE),
+                                       ws_game=ws_game,
+                                       repo=repo)
+
+
+adventure_game_mode_runner_dependency = Annotated[IGamesModeRunner, Depends(AdventureGameModeRunnerDependency.inject)]

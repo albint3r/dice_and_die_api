@@ -11,7 +11,7 @@ from app.infrastructure.auth.auth_handler_impl import token_ws_dependency
 from app.infrastructure.game.game_websocket_manager import game_websocket_manger
 from app.infrastructure.game.viewers_websocket_manager import viewers_websocket_manager
 from app.inyectables import pve_game_use_case_dependency, game_use_case_dependency, viewers_use_case_dependency, \
-    chat_observer_dependency
+    chat_observer_dependency, adventure_game_mode_runner_dependency
 
 router = APIRouter(tags=['game'], prefix='/v2')
 
@@ -22,6 +22,16 @@ async def check_active_connections():
     ic(viewers_websocket_manager.active_connections)
     ic(game_websocket_manger.active_games)
     return {"ok": 200}
+
+
+@router.websocket('/game/adventure')
+async def play_adventure_game(websocket: WebSocket,
+                              game_mode: adventure_game_mode_runner_dependency,
+                              user_id: token_ws_dependency):
+    game, player = await game_mode.create_or_join('FAKE_GAME_ID', user_id, websocket)
+    ic(game)
+    while True:
+        user_event_request = await game_mode.get_user_event_request(websocket)
 
 
 @router.websocket('/game/ai')

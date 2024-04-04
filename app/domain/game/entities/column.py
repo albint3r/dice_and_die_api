@@ -8,11 +8,11 @@ from app.domain.game.errors.errors import RemoveValuesFromColumnError, AddValues
 class Column(BaseModel):
     values: list[int] = []
     score: int = 0
-    _max_length: int = 3
+    max_length: int = 3
 
     def is_full(self) -> bool:
         """Validate if the column is full"""
-        return len(self.values) >= self._max_length
+        return len(self.values) >= self.max_length
 
     def is_empty(self) -> bool:
         """Check if the Column is not empty to remove values on it."""
@@ -41,7 +41,7 @@ class Column(BaseModel):
 
     def get_remaining_turn(self) -> int:
         """Count how many spaces are empty compare with the max length in the column."""
-        return self._max_length - len(self.values)
+        return self.max_length - len(self.values)
 
     def get_score(self) -> int:
         """Calculate the current score point in the column"""

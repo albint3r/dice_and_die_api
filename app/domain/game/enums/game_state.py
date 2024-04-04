@@ -13,3 +13,4 @@ class GameState(Enum):
     CHANGE_CURRENT_PLAYER: str = "change_current_player"
     FINISH_GAME: str = "finish_game"
     DISCONNECT_PLAYER: str = "disconnect_player"
+    REPLAY: str = 'replay'

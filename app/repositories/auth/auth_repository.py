@@ -1,14 +1,13 @@
-from icecream import ic
 from pydantic import BaseModel
 
 from app.db.db import _DataBase  # noqa
+from app.domain.analytics.entities.single_play_history import SinglePlayHistory
 from app.domain.auth.entities.bank_account import BankAccount
 from app.domain.auth.entities.user import User
 from app.domain.auth.entities.user_level import UserLevel
 from app.domain.auth.entities.user_rank import UserRank
 from app.domain.auth.errors.errors import UserLevelNotExist, NoUserInRanking
 from app.domain.game.entities.play_history import PlayHistory
-from app.domain.analytics.entities.single_play_history import SinglePlayHistory
 
 
 class AuthRepository(BaseModel):
@@ -88,7 +87,7 @@ class AuthRepository(BaseModel):
         result = self.db.query(query, (), fetch_all=True)
         if result:
             return [UserRank(**user) for user in result]
-        raise NoUserInRanking('There is not user in the ranking leader. Crear user first')
+        raise NoUserInRanking('User not exit.')
 
     def get_user_ranking(self, user_id: str) -> UserRank:
         query = """
@@ -155,7 +154,7 @@ class AuthRepository(BaseModel):
         result = self.db.query(query, values)
         if result:
             return UserRank(**result)
-        raise NoUserInRanking('There is not user in the ranking leader. Crear user first')
+        raise NoUserInRanking('There is not user in the ranking league leader. Crear user first')
 
     def update_user_level(self, user_level: UserLevel) -> None:
         """Update the level and experience points of the user level"""
@@ -219,7 +218,6 @@ class AuthRepository(BaseModel):
             play_history.p2_col_3_2
         )
         self.db.execute(query, values)
-        ic('Save Users')
 
     def save_single_play_history(self, single_game_history: SinglePlayHistory) -> None:
         """Save the game match result"""
@@ -261,4 +259,3 @@ class AuthRepository(BaseModel):
             single_game_history.column_index
         )
         self.db.execute(query, values)
-        ic('Save Single Play History')

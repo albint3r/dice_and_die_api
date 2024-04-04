@@ -81,7 +81,7 @@ analytics_use_case_dependency = Annotated[IAnalyticsUseCase, Depends(AnalyticUse
 class LobbyWebSocketDependency(Inyectables):
 
     @staticmethod
-    def inject(*args, **kwargs) -> ILobbyWebSocketManager:
+    def inject() -> ILobbyWebSocketManager:
         return lobby_websocket_manager
 
 

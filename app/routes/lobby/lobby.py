@@ -3,8 +3,6 @@ from fastapi_utilities import repeat_every
 from icecream import ic
 
 from app.infrastructure.auth.auth_handler_impl import token_ws_dependency
-from app.infrastructure.game.game_websocket_manager import game_websocket_manger
-from app.infrastructure.lobby.lobby_use_case import LobbyUseCase
 from app.infrastructure.lobby.lobby_websocket_manager import lobby_websocket_manager
 from app.inyectables import lobby_use_case_dependency
 

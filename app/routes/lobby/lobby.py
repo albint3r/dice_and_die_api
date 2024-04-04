@@ -30,7 +30,8 @@ async def kill_connections():
 
 
 @router.websocket('/games')
-async def get_lobby_games(websocket: WebSocket, lobby_use_case: lobby_use_case_dependency,
+async def get_lobby_games(websocket: WebSocket,
+                          lobby_use_case: lobby_use_case_dependency,
                           user_id: token_ws_dependency):
     """This creates a connection with the current playing games"""
 

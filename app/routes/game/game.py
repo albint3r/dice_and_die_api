@@ -3,22 +3,15 @@ from asyncio import sleep
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from icecream import ic
 
-from app.db.db import db
 from app.domain.game.entities.player_rol import PlayerRol
 from app.domain.game.enums.game_event import GameEvent
 from app.domain.game.enums.game_state import GameState
 from app.domain.game.schemas.request import GamePlayerRequest
 from app.infrastructure.auth.auth_handler_impl import token_ws_dependency
-from app.infrastructure.game.chat_observer import ChatObserver
-from app.infrastructure.game.game_use_case import GameUseCase
 from app.infrastructure.game.game_websocket_manager import game_websocket_manger
-from app.infrastructure.game.level_use_case import LevelUserCase
-from app.infrastructure.game.manager_leveling_use_case import ManagerLevelingUseCase
-from app.infrastructure.game.pve_game_use_case import PVEGameUseCase
-from app.infrastructure.game.rank_use_case import RankUseCase
-from app.infrastructure.game.view_user_cases import ViewUseCase
 from app.infrastructure.game.viewers_websocket_manager import viewers_websocket_manager
-from app.repositories.auth.auth_repository import AuthRepository
+from app.inyectables import pve_game_use_case_dependency, game_use_case_dependency, viewers_use_case_dependency, \
+    chat_observer_dependency
 
 router = APIRouter(tags=['game'], prefix='/v2')
 
@@ -32,16 +25,7 @@ async def check_active_connections():
 
 
 @router.websocket('/game/ai')
-async def play_game_ai(websocket: WebSocket, user_id: token_ws_dependency):
-    repo = AuthRepository(db=db)
-    leveling_manager = ManagerLevelingUseCase(leve_manager=LevelUserCase(), rank_manager=RankUseCase())
-    leveling_manager._base_win_points = 0
-
-    game_use_case = PVEGameUseCase(websocket_manager=game_websocket_manger,
-                                   viewers_websocket_manager=viewers_websocket_manager,
-                                   leveling_manager=leveling_manager, repo=repo)
-    # We are going to use always a new game because we wanted the game is visible in the lobby but no playable for
-    # other players. This creates a new room but because we are going to fill it with the AI  nobody would be entering.
+async def play_game_ai(websocket: WebSocket, game_use_case: pve_game_use_case_dependency, user_id: token_ws_dependency):
     game_id = game_use_case.get_valid_game_id('', '')
     game, player = await game_use_case.create_or_join(game_id=game_id, user_id=user_id, websocket=websocket)
 
@@ -74,25 +58,21 @@ async def play_game_ai(websocket: WebSocket, user_id: token_ws_dependency):
 
 
 @router.websocket('/game/{game_id}')
-async def play_game_pvp(websocket: WebSocket, game_id: str, user_id: token_ws_dependency):
+async def play_game_pvp(websocket: WebSocket, game_id: str,
+                        game_use_case: game_use_case_dependency,
+                        view_use_case: viewers_use_case_dependency,
+                        chat_observer: chat_observer_dependency,
+                        user_id: token_ws_dependency):
     """This is the websocket endpoint to play the dice and die game"""
-    repo = AuthRepository(db=db)
-    leveling_manager = ManagerLevelingUseCase(leve_manager=LevelUserCase(), rank_manager=RankUseCase())
-    game_use_case = GameUseCase(websocket_manager=game_websocket_manger,
-                                viewers_websocket_manager=viewers_websocket_manager,
-                                leveling_manager=leveling_manager, repo=repo)
+
     # This validates if the user is creating or joining. If the game not exist is a dead game ID.
     game_id = game_use_case.get_valid_game_id(user_id, game_id)
 
     if game_use_case.websocket_manager.is_full(game_id):
-        view_use_case = ViewUseCase(websocket_manager=game_websocket_manger,
-                                    viewers_websocket_manager=viewers_websocket_manager, repo=repo)
-
         await view_use_case.create_or_join(game_id, user_id, websocket)
         return
     game, player = await game_use_case.create_or_join(game_id=game_id, user_id=user_id, websocket=websocket)
-    chat_observer = ChatObserver(viewers_websockets_manager=viewers_websocket_manager,
-                                 websockets_manager=game_websocket_manger)
+
     try:
         await game_use_case.execute(game)
         while not game.is_finished or game.is_waiting_opponent:

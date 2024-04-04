@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status, HTTPException
 
-from app.domain.auth.schemas.request import RequestAuthEmail, RequestNameAndLastName
+from app.domain.auth.schemas.request import LoginOrSignInRequest, UserUpdateNamesRequest
 from app.domain.auth.schemas.response import (ResponseLogIn, ResponseSignin, ResponseUpdateUserNameAndLastName,
                                               ResponseUsersRanking, ResponseUserRank)
 from app.infrastructure.auth.auth_handler_impl import auth_handler, token_http_dependency
@@ -19,7 +19,7 @@ router = APIRouter(
 
 
 @router.post('/signin', status_code=status.HTTP_201_CREATED)
-async def signin_with_email_and_password(form_data: RequestAuthEmail, facade: auth_use_case_dependency) -> ResponseSignin:
+async def signin_with_email_and_password(form_data: LoginOrSignInRequest, facade: auth_use_case_dependency) -> ResponseSignin:
     try:
         return facade.signin(form_data.email, form_data.password.get_secret_value(), auth_handler)
     except Exception as e:
@@ -27,7 +27,7 @@ async def signin_with_email_and_password(form_data: RequestAuthEmail, facade: au
 
 
 @router.post('/login', status_code=status.HTTP_202_ACCEPTED)
-async def login_with_email_and_password(form_data: RequestAuthEmail, facade: auth_use_case_dependency) -> ResponseLogIn:
+async def login_with_email_and_password(form_data: LoginOrSignInRequest, facade: auth_use_case_dependency) -> ResponseLogIn:
     try:
         return facade.login(form_data.email, form_data.password.get_secret_value(), auth_handler)
     except Exception as e:
@@ -43,7 +43,7 @@ async def login_with_session_token(facade: auth_use_case_dependency, user_id: to
 
 
 @router.put('/profile', status_code=status.HTTP_201_CREATED)
-async def update_user_name_and_last_name(data: RequestNameAndLastName,
+async def update_user_name_and_last_name(data: UserUpdateNamesRequest,
                                          facade: auth_use_case_dependency,
                                          user_id: token_http_dependency) -> ResponseUpdateUserNameAndLastName:
     try:

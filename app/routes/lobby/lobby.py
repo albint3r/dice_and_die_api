@@ -21,12 +21,6 @@ async def check_connections():
     return {'ok': 200}
 
 
-@router.get('/kill-connections')
-async def kill_connections():
-    lobby_websocket_manager.active_connections = {}
-    return {'ok': 200, 'connections': lobby_websocket_manager.active_connections}
-
-
 @router.websocket('/games')
 async def get_lobby_games(websocket: WebSocket,
                           lobby_use_case: lobby_use_case_dependency,
@@ -43,4 +37,3 @@ async def get_lobby_games(websocket: WebSocket,
     except WebSocketDisconnect:
         await lobby_use_case.unsubscribe_user(user_id, websocket)
         await lobby_use_case.update_lobby_information()
-        ic('Disconnect user from lobby')

@@ -47,7 +47,6 @@ class PVEGameUseCase(GameUseCase):
         """Return the index integer of the column to select by the AI"""
 
         model_file = 'best_estimator.pkl'
-        ic(model_file)
         if not os.path.exists(model_file):
             raise InvalidAIPathModel('Not AI model path.')
 
@@ -59,6 +58,5 @@ class PVEGameUseCase(GameUseCase):
         columns = game.p2.board.columns
         available_columns = [str(i) for i, col in columns.items() if not col.is_full()]
         if index_column in available_columns:
-            ic('It was used the ML model')
             return index_column
         return choice(available_columns)

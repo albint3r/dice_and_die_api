@@ -27,3 +27,7 @@ class IAuthHandler(ABC, BaseModel):
     @abstractmethod
     def auth_wrapper(self, auth: HTTPAuthorizationCredentials) -> int:
         """Is the auth handler to the routers"""
+
+    @abstractmethod
+    async def auth_websocket(self, **kwargs) -> str:
+        """Is the auth handler for the websocket endpoints"""

@@ -57,15 +57,12 @@ class _LobbyWebSocketManager(ILobbyWebSocketManager):
     async def check_inactive_connections(self) -> None:
         current_time = datetime.now()
         inactive_connections: list[tuple[str, WebSocket]] = []
-        ic(f'{datetime.now()}::check_inactive_connections')
-        ic(f'active_connections: {len(self.active_connections)}')
         for user_id, socket_and_time in self.active_connections.items():
             ws = list(socket_and_time.keys())[0]
             last_activity = list(socket_and_time.values())[0]
             if current_time - last_activity > timedelta(minutes=self.INACTIVE_TIME_MINUTES):
                 inactive_connections.append((user_id, ws))
         # Disconnect all the inactive connections.
-        ic(f'inactive_connections: {inactive_connections}')
         for uid, websocket in inactive_connections:
             try:
                 await websocket.close()
@@ -74,7 +71,6 @@ class _LobbyWebSocketManager(ILobbyWebSocketManager):
             del self.active_connections[uid]
             await logger_conf.log_inactive_connections(uid)
             ic('Connection succefully disconnected for inactivity.')
-        ic(f'Result prune connections: {len(self.active_connections)}')
 
 
 lobby_websocket_manager: Final[ILobbyWebSocketManager] = _LobbyWebSocketManager()

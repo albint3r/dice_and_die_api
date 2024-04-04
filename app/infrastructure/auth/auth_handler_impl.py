@@ -3,9 +3,8 @@ from typing import Final, Annotated
 
 import bcrypt
 import jwt
-from fastapi import HTTPException, status, Security, Query
+from fastapi import HTTPException, status, Security, Query, Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from icecream import ic
 
 from app.domain.auth.use_cases.i_auth_handler import IAuthHandler
 from credentials_provider import credentials_provider
@@ -53,3 +52,5 @@ class _AuthHandlerImpl(IAuthHandler):
 
 
 auth_handler: Final[IAuthHandler] = _AuthHandlerImpl()
+token_http_dependency = Annotated[str, Depends(auth_handler.auth_wrapper)]
+token_ws_dependency = Annotated[str, Depends(auth_handler.auth_websocket)]

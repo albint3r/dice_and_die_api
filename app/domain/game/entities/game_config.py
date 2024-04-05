@@ -1,5 +1,6 @@
 from math import ceil
 
+from icecream import ic
 from pydantic import BaseModel, Field
 
 from app.domain.game.entities.player import Player
@@ -17,6 +18,7 @@ class GameConfig(BaseModel):
     total_games: int = 3
     wins_counter: TWinCounter = {}
     confirmed_players: set[str] = Field(default_factory=set)
+    games_counter: int = 0
 
     @property
     def is_rematch(self) -> bool:
@@ -35,13 +37,19 @@ class GameConfig(BaseModel):
     def update_wins_counter(self, player: Player) -> None:
         """Update the record property to count how many wins have the player."""
         user_id = player.user.user_id
-        self.wins_counter[user_id] = self.wins_counter.get(user_id, 0) + 1
+        self.games_counter += 1
+        if self.rematch_mode == RematchMode.n_best:
+            self.wins_counter[user_id] = self.wins_counter.get(user_id, 0) + 1
+        if self.rematch_mode == RematchMode.best_total_games_score:
+            self.wins_counter[user_id] = self.wins_counter.get(user_id, 0) + player.board.score
 
     def are_all_games_played(self) -> bool:
         """Check if the game mode is over"""
         if self.rematch_mode == RematchMode.n_best:
             target_n = ceil(self.total_games * .51)
             self.is_game_mode_over = any([c == target_n for c in self.wins_counter.values()])
-            return self.is_game_mode_over
+
         if self.rematch_mode == RematchMode.best_total_games_score:
-            return sum(self.wins_counter.values()) == self.total_games
+            self.is_game_mode_over = self.games_counter >= self.total_games
+
+        return self.is_game_mode_over

@@ -35,141 +35,41 @@ class AdventureGameModeRunner(IGamesModeRunner):
     ws_viewers: IViewersWebSocketManager
     leveling_manager: IManagerLevelingUseCase
 
-    async def play(self, game: Game,
-                   player: Player | None = None,
-                   game_events: GamePlayerRequest | None = None,
-                   **kwargs) -> None:
+    async def play(self, game: Game, player: Player | None = None,
+                   game_events: GamePlayerRequest | None = None, **kwargs) -> None:
         match game.state:
             case GameState.CREATE_NEW_GAME:
-                game.state = GameState.WAITING_OPPONENT
-                extras = {}
-                message = 'player_1_connected'
-                await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
+                await self._create_new_game(game)
 
             case GameState.WAITING_OPPONENT:
-                started_player = self.get_starter_player(game)
-                game.current_player = started_player
-                game.state = GameState.ROLL_DICE
-                extras = {}
-                message = 'player_2_connected'
-                await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
+                await self._waiting_opponent(game)
 
             case GameState.ROLL_DICE:
-                if game_events.event == GameEvent.ROLL:
-                    game.current_player.die.roll()
-                    game.state = GameState.SELECT_COLUMN
-                    extras = {}
-                    message = 'roll_dice'
-                    await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
+                await self._roll_dice(game, game_events)
 
             case GameState.SELECT_COLUMN:
-                column_index = self.select_column(game_events)
-                column = game.current_player.board.columns.get(column_index)
-                if column and not column.is_full():
-                    # This save the result move from the user. This table helps to the machine learning model.
-                    # Only save the Human inputs to train the model.
-                    if game.current_player.rol == PlayerRol.HUMAN:
-                        self.save_single_game_history(game, column_index)
-                    game.state = GameState.ADD_DICE_TO_COLUMN
-                    await self.play(game, player, column_index=column_index)
+                await self._select_column(game, game_events, player)
 
             case GameState.ADD_DICE_TO_COLUMN:
-                column_index: int = kwargs['column_index']
-                column = game.current_player.board.columns.get(column_index)
-                die_val = game.current_player.die.current_number
-                column.add(die_val)
-                opponent_player = game.get_opponent_player()
-                column_opponent_player = opponent_player.board.columns.get(column_index)
-                if column_opponent_player.can_remove_values(die_val):
-                    game.state = GameState.DESTROY_OPPONENT_TARGET_COLUMN
-                    await self.play(game, column_opponent_player=column_opponent_player, die_val=die_val)
-                else:
-                    game.state = GameState.UPDATE_PLAYERS_POINTS
-                    extras = {}
-                    message = 'add_dice'
-                    await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
-                    await self.play(game)
+                await self._add_dice_to_column(game, kwargs)
 
             case GameState.DESTROY_OPPONENT_TARGET_COLUMN:
-                column_opponent_player: Column = kwargs['column_opponent_player']
-                die_val: int = kwargs['die_val']
-                removed_indices = column_opponent_player.remove(die_val)
-                game.state = GameState.UPDATE_PLAYERS_POINTS
-                extras = {'removed_indices': removed_indices}
-                message = 'destroy_opponent_target_column'
-                await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
-                await self.play(game)
+                await self._destroy_opponent_target_column(game, kwargs)
 
             case GameState.UPDATE_PLAYERS_POINTS:
-                self.update_player_scores(game)
-                if game.is_finished:
-                    game.state = GameState.FINISH_GAME
-                else:
-                    game.state = GameState.CHANGE_CURRENT_PLAYER
-                extras = {}
-                message = 'update_players_points'
-                await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
-                await self.play(game)
+                await self._update_players_points(game)
 
             case GameState.CHANGE_CURRENT_PLAYER:
-                game.current_player = game.get_opponent_player()
-                game.state = GameState.ROLL_DICE
-                extras = {}
-                message = 'change_current_player'
-                await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
+                await self._change_current_player(game)
 
             case GameState.FINISH_GAME:
-                winner_player, tied_player = game.get_winner()
-                exp_points = self.leveling_manager.get_winner_earned_exp_points(game)
-                if tied_player:
-                    # Update both players points and ranks
-                    self.update_user_level_rank_and_bank_account(exp_points, tied_player)
-                    game.config.update_wins_counter(tied_player)
-                self.update_user_level_rank_and_bank_account(exp_points, winner_player)
-                game.config.update_wins_counter(winner_player)
-
-                if not game.config.are_all_games_played():
-                    game.state = GameState.REMATCH
-
-                extras = {}
-                message = 'finish_game'
-                await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
-                self.save_game_history(game)
+                await self._finish_game(game)
 
             case GameState.REMATCH:
-
-                if game_events.event == GameEvent.NO:
-                    game.config.is_game_mode_over = True
-
-                if game_events.event == GameEvent.YES:
-                    if player == game.p1:
-                        game.p1.reset_board(game.config.col_length, game.config.total_columns)
-                        game.config.confirm_player_rematch_game(player)
-                    else:
-                        game.p2.reset_board(game.config.col_length, game.config.total_columns)
-                        game.config.confirm_player_rematch_game(player)
-
-                if game.config.is_rematch:
-                    game.current_player = None
-                    game.winner_player = None
-                    game.current_turn = 0
-                    started_player = self.get_starter_player(game)
-                    game.current_player = started_player
-                    game.state = GameState.ROLL_DICE
-                    extras = {}
-                    message = 'roll_dice'
-                    await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
-                    game.config.reset_confirmed_players_rematch_game()
+                await self._rematch(game, game_events, player)
 
             case GameState.DISCONNECT_PLAYER:
-                winner_player, _ = game.winner_player
-                exp_points = self.leveling_manager.get_winner_earned_exp_after_player_disconnect()
-                # Create a copy to compare if the user level up
-                self.update_user_level_rank_and_bank_account(exp_points, winner_player)
-                extras = {}
-                message = 'player_disconnected'
-                await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
-                await self.ws_viewers.broadcast(game=game, message=message, extras=extras)
+                await self._disconnect_player(game)
 
     async def create_or_join(self, game_id: str, user_id: str, websocket: WebSocket) -> TGamePlayer:
         game = self.ws_game.active_games.get(game_id)
@@ -196,18 +96,17 @@ class AdventureGameModeRunner(IGamesModeRunner):
 
     def create_new_game(self, game_id: str, player: Player) -> Game:
         config = GameConfig(game_mode=GameMode.CLASSIC,
-                            rematch_mode=RematchMode.n_best,
+                            rematch_mode=RematchMode.best_total_games_score,
                             col_length=1,
                             total_columns=1,
                             total_games=3)
         return Game(game_id=game_id, p1=player, state=GameState.CREATE_NEW_GAME, config=config)
 
     def create_new_player(self, user: User) -> Player:
-        return Player(
-            user=user,
-            board=self.create_board(),
-            die=Die()
-        )
+        return Player(user=user,
+                      board=self.create_board(),
+                      die=Die()
+                      )
 
     def get_user(self, user_id: str) -> User:
         user = self.repo.get_user_by_id(user_id)
@@ -294,3 +193,129 @@ class AdventureGameModeRunner(IGamesModeRunner):
             self.repo.save_single_play_history(single_game_history)
         except SinglePlaHistoryDontMatchColumnsLength:
             ic('Game wont be saved')
+
+    async def _disconnect_player(self, game):
+        winner_player, _ = game.winner_player
+        exp_points = self.leveling_manager.get_winner_earned_exp_after_player_disconnect()
+        # Create a copy to compare if the user level up
+        self.update_user_level_rank_and_bank_account(exp_points, winner_player)
+        extras = {}
+        message = 'player_disconnected'
+        await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
+        await self.ws_viewers.broadcast(game=game, message=message, extras=extras)
+
+    async def _rematch(self, game, game_events, player):
+        if game_events.event == GameEvent.NO:
+            game.config.is_game_mode_over = True
+        if game_events.event == GameEvent.YES:
+            if player == game.p1:
+                game.p1.reset_board(game.config.col_length, game.config.total_columns)
+                game.config.confirm_player_rematch_game(player)
+            else:
+                game.p2.reset_board(game.config.col_length, game.config.total_columns)
+                game.config.confirm_player_rematch_game(player)
+        if game.config.is_rematch:
+            game.current_player = None
+            game.winner_player = None
+            game.current_turn = 0
+            started_player = self.get_starter_player(game)
+            game.current_player = started_player
+            game.state = GameState.ROLL_DICE
+            extras = {}
+            message = 'roll_dice'
+            await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
+            game.config.reset_confirmed_players_rematch_game()
+
+    async def _finish_game(self, game):
+        winner_player, tied_player = game.get_winner()
+        exp_points = self.leveling_manager.get_winner_earned_exp_points(game)
+        if tied_player:
+            # Update both players points and ranks
+            self.update_user_level_rank_and_bank_account(exp_points, tied_player)
+            game.config.update_wins_counter(tied_player)
+        self.update_user_level_rank_and_bank_account(exp_points, winner_player)
+        game.config.update_wins_counter(winner_player)
+        if not game.config.are_all_games_played():
+            game.state = GameState.REMATCH
+        extras = {}
+        message = 'finish_game'
+        await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
+        self.save_game_history(game)
+
+    async def _change_current_player(self, game):
+        game.current_player = game.get_opponent_player()
+        game.state = GameState.ROLL_DICE
+        extras = {}
+        message = 'change_current_player'
+        await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
+
+    async def _update_players_points(self, game):
+        self.update_player_scores(game)
+        if game.is_finished:
+            game.state = GameState.FINISH_GAME
+        else:
+            game.state = GameState.CHANGE_CURRENT_PLAYER
+        extras = {}
+        message = 'update_players_points'
+        await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
+        await self.play(game)
+
+    async def _destroy_opponent_target_column(self, game, kwargs):
+        column_opponent_player: Column = kwargs['column_opponent_player']
+        die_val: int = kwargs['die_val']
+        removed_indices = column_opponent_player.remove(die_val)
+        game.state = GameState.UPDATE_PLAYERS_POINTS
+        extras = {'removed_indices': removed_indices}
+        message = 'destroy_opponent_target_column'
+        await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
+        await self.play(game)
+
+    async def _add_dice_to_column(self, game, kwargs):
+        column_index: int = kwargs['column_index']
+        column = game.current_player.board.columns.get(column_index)
+        die_val = game.current_player.die.current_number
+        column.add(die_val)
+        opponent_player = game.get_opponent_player()
+        column_opponent_player = opponent_player.board.columns.get(column_index)
+        if column_opponent_player.can_remove_values(die_val):
+            game.state = GameState.DESTROY_OPPONENT_TARGET_COLUMN
+            await self.play(game, column_opponent_player=column_opponent_player, die_val=die_val)
+        else:
+            game.state = GameState.UPDATE_PLAYERS_POINTS
+            extras = {}
+            message = 'add_dice'
+            await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
+            await self.play(game)
+
+    async def _select_column(self, game, game_events, player):
+        column_index = self.select_column(game_events)
+        column = game.current_player.board.columns.get(column_index)
+        if column and not column.is_full():
+            # This save the result move from the user. This table helps to the machine learning model.
+            # Only save the Human inputs to train the model.
+            if game.current_player.rol == PlayerRol.HUMAN:
+                self.save_single_game_history(game, column_index)
+            game.state = GameState.ADD_DICE_TO_COLUMN
+            await self.play(game, player, column_index=column_index)
+
+    async def _roll_dice(self, game, game_events):
+        if game_events.event == GameEvent.ROLL:
+            game.current_player.die.roll()
+            game.state = GameState.SELECT_COLUMN
+            extras = {}
+            message = 'roll_dice'
+            await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
+
+    async def _waiting_opponent(self, game):
+        started_player = self.get_starter_player(game)
+        game.current_player = started_player
+        game.state = GameState.ROLL_DICE
+        extras = {}
+        message = 'player_2_connected'
+        await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
+
+    async def _create_new_game(self, game):
+        game.state = GameState.WAITING_OPPONENT
+        extras = {}
+        message = 'player_1_connected'
+        await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)

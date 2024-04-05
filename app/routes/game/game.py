@@ -30,7 +30,6 @@ async def play_adventure_game(websocket: WebSocket,
                               user_id: token_ws_dependency):
     game_id = 'FAKE_GAME_ID'
     game, player = await game_mode.create_or_join(game_id, user_id, websocket)
-    await game_mode.play(game)
     try:
         while not game.config.is_game_mode_over:
             user_event_request = await game_mode.get_user_event_request(websocket)
@@ -38,8 +37,11 @@ async def play_adventure_game(websocket: WebSocket,
             if game.current_player and game.current_player.is_player_turn(player) or game.state == GameState.REMATCH:
                 await game_mode.play(game, player, user_event_request)
                 game_mode.verbose(game)
+        await websocket.close()
+        await game_mode.ws_game.disconnect(game_id=game_id, websocket=websocket)
     except WebSocketDisconnect:
-        await game_mode.ws_game.disconnect(game_id=game.game_id, websocket=websocket)
+        await game_mode.get_winner_after_player_disconnect(disconnected_player=player,
+                                                           game=game, websocket=websocket)
 
 
 @router.websocket('/game/ai')

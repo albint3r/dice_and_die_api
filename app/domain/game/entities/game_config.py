@@ -1,13 +1,16 @@
+from math import ceil
+
 from pydantic import BaseModel, Field
 
 from app.domain.game.entities.player import Player
-from app.domain.game.enums.game_mode import GameMode
+from app.domain.game.enums.game_mode import GameMode, RematchMode
 
 TWinCounter = dict[str, int]
 
 
 class GameConfig(BaseModel):
-    mode: GameMode
+    game_mode: GameMode
+    rematch_mode: RematchMode
     is_game_mode_over: bool = False
     col_length: int = 3
     total_columns: int = 3
@@ -36,5 +39,9 @@ class GameConfig(BaseModel):
 
     def are_all_games_played(self) -> bool:
         """Check if the game mode is over"""
-        self.is_game_mode_over = sum(self.wins_counter.values()) == self.total_games
-        return self.is_game_mode_over
+        if self.rematch_mode == RematchMode.n_best:
+            target_n = ceil(self.total_games * .51)
+            self.is_game_mode_over = any([c == target_n for c in self.wins_counter.values()])
+            return self.is_game_mode_over
+        if self.rematch_mode == RematchMode.best_total_games_score:
+            return sum(self.wins_counter.values()) == self.total_games

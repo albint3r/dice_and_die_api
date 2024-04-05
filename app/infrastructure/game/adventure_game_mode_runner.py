@@ -18,7 +18,7 @@ from app.domain.game.entities.play_history import PlayHistory
 from app.domain.game.entities.player import Player
 from app.domain.game.entities.player_rol import PlayerRol
 from app.domain.game.enums.game_event import GameEvent
-from app.domain.game.enums.game_mode import GameMode
+from app.domain.game.enums.game_mode import GameMode, RematchMode
 from app.domain.game.enums.game_state import GameState
 from app.domain.game.errors.errors import SinglePlaHistoryDontMatchColumnsLength, PlaHistoryDontMatchColumnsLength
 from app.domain.game.schemas.request import GamePlayerRequest
@@ -138,10 +138,10 @@ class AdventureGameModeRunner(IGamesModeRunner):
 
             case GameState.REMATCH:
 
-                if ic(game_events.event == GameEvent.NO):
+                if game_events.event == GameEvent.NO:
                     game.config.is_game_mode_over = True
 
-                if ic(game_events.event == GameEvent.YES):
+                if game_events.event == GameEvent.YES:
                     if player == game.p1:
                         game.p1.reset_board(game.config.col_length, game.config.total_columns)
                         game.config.confirm_player_rematch_game(player)
@@ -181,7 +181,7 @@ class AdventureGameModeRunner(IGamesModeRunner):
             player = self.create_new_player(self.get_user(user_id))
             game.p2 = player
             await self.ws_game.connect(game_id=game_id, new_game=game, websocket=websocket)
-
+        await self.play(game)
         return game, player
 
     async def get_user_event_request(self, websocket: WebSocket) -> GamePlayerRequest:  # noqa
@@ -195,7 +195,11 @@ class AdventureGameModeRunner(IGamesModeRunner):
             return GamePlayerRequest(event=GameEvent.INVALID_INPUT_EVENT)
 
     def create_new_game(self, game_id: str, player: Player) -> Game:
-        config = GameConfig(mode=GameMode.ADVENTURE, col_length=1, total_columns=1, total_games=3)
+        config = GameConfig(game_mode=GameMode.CLASSIC,
+                            rematch_mode=RematchMode.n_best,
+                            col_length=1,
+                            total_columns=1,
+                            total_games=3)
         return Game(game_id=game_id, p1=player, state=GameState.CREATE_NEW_GAME, config=config)
 
     def create_new_player(self, user: User) -> Player:

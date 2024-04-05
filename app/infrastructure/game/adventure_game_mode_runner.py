@@ -124,8 +124,13 @@ class AdventureGameModeRunner(IGamesModeRunner):
                 if tied_player:
                     # Update both players points and ranks
                     self.update_user_level_rank_and_bank_account(exp_points, tied_player)
+                    game.config.update_wins_counter(tied_player)
                 self.update_user_level_rank_and_bank_account(exp_points, winner_player)
-                game.state = GameState.REMATCH
+                game.config.update_wins_counter(winner_player)
+
+                if not game.config.are_all_games_played():
+                    game.state = GameState.REMATCH
+
                 extras = {}
                 message = 'finish_game'
                 await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
@@ -148,9 +153,7 @@ class AdventureGameModeRunner(IGamesModeRunner):
                     game.current_player = None
                     game.winner_player = None
                     game.current_turn = 0
-                    ic(game)
                     started_player = self.get_starter_player(game)
-                    ic(started_player)
                     game.current_player = started_player
                     game.state = GameState.ROLL_DICE
                     extras = {}

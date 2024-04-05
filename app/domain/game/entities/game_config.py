@@ -1,8 +1,10 @@
+from functools import reduce
 from math import ceil
 
 from icecream import ic
 from pydantic import BaseModel, Field
 
+from app.domain.game.entities.game import Game, TWinner
 from app.domain.game.entities.player import Player
 from app.domain.game.enums.game_mode import GameMode, RematchMode
 
@@ -19,6 +21,7 @@ class GameConfig(BaseModel):
     wins_counter: TWinCounter = {}
     confirmed_players: set[str] = Field(default_factory=set)
     games_counter: int = 0
+    winner_player: TWinner | None = None
 
     @property
     def is_rematch(self) -> bool:

@@ -75,3 +75,7 @@ class IGamesModeRunner(BaseModel, ABC):
     async def get_winner_after_player_disconnect(self, disconnected_player: Player, game: Game,
                                                  websocket: WebSocket) -> None:
         """Get the winner after a user disconnect before the game ends."""
+
+    @abstractmethod
+    async def get_overall_games_winner(self, game: Game):
+        """This is the final result of the players after playing all the games."""

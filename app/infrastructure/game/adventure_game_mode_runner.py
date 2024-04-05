@@ -12,7 +12,7 @@ from app.domain.core.ref_types import TGamePlayer
 from app.domain.game.entities.board import Board
 from app.domain.game.entities.column import Column
 from app.domain.game.entities.die import Die
-from app.domain.game.entities.game import Game
+from app.domain.game.entities.game import Game, TWinner
 from app.domain.game.entities.game_config import GameConfig
 from app.domain.game.entities.play_history import PlayHistory
 from app.domain.game.entities.player import Player
@@ -140,6 +140,21 @@ class AdventureGameModeRunner(IGamesModeRunner):
         # If is not opponent disconnect safe.
         else:
             await self.ws_game.disconnect(game_id=game.game_id, websocket=websocket)
+
+    # Todo: add to abs methods
+    # Create class to handle the confing last result exp and rewards
+    async def get_overall_games_winner(self, game: Game) -> TWinner:
+        """This is the final result of the players after playing all the games."""
+        p1_score = game.config.wins_counter.get(game.p1.user.user_id, 0)
+        p2_score = game.config.wins_counter.get(game.p2.user.user_id, 0)
+        if p1_score > p2_score:
+            winner_player = (game.p1, None)
+        elif p2_score > p1_score:
+            winner_player = (game.p2, None)
+        else:
+            winner_player = (game.p1, game.p2)
+
+        return winner_player
 
     def verbose(self, game: Game) -> None:
         ic('/' * 100)

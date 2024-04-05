@@ -124,10 +124,15 @@ class AdventureGameModeRunner(IGamesModeRunner):
                     # Update both players points and ranks
                     self.update_user_level_rank_and_bank_account(exp_points, tied_player)
                 self.update_user_level_rank_and_bank_account(exp_points, winner_player)
+                game.state = GameState.REMATCH
                 extras = {}
                 message = 'finish_game'
                 await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
                 self.save_game_history(game)
+                await self.play(game)
+
+            case GameState.REMATCH:
+                ic('Aqui ando')
 
             case GameState.DISCONNECT_PLAYER:
                 winner_player, _ = game.winner_player

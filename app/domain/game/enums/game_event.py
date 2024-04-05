@@ -9,3 +9,5 @@ class GameEvent(Enum):
     COL2 = '2'
     COL3 = '3'
     COL4 = '4'
+    YES = 'yes'
+    NO = 'no'

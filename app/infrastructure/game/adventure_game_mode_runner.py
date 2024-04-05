@@ -133,6 +133,11 @@ class AdventureGameModeRunner(IGamesModeRunner):
 
             case GameState.REMATCH:
                 ic('Aqui ando')
+                # Add The Rematch logic.
+                # User send if he wants a rematch
+                # If at least one user don't want rematch the game close.
+                # If user is ready cant send a request again
+                # if the second player accept the rematch reset game and start again.
 
             case GameState.DISCONNECT_PLAYER:
                 winner_player, _ = game.winner_player

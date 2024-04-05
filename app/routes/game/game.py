@@ -28,10 +28,11 @@ async def check_active_connections():
 async def play_adventure_game(websocket: WebSocket,
                               game_mode: adventure_game_mode_runner_dependency,
                               user_id: token_ws_dependency):
-    game, player = await game_mode.create_or_join('FAKE_GAME_ID', user_id, websocket)
+    game_id = 'FAKE_GAME_ID'
+    game, player = await game_mode.create_or_join(game_id, user_id, websocket)
     await game_mode.play(game)
     try:
-        while not game_mode.is_finish:
+        while not game_mode.config.is_finish:
             user_event_request = await game_mode.get_user_event_request(websocket)
             ic(user_event_request)
             if game.current_player and game.current_player.is_player_turn(player) or game.state == GameState.REMATCH:

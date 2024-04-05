@@ -32,7 +32,6 @@ class AdventureGameModeRunner(IGamesModeRunner):
     ws_game: IGameWebSocketManager
     ws_viewers: IViewersWebSocketManager
     leveling_manager: IManagerLevelingUseCase
-    is_finish: bool = False
 
     async def play(self, game: Game,
                    player: Player | None = None,
@@ -129,15 +128,33 @@ class AdventureGameModeRunner(IGamesModeRunner):
                 message = 'finish_game'
                 await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
                 self.save_game_history(game)
-                await self.play(game)
 
             case GameState.REMATCH:
-                ic('Aqui ando')
-                # Add The Rematch logic.
-                # User send if he wants a rematch
-                # If at least one user don't want rematch the game close.
-                # If user is ready cant send a request again
-                # if the second player accept the rematch reset game and start again.
+
+                if ic(game_events.event == GameEvent.NO):
+                    self.config.is_finish = True
+
+                if ic(game_events.event == GameEvent.YES):
+
+                    new_player = self.create_new_player(self.get_user(player.user.user_id))
+                    if player == game.p1:
+                        game.p1 = new_player
+                        self.config.confirm_player_rematch_game(player)
+                    else:
+                        game.p2 = new_player
+                        self.config.confirm_player_rematch_game(player)
+
+                if self.config.is_rematch:
+                    game.current_player = None
+                    game.winner_player = None
+                    game.current_turn = 0
+                    started_player = self.get_starter_player(game)
+                    game.current_player = started_player
+                    game.state = GameState.ROLL_DICE
+                    extras = {}
+                    message = 'roll_dice'
+                    await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
+                    self.config.reset_confirmed_players_rematch_game()
 
             case GameState.DISCONNECT_PLAYER:
                 winner_player, _ = game.winner_player
@@ -229,7 +246,7 @@ class AdventureGameModeRunner(IGamesModeRunner):
            game.p1.board.columns.get(4))
         ic('*-' * 100)
 
-    def create_board(self, max_length: int = 2) -> Board:  # noqa
+    def create_board(self, max_length: int = 1) -> Board:  # noqa
         return Board(columns={i: Column(max_length=max_length) for i in range(1, max_length + 1)})
 
     def get_starter_player(self, game: Game) -> Player:  # noqa

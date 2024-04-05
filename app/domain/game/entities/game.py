@@ -2,6 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
+from app.domain.game.entities.game_config import GameConfig
 from app.domain.game.entities.player import Player
 from app.domain.game.enums.game_state import GameState
 
@@ -17,6 +18,7 @@ class Game(BaseModel):
     winner_player: TWinner | None = None
     current_turn: int = 0
     state: GameState
+    config: GameConfig | None = None
 
     @property
     def is_finished(self) -> bool:

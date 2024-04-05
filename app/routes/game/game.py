@@ -32,7 +32,7 @@ async def play_adventure_game(websocket: WebSocket,
     game, player = await game_mode.create_or_join(game_id, user_id, websocket)
     await game_mode.play(game)
     try:
-        while not game_mode.config.is_finish:
+        while not game.config.is_game_mode_over:
             user_event_request = await game_mode.get_user_event_request(websocket)
             ic(user_event_request)
             if game.current_player and game.current_player.is_player_turn(player) or game.state == GameState.REMATCH:

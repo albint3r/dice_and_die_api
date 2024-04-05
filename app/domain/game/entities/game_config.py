@@ -6,10 +6,11 @@ from app.domain.game.enums.game_mode import GameMode
 
 class GameConfig(BaseModel):
     mode: GameMode
-    grid_size: int = 3
-    col_max_length: int = 3
-    total_games_to_win: int = 3
-    is_finish: bool = False
+    is_game_mode_over: bool = False
+    col_length: int = 3
+    total_columns: int = 3
+    total_games: int = 3
+    win_counter: dict[str, int] = {}
     confirmed_players: set[str] = Field(default_factory=set)
 
     @property

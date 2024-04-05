@@ -13,10 +13,12 @@ from app.domain.game.entities.board import Board
 from app.domain.game.entities.column import Column
 from app.domain.game.entities.die import Die
 from app.domain.game.entities.game import Game
+from app.domain.game.entities.game_config import GameConfig
 from app.domain.game.entities.play_history import PlayHistory
 from app.domain.game.entities.player import Player
 from app.domain.game.entities.player_rol import PlayerRol
 from app.domain.game.enums.game_event import GameEvent
+from app.domain.game.enums.game_mode import GameMode
 from app.domain.game.enums.game_state import GameState
 from app.domain.game.errors.errors import SinglePlaHistoryDontMatchColumnsLength, PlaHistoryDontMatchColumnsLength
 from app.domain.game.schemas.request import GamePlayerRequest
@@ -132,29 +134,29 @@ class AdventureGameModeRunner(IGamesModeRunner):
             case GameState.REMATCH:
 
                 if ic(game_events.event == GameEvent.NO):
-                    self.config.is_finish = True
+                    game.config.is_game_mode_over = True
 
                 if ic(game_events.event == GameEvent.YES):
-
-                    new_player = self.create_new_player(self.get_user(player.user.user_id))
                     if player == game.p1:
-                        game.p1 = new_player
-                        self.config.confirm_player_rematch_game(player)
+                        game.p1.reset_board(game.config.col_length, game.config.total_columns)
+                        game.config.confirm_player_rematch_game(player)
                     else:
-                        game.p2 = new_player
-                        self.config.confirm_player_rematch_game(player)
+                        game.p2.reset_board(game.config.col_length, game.config.total_columns)
+                        game.config.confirm_player_rematch_game(player)
 
-                if self.config.is_rematch:
+                if game.config.is_rematch:
                     game.current_player = None
                     game.winner_player = None
                     game.current_turn = 0
+                    ic(game)
                     started_player = self.get_starter_player(game)
+                    ic(started_player)
                     game.current_player = started_player
                     game.state = GameState.ROLL_DICE
                     extras = {}
                     message = 'roll_dice'
                     await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
-                    self.config.reset_confirmed_players_rematch_game()
+                    game.config.reset_confirmed_players_rematch_game()
 
             case GameState.DISCONNECT_PLAYER:
                 winner_player, _ = game.winner_player
@@ -190,7 +192,8 @@ class AdventureGameModeRunner(IGamesModeRunner):
             return GamePlayerRequest(event=GameEvent.INVALID_INPUT_EVENT)
 
     def create_new_game(self, game_id: str, player: Player) -> Game:
-        return Game(game_id=game_id, p1=player, state=GameState.CREATE_NEW_GAME)
+        config = GameConfig(mode=GameMode.ADVENTURE, col_length=1, total_columns=1, total_games=3)
+        return Game(game_id=game_id, p1=player, state=GameState.CREATE_NEW_GAME, config=config)
 
     def create_new_player(self, user: User) -> Player:
         return Player(

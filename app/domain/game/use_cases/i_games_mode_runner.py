@@ -13,7 +13,6 @@ from app.domain.game.entities.board import Board
 
 
 class IGamesModeRunner(BaseModel, ABC):
-    config: GameConfig
 
     @abstractmethod
     async def play(self, game: Game, player: Player | None = None,

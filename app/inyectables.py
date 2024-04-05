@@ -7,8 +7,6 @@ from pydantic import BaseModel
 from app.db.db import db
 from app.domain.analytics.use_cases.i_analytics_use_case import IAnalyticsUseCase
 from app.domain.auth.use_cases.i_auth_use_case import IAuthUseCase
-from app.domain.game.entities.game_config import GameConfig
-from app.domain.game.enums.game_mode import GameMode
 from app.domain.game.use_cases.i_chat_observer import IChatObserver
 from app.domain.game.use_cases.i_game_use_case import IGameUseCase
 from app.domain.game.use_cases.i_game_websocket_manager import IGameWebSocketManager
@@ -217,8 +215,7 @@ class AdventureGameModeRunnerDependency(Inyectables):
                ws_viewers: viewers_websocket_dependency,
                leveling_manager: manager_leveling_use_case_dependency,
                repo: auth_repository_dependency) -> IGamesModeRunner:
-        return AdventureGameModeRunner(config=GameConfig(mode=GameMode.ADVENTURE),
-                                       ws_game=ws_game,
+        return AdventureGameModeRunner(ws_game=ws_game,
                                        ws_viewers=ws_viewers,
                                        leveling_manager=leveling_manager,
                                        repo=repo)

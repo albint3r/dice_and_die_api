@@ -17,11 +17,19 @@ class InvalidNewBoardInstance(GameError):
     """Throw this error when the Board is not a new one"""
 
 
+class PlaHistoryDontMatchColumnsLength(GameError):
+    """Throw this error when the Board is not a new one"""
+
+
+class SinglePlaHistoryDontMatchColumnsLength(GameError):
+    """Throw this error when the Board is not a new one"""
+
+
 class InvalidNewDieInstance(GameError):
     """Throw this error when the Die is not a new one"""
 
 
-class NotRemainingActiveConnectionsErro(GameError):
+class NotRemainingActiveConnectionsError(GameError):
     """Throw this error when try to get the remaining connections and are empty"""
 
 

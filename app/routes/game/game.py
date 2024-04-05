@@ -29,9 +29,16 @@ async def play_adventure_game(websocket: WebSocket,
                               game_mode: adventure_game_mode_runner_dependency,
                               user_id: token_ws_dependency):
     game, player = await game_mode.create_or_join('FAKE_GAME_ID', user_id, websocket)
-    ic(game)
-    while True:
-        user_event_request = await game_mode.get_user_event_request(websocket)
+    await game_mode.play(game)
+    try:
+        while not game_mode.is_finish:
+            user_event_request = await game_mode.get_user_event_request(websocket)
+            ic(user_event_request)
+            if game.current_player and game.current_player.is_player_turn(player):
+                await game_mode.play(game, player, user_event_request)
+                game_mode.verbose(game)
+    except WebSocketDisconnect:
+        await game_mode.ws_game.disconnect(game_id=game.game_id, websocket=websocket)
 
 
 @router.websocket('/game/ai')

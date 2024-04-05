@@ -213,9 +213,14 @@ chat_observer_dependency = Annotated[IChatObserver, Depends(ChatObserverDependen
 
 class AdventureGameModeRunnerDependency(Inyectables):
     @staticmethod
-    def inject(ws_game: game_websocket_dependency, repo: auth_repository_dependency) -> IGamesModeRunner:
+    def inject(ws_game: game_websocket_dependency,
+               ws_viewers: viewers_websocket_dependency,
+               leveling_manager: manager_leveling_use_case_dependency,
+               repo: auth_repository_dependency) -> IGamesModeRunner:
         return AdventureGameModeRunner(config=GameConfig(mode=GameMode.ADVENTURE),
                                        ws_game=ws_game,
+                                       ws_viewers=ws_viewers,
+                                       leveling_manager=leveling_manager,
                                        repo=repo)
 
 

@@ -4,7 +4,7 @@ from starlette.websockets import WebSocket
 
 from app.domain.core.ref_types import TExtras
 from app.domain.game.entities.game import Game
-from app.domain.game.errors.errors import NotRemainingActiveConnectionsErro, MissingBroadcastGameInPlayersMatch
+from app.domain.game.errors.errors import NotRemainingActiveConnectionsError, MissingBroadcastGameInPlayersMatch
 from app.domain.game.schemas.response import ResponseGame
 from app.domain.game.use_cases.i_game_websocket_manager import IGameWebSocketManager
 
@@ -50,7 +50,7 @@ class _GameWebSocketManager(IGameWebSocketManager):
         if connections:
             websockets = list(connections)[0]
             return websockets
-        raise NotRemainingActiveConnectionsErro('Not remaining active connections.')
+        raise NotRemainingActiveConnectionsError('Not remaining active connections.')
 
     def is_full(self, game_id: str) -> bool:
         game = self.active_connections.get(game_id)

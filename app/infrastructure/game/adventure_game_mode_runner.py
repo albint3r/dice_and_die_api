@@ -1,7 +1,9 @@
 import copy
+from json import JSONDecodeError
 from random import choice
 
 from icecream import ic
+from pydantic import ValidationError
 from starlette.websockets import WebSocket
 
 from app.domain.analytics.entities.single_play_history import SinglePlayHistory
@@ -18,10 +20,18 @@ from app.domain.game.enums.game_event import GameEvent
 from app.domain.game.enums.game_state import GameState
 from app.domain.game.errors.errors import SinglePlaHistoryDontMatchColumnsLength, PlaHistoryDontMatchColumnsLength
 from app.domain.game.schemas.request import GamePlayerRequest
+from app.domain.game.use_cases.i_game_websocket_manager import IGameWebSocketManager
 from app.domain.game.use_cases.i_games_mode_runner import IGamesModeRunner
+from app.domain.game.use_cases.i_user_level_use_case import IManagerLevelingUseCase
+from app.domain.game.use_cases.i_viewers_websocket_manager import IViewersWebSocketManager
+from app.repositories.auth.auth_repository import AuthRepository
 
 
 class AdventureGameModeRunner(IGamesModeRunner):
+    repo: AuthRepository
+    ws_game: IGameWebSocketManager
+    ws_viewers: IViewersWebSocketManager
+    leveling_manager: IManagerLevelingUseCase
     is_finish: bool = False
 
     async def play(self, game: Game,
@@ -36,7 +46,7 @@ class AdventureGameModeRunner(IGamesModeRunner):
                 await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
 
             case GameState.WAITING_OPPONENT:
-                started_player = self._get_starter_player(game)
+                started_player = self.get_starter_player(game)
                 game.current_player = started_player
                 game.state = GameState.ROLL_DICE
                 extras = {}
@@ -58,7 +68,7 @@ class AdventureGameModeRunner(IGamesModeRunner):
                     # This save the result move from the user. This table helps to the machine learning model.
                     # Only save the Human inputs to train the model.
                     if game.current_player.rol == PlayerRol.HUMAN:
-                        self._save_single_game_history(game, column_index)
+                        self.save_single_game_history(game, column_index)
                     game.state = GameState.ADD_DICE_TO_COLUMN
                     await self.play(game, player, column_index=column_index)
 
@@ -112,18 +122,18 @@ class AdventureGameModeRunner(IGamesModeRunner):
                 exp_points = self.leveling_manager.get_winner_earned_exp_points(game)
                 if tied_player:
                     # Update both players points and ranks
-                    self._update_user_level_rank_and_bank_account(exp_points, tied_player)
-                self._update_user_level_rank_and_bank_account(exp_points, winner_player)
+                    self.update_user_level_rank_and_bank_account(exp_points, tied_player)
+                self.update_user_level_rank_and_bank_account(exp_points, winner_player)
                 extras = {}
                 message = 'finish_game'
                 await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
-                self._save_game_history(game)
+                self.save_game_history(game)
 
             case GameState.DISCONNECT_PLAYER:
                 winner_player, _ = game.winner_player
                 exp_points = self.leveling_manager.get_winner_earned_exp_after_player_disconnect()
                 # Create a copy to compare if the user level up
-                self._update_user_level_rank_and_bank_account(exp_points, winner_player)
+                self.update_user_level_rank_and_bank_account(exp_points, winner_player)
                 extras = {}
                 message = 'player_disconnected'
                 await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
@@ -142,21 +152,37 @@ class AdventureGameModeRunner(IGamesModeRunner):
 
         return game, player
 
+    async def get_user_event_request(self, websocket: WebSocket) -> GamePlayerRequest:  # noqa
+        """Get the player message event from the client"""
+        try:
+            json_str = await websocket.receive_json()
+            return GamePlayerRequest(**json_str)
+        except ValidationError:
+            return GamePlayerRequest(event=GameEvent.INVALID_INPUT_EVENT)
+        except JSONDecodeError:
+            return GamePlayerRequest(event=GameEvent.INVALID_INPUT_EVENT)
+
     def create_new_game(self, game_id: str, player: Player) -> Game:
         return Game(game_id=game_id, p1=player, state=GameState.CREATE_NEW_GAME)
 
     def create_new_player(self, user: User) -> Player:
         return Player(
             user=user,
-            board=self._create_board(),
+            board=self.create_board(),
             die=Die()
         )
 
     def get_user(self, user_id: str) -> User:
-        return super().get_user(user_id)
+        user = self.repo.get_user_by_id(user_id)
+        user.user_level = self.repo.get_user_level(user.user_id)
+        user.bank_account = self.repo.get_user_bank_account(user.user_id)
+        return user
 
     def select_column(self, request: GamePlayerRequest) -> int:
-        return super().select_column(request)
+        try:
+            return int(request.event.value)
+        except ValueError:
+            return 0
 
     def update_player_scores(self, game: Game) -> None:  # noqa
         """Update the current players scores"""
@@ -193,14 +219,14 @@ class AdventureGameModeRunner(IGamesModeRunner):
            game.p1.board.columns.get(4))
         ic('*-' * 100)
 
-    def _create_board(self, max_length: int = 2) -> Board:  # noqa
+    def create_board(self, max_length: int = 2) -> Board:  # noqa
         return Board(columns={i: Column(max_length=max_length) for i in range(1, max_length + 1)})
 
-    def _get_starter_player(self, game: Game) -> Player:  # noqa
+    def get_starter_player(self, game: Game) -> Player:  # noqa
         """Select randomly witch player would start the game."""
         return choice([game.p1, game.p2])
 
-    def _update_user_level_rank_and_bank_account(self, exp_points, winner_player):
+    def update_user_level_rank_and_bank_account(self, exp_points, winner_player):
         """Update Winner level, rank and bank account.
 
         This method is used after the game finished or when the usr disconnect.
@@ -214,7 +240,7 @@ class AdventureGameModeRunner(IGamesModeRunner):
             self.repo.update_user_bank_account_amount(user.user_id, 100.0)
         self.repo.update_user_level(user.user_level)
 
-    def _save_game_history(self, game: Game) -> None:
+    def save_game_history(self, game: Game) -> None:
         """Save the game match result"""
         try:
             play_history = PlayHistory.from_game(game)
@@ -224,7 +250,7 @@ class AdventureGameModeRunner(IGamesModeRunner):
         except PlaHistoryDontMatchColumnsLength:
             ic('Game wont be saved')
 
-    def _save_single_game_history(self, game: Game, column_index: int) -> None:
+    def save_single_game_history(self, game: Game, column_index: int) -> None:
         """Save single game history player column selection"""
         try:
             single_game_history = SinglePlayHistory.from_game(game, column_index)

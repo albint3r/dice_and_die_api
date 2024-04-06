@@ -12,6 +12,34 @@ from app.domain.game.schemas.request import GamePlayerRequest
 
 
 class IGamesModeRunner(BaseModel, ABC):
+    """
+    Interface for running game modes.
+
+    Attributes:
+        Config (class): Configuration options for Pydantic BaseModel.
+
+    Methods:
+        play: Run the game.
+        verbose: Print the Game for debugging.
+        get_valid_game_id: Create, update or maintain the game id to handle where redirect the user.
+        create_or_join: Create a new room or joint the user to the room.
+        get_user_event_request: Get the player message event from the client.
+        get_user: Create an instance of the user by the user id.
+        create_new_player: Create a new personalized player.
+        create_board: Create Player Board.
+        create_new_game: Create a new personalized Game.
+        get_starter_player: Select randomly which player would start the game.
+        select_column: Player select target index column.
+        update_player_scores: Update the current players scores.
+        update_user_level_rank_and_bank_account: Update Winner level, rank and bank account.
+        update_game_mode_user_level_rank_and_bank_account: Update Winner level, rank and bank account in the Game Mode.
+        save_single_game_history: Save single game history player column selection.
+        save_game_history: Save the game match result.
+        get_winner_after_player_disconnect: Get the winner after a user disconnect before the game ends.
+        get_overall_games_winner: This is the final result of the players after playing all the games.
+        end_game: End the game Mode.
+    """
+
     class Config:
         arbitrary_types_allowed = True
 

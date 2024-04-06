@@ -30,7 +30,7 @@ async def play_adventure_game(websocket: WebSocket, game_id: str,
                               view_use_case: viewers_use_case_dependency,
                               chat_observer: chat_observer_dependency,
                               user_id: token_ws_dependency):
-    game_id = 'game_mode.get_valid_game_id(user_id, game_id)'
+    game_id = game_mode.get_valid_game_id(user_id, game_id)
     if view_use_case.is_room_full(game_id):
         await view_use_case.create_or_join(game_id, user_id, websocket)
         return

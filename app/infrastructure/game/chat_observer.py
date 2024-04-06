@@ -1,6 +1,5 @@
 from datetime import datetime
 
-from icecream import ic
 from pydantic import ValidationError
 
 from app.domain.game.entities.emote_message import EmoteMessage

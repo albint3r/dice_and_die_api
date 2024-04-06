@@ -5,15 +5,13 @@ from starlette.websockets import WebSocket
 
 from app.domain.auth.entities.user import User
 from app.domain.core.ref_types import TGamePlayer
+from app.domain.game.entities.board import Board
 from app.domain.game.entities.game import Game
-from app.domain.game.entities.game_config import GameConfig
 from app.domain.game.entities.player import Player
 from app.domain.game.schemas.request import GamePlayerRequest
-from app.domain.game.entities.board import Board
 
 
 class IGamesModeRunner(BaseModel, ABC):
-
     @abstractmethod
     async def play(self, game: Game, player: Player | None = None,
                    game_events: GamePlayerRequest | None = None, **kwargs) -> None:
@@ -64,6 +62,10 @@ class IGamesModeRunner(BaseModel, ABC):
         """Update Winner level, rank and bank account."""
 
     @abstractmethod
+    def update_game_mode_user_level_rank_and_bank_account(self, exp_points, winner_player):
+        """Update Winner level, rank and bank account in the Game Mode"""
+
+    @abstractmethod
     def save_single_game_history(self, game: Game, column_index: int) -> None:
         """Save single game history player column selection"""
 
@@ -79,3 +81,7 @@ class IGamesModeRunner(BaseModel, ABC):
     @abstractmethod
     async def get_overall_games_winner(self, game: Game, player: Player) -> None:
         """This is the final result of the players after playing all the games."""
+
+    @abstractmethod
+    async def end_game(self, game_id: str, websocket: WebSocket) -> None:
+        """End the game Mode"""

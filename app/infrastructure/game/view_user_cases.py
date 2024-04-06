@@ -2,7 +2,7 @@ from datetime import datetime
 from json import JSONDecodeError
 
 from icecream import ic
-from pydantic import ValidationError
+from pydantic import ValidationError, validate_call
 from starlette.websockets import WebSocket, WebSocketDisconnect
 
 from app.domain.game.entities.game import Game
@@ -17,6 +17,7 @@ from app.repositories.auth.auth_repository import AuthRepository
 class ViewUseCase(IViewUseCase):
     repo: AuthRepository
 
+    @validate_call(config=dict(arbitrary_types_allowed=True))
     async def create_or_join(self, game_id: str, user_id: str, websocket: WebSocket) -> None:
         user = self.repo.get_user_by_id(user_id)
         viewer = Viewer(user=user)
@@ -24,7 +25,6 @@ class ViewUseCase(IViewUseCase):
         extras = {'viewer': viewer.model_dump_json()}
         await self.viewers_websocket_manager.connect(game_id, websocket)
         await self.viewers_websocket_manager.broadcast(game, message='join_viewer', extras=extras)
-        ic(viewer)
         try:
             while True:
                 await self.execute(game, websocket)
@@ -35,6 +35,7 @@ class ViewUseCase(IViewUseCase):
             await self.viewers_websocket_manager.disconnect(game_id, websocket)
             ic('disconnect viewer')
 
+    @validate_call(config=dict(arbitrary_types_allowed=True), validate_return=True)
     async def get_user_request_event(self, websocket: WebSocket) -> ViewerRequest:
         try:
             json_str = await websocket.receive_json()
@@ -44,7 +45,8 @@ class ViewUseCase(IViewUseCase):
         except JSONDecodeError:
             return ViewerRequest(event=ViewerEvent.INVALID_INPUT_EVENT)
 
-    async def execute(self, game: Game, websocket: WebSocket):
+    @validate_call(config=dict(arbitrary_types_allowed=True))
+    async def execute(self, game: Game, websocket: WebSocket) -> None:
         request = await self.get_user_request_event(websocket)
         # Exist Game and is a valid input event?
         if request.event != ViewerEvent.INVALID_INPUT_EVENT:
@@ -53,3 +55,7 @@ class ViewUseCase(IViewUseCase):
             # Broadcast Viewer event to Players and Viewers
             await self.websocket_manager.broadcast(game_id=game.game_id, message=message, extras=extras)
             await self.viewers_websocket_manager.broadcast(game=game, message=message, extras=extras)
+
+    @validate_call(validate_return=True)
+    def is_room_full(self, game_id: str) -> bool:
+        return self.websocket_manager.is_full(game_id)

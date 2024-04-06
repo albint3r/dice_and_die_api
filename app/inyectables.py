@@ -10,6 +10,7 @@ from app.domain.auth.use_cases.i_auth_use_case import IAuthUseCase
 from app.domain.game.use_cases.i_chat_observer import IChatObserver
 from app.domain.game.use_cases.i_game_use_case import IGameUseCase
 from app.domain.game.use_cases.i_game_websocket_manager import IGameWebSocketManager
+from app.domain.game.use_cases.i_games_mode_runner import IGamesModeRunner
 from app.domain.game.use_cases.i_progress_use_case import ILevelUseCase, IRankUseCase
 from app.domain.game.use_cases.i_user_level_use_case import IManagerLevelingUseCase
 from app.domain.game.use_cases.i_view_use_case import IViewUseCase
@@ -18,10 +19,12 @@ from app.domain.lobby.use_cases.i_lobby_use_case import ILobbyUseCase
 from app.domain.lobby.use_cases.i_lobby_websocket_manager import ILobbyWebSocketManager
 from app.infrastructure.analytics.analytics_use_case import AnalyticsUseCase
 from app.infrastructure.auth.auth_use_case import AuthUseCase
+from app.infrastructure.game.adventure_game_mode_runner import AdventureGameModeRunner
 from app.infrastructure.game.chat_observer import ChatObserver
 from app.infrastructure.game.game_use_case import GameUseCase
 from app.infrastructure.game.game_websocket_manager import game_websocket_manger
 from app.infrastructure.game.level_use_case import LevelUserCase
+from app.infrastructure.game.manager_leveling_game_mode_use_case import ManagerLevelingGameModeUseCase
 from app.infrastructure.game.manager_leveling_use_case import ManagerLevelingUseCase
 from app.infrastructure.game.pve_game_use_case import PVEGameUseCase
 from app.infrastructure.game.rank_use_case import RankUseCase
@@ -131,6 +134,18 @@ manager_leveling_use_case_dependency = Annotated[
     IManagerLevelingUseCase, Depends(ManagerLevelingUseCaseDependency.inject)]
 
 
+class ManagerLevelingGameModeUseCaseDependency(Inyectables):
+
+    @staticmethod
+    def inject(level_manager: level_use_case_dependency,
+               rank_manager: rank_use_case_dependency) -> IManagerLevelingUseCase:
+        return ManagerLevelingGameModeUseCase(leve_manager=level_manager, rank_manager=rank_manager)
+
+
+manager_leveling_game_mode_use_case_dependency = Annotated[
+    IManagerLevelingUseCase, Depends(ManagerLevelingGameModeUseCaseDependency.inject)]
+
+
 class GameWebSocketDependency(Inyectables):
 
     @staticmethod
@@ -205,3 +220,20 @@ class ChatObserverDependency(Inyectables):
 
 
 chat_observer_dependency = Annotated[IChatObserver, Depends(ChatObserverDependency.inject)]
+
+
+class AdventureGameModeRunnerDependency(Inyectables):
+    @staticmethod
+    def inject(ws_game: game_websocket_dependency,
+               ws_viewers: viewers_websocket_dependency,
+               leveling_manager: manager_leveling_use_case_dependency,
+               leveling_game_mode_manager: manager_leveling_game_mode_use_case_dependency,
+               repo: auth_repository_dependency) -> IGamesModeRunner:
+        return AdventureGameModeRunner(ws_game=ws_game,
+                                       ws_viewers=ws_viewers,
+                                       leveling_manager=leveling_manager,
+                                       leveling_game_mode_manager=leveling_game_mode_manager,
+                                       repo=repo)
+
+
+adventure_game_mode_runner_dependency = Annotated[IGamesModeRunner, Depends(AdventureGameModeRunnerDependency.inject)]

@@ -1,6 +1,5 @@
 from typing import Final
 
-from icecream import ic
 from starlette.websockets import WebSocket
 
 from app.domain.core.ref_types import TExtras

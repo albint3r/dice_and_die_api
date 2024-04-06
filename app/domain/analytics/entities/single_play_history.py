@@ -6,6 +6,8 @@ from app.domain.game.entities.game import Game
 
 import numpy as np
 
+from app.domain.game.errors.errors import SinglePlaHistoryDontMatchColumnsLength
+
 
 class SinglePlayHistory(BaseModel):
     creation_date: datetime = Field(default_factory=datetime.now)
@@ -37,31 +39,37 @@ class SinglePlayHistory(BaseModel):
     def from_game(cls, game: Game, column_index: int) -> 'SinglePlayHistory':
         p1 = game.current_player
         p2 = game.get_opponent_player()
-        return cls(
-            game_id=game.game_id,
-            p1_score=p1.board.score,
-            p1_col_1_0=cls.get_score_value(p1.board.columns.get(1).values, 0),
-            p1_col_1_1=cls.get_score_value(p1.board.columns.get(1).values, 1),
-            p1_col_1_2=cls.get_score_value(p1.board.columns.get(1).values, 2),
-            p1_col_2_0=cls.get_score_value(p1.board.columns.get(2).values, 0),
-            p1_col_2_1=cls.get_score_value(p1.board.columns.get(2).values, 1),
-            p1_col_2_2=cls.get_score_value(p1.board.columns.get(2).values, 2),
-            p1_col_3_0=cls.get_score_value(p1.board.columns.get(3).values, 0),
-            p1_col_3_1=cls.get_score_value(p1.board.columns.get(3).values, 1),
-            p1_col_3_2=cls.get_score_value(p1.board.columns.get(3).values, 2),
-            p2_score=p2.board.score,
-            p2_col_1_0=cls.get_score_value(p2.board.columns.get(1).values, 0),
-            p2_col_1_1=cls.get_score_value(p2.board.columns.get(1).values, 1),
-            p2_col_1_2=cls.get_score_value(p2.board.columns.get(1).values, 2),
-            p2_col_2_0=cls.get_score_value(p2.board.columns.get(2).values, 0),
-            p2_col_2_1=cls.get_score_value(p2.board.columns.get(2).values, 1),
-            p2_col_2_2=cls.get_score_value(p2.board.columns.get(2).values, 2),
-            p2_col_3_0=cls.get_score_value(p2.board.columns.get(3).values, 0),
-            p2_col_3_1=cls.get_score_value(p2.board.columns.get(3).values, 1),
-            p2_col_3_2=cls.get_score_value(p2.board.columns.get(3).values, 2),
-            dice_result=p1.die.current_number,
-            column_index=column_index
-        )
+        try:
+            return cls(
+                game_id=game.game_id,
+                p1_score=p1.board.score,
+                p1_col_1_0=cls.get_score_value(p1.board.columns.get(1).values, 0),
+                p1_col_1_1=cls.get_score_value(p1.board.columns.get(1).values, 1),
+                p1_col_1_2=cls.get_score_value(p1.board.columns.get(1).values, 2),
+                p1_col_2_0=cls.get_score_value(p1.board.columns.get(2).values, 0),
+                p1_col_2_1=cls.get_score_value(p1.board.columns.get(2).values, 1),
+                p1_col_2_2=cls.get_score_value(p1.board.columns.get(2).values, 2),
+                p1_col_3_0=cls.get_score_value(p1.board.columns.get(3).values, 0),
+                p1_col_3_1=cls.get_score_value(p1.board.columns.get(3).values, 1),
+                p1_col_3_2=cls.get_score_value(p1.board.columns.get(3).values, 2),
+                p2_score=p2.board.score,
+                p2_col_1_0=cls.get_score_value(p2.board.columns.get(1).values, 0),
+                p2_col_1_1=cls.get_score_value(p2.board.columns.get(1).values, 1),
+                p2_col_1_2=cls.get_score_value(p2.board.columns.get(1).values, 2),
+                p2_col_2_0=cls.get_score_value(p2.board.columns.get(2).values, 0),
+                p2_col_2_1=cls.get_score_value(p2.board.columns.get(2).values, 1),
+                p2_col_2_2=cls.get_score_value(p2.board.columns.get(2).values, 2),
+                p2_col_3_0=cls.get_score_value(p2.board.columns.get(3).values, 0),
+                p2_col_3_1=cls.get_score_value(p2.board.columns.get(3).values, 1),
+                p2_col_3_2=cls.get_score_value(p2.board.columns.get(3).values, 2),
+                dice_result=p1.die.current_number,
+                column_index=column_index
+            )
+        except AttributeError:
+            raise SinglePlaHistoryDontMatchColumnsLength(
+                'The user modify or the game mode you are playing dont match with'
+                ' the board columns in the database.'
+                ' So the match wont be saved.')
 
     @staticmethod
     def get_score_value(column: list[int], i: int) -> int:

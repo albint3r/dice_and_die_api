@@ -12,6 +12,9 @@ from app.domain.game.schemas.request import GamePlayerRequest
 
 
 class IGamesModeRunner(BaseModel, ABC):
+    class Config:
+        arbitrary_types_allowed = True
+
     @abstractmethod
     async def play(self, game: Game, player: Player | None = None,
                    game_events: GamePlayerRequest | None = None, **kwargs) -> None:

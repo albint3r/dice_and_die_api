@@ -43,6 +43,18 @@ class GameConfig(BaseModel):
         if self.rematch_mode == RematchMode.best_total_games_score:
             self.wins_counter[user_id] = self.wins_counter.get(user_id, 0) + player.board.score
 
+    def get_winner(self, game):  # noqa
+        p1_score = game.config.wins_counter.get(game.p1.user.user_id, 0)
+        p2_score = game.config.wins_counter.get(game.p2.user.user_id, 0)
+        if p1_score > p2_score:
+            winner_player, tied_player = (game.p1, None)
+        elif p2_score > p1_score:
+            winner_player, tied_player = (game.p2, None)
+        else:
+            winner_player, tied_player = (game.p1, game.p2)
+
+        return winner_player, tied_player
+
     def are_all_games_played(self) -> bool:
         """Check if the game mode is over"""
         if self.rematch_mode == RematchMode.n_best:

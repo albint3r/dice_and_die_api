@@ -73,7 +73,7 @@ class AdventureGameModeRunner(IGamesModeRunner):
             case GameState.DISCONNECT_PLAYER:
                 await self._disconnect_player(game)
 
-    @validate_call
+    @validate_call(config=dict(arbitrary_types_allowed=True), validate_return=True)
     async def create_or_join(self, game_id: str, user_id: str, websocket: WebSocket) -> TGamePlayer:
         game = self.ws_game.active_games.get(game_id)
         if not game:
@@ -87,7 +87,7 @@ class AdventureGameModeRunner(IGamesModeRunner):
         await self.play(game)
         return game, player
 
-    @validate_call
+    @validate_call(config=dict(arbitrary_types_allowed=True), validate_return=True)
     async def get_user_event_request(self, websocket: WebSocket) -> GamePlayerRequest:  # noqa
         """Get the player message event from the client"""
         try:
@@ -98,7 +98,7 @@ class AdventureGameModeRunner(IGamesModeRunner):
         except JSONDecodeError:
             return GamePlayerRequest(event=GameEvent.INVALID_INPUT_EVENT)
 
-    @validate_call
+    @validate_call(validate_return=True)
     def create_new_game(self, game_id: str, player: Player) -> Game:
         config = GameConfig(game_mode=GameMode.CLASSIC,
                             rematch_mode=RematchMode.n_best,
@@ -107,21 +107,18 @@ class AdventureGameModeRunner(IGamesModeRunner):
                             total_games=3)
         return Game(game_id=game_id, p1=player, state=GameState.CREATE_NEW_GAME, config=config)
 
-    @validate_call
+    @validate_call(validate_return=True)
     def create_new_player(self, user: User) -> Player:
-        return Player(user=user,
-                      board=self.create_board(),
-                      die=Die()
-                      )
+        return Player(user=user, board=self.create_board(), die=Die())
 
-    @validate_call
+    @validate_call(validate_return=True)
     def get_user(self, user_id: str) -> User:
         user = self.repo.get_user_by_id(user_id)
         user.user_level = self.repo.get_user_level(user.user_id)
         user.bank_account = self.repo.get_user_bank_account(user.user_id)
         return user
 
-    @validate_call
+    @validate_call(validate_return=True)
     def select_column(self, request: GamePlayerRequest) -> int:
         try:
             return int(request.event.value)
@@ -134,7 +131,7 @@ class AdventureGameModeRunner(IGamesModeRunner):
         game.p1.board.get_score()
         game.p2.board.get_score()
 
-    @validate_call
+    @validate_call(config=dict(arbitrary_types_allowed=True))
     async def get_winner_after_player_disconnect(self, disconnected_player: Player, game: Game,
                                                  websocket: WebSocket) -> None:
         """Get the winner after a user disconnect before the game ends."""
@@ -154,17 +151,16 @@ class AdventureGameModeRunner(IGamesModeRunner):
     @validate_call
     async def get_overall_games_winner(self, game: Game, player: Player) -> None:
         """This is the final result of the players after playing all the games."""
+        # Only calculates the first time. If the second player leave the game won't be trigger this event.
         if not game.config.winner_player:
+
+            winner_player, tied_player = game.config.get_winner(game)
+            # Get the single score of each player. The reason of this it's because the config contains the overall result
+            # from all the games. If you use only the game you would have only the result of the last match.
+            # That's the reason why I get the p1 and p2 scores to calculate how wins and by how many points.
             p1_score = game.config.wins_counter.get(game.p1.user.user_id, 0)
             p2_score = game.config.wins_counter.get(game.p2.user.user_id, 0)
             player_score = game.config.wins_counter.get(player.user.user_id, 0)
-            if p1_score > p2_score:
-                winner_player, tied_player = (game.p1, None)
-            elif p2_score > p1_score:
-                winner_player, tied_player = (game.p2, None)
-            else:
-                winner_player, tied_player = (game.p1, game.p2)
-
             game.config.winner_player = winner_player, tied_player
             exp_points = self.leveling_game_mode_manager.get_winner_earned_exp_points(p1_score=p1_score,
                                                                                       p2_score=p2_score,
@@ -179,17 +175,17 @@ class AdventureGameModeRunner(IGamesModeRunner):
             message = 'finish_game'
             await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
 
-    @validate_call
+    @validate_call(validate_return=True)
     def create_board(self, max_length: int = 1) -> Board:  # noqa
         return Board(columns={i: Column(max_length=max_length) for i in range(1, max_length + 1)})
 
-    @validate_call
+    @validate_call(validate_return=True)
     def get_starter_player(self, game: Game) -> Player:  # noqa
         """Select randomly witch player would start the game."""
         return choice([game.p1, game.p2])
 
     @validate_call
-    def update_user_level_rank_and_bank_account(self, exp_points, winner_player):
+    def update_user_level_rank_and_bank_account(self, exp_points, winner_player) -> None:
         """Update Winner level, rank and bank account.
 
         This method is used after the game finished or when the usr disconnect.
@@ -204,7 +200,7 @@ class AdventureGameModeRunner(IGamesModeRunner):
         self.repo.update_user_level(user.user_level)
 
     @validate_call
-    def update_game_mode_user_level_rank_and_bank_account(self, exp_points, winner_player):
+    def update_game_mode_user_level_rank_and_bank_account(self, exp_points, winner_player) -> None:
         """Update Winner level, rank and bank account.
 
         This method is used after the game finished or when the usr disconnect.

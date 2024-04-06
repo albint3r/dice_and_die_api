@@ -24,15 +24,22 @@ async def check_active_connections():
     return {"ok": 200}
 
 
-@router.websocket('/game/adventure')
-async def play_adventure_game(websocket: WebSocket,
+@router.websocket('/game/adventure/{game_id}')
+async def play_adventure_game(websocket: WebSocket, game_id: str,
                               game_mode: adventure_game_mode_runner_dependency,
+                              view_use_case: viewers_use_case_dependency,
+                              chat_observer: chat_observer_dependency,
                               user_id: token_ws_dependency):
-    game_id = 'FAKE_GAME_ID'
+    game_id = 'game_mode.get_valid_game_id(user_id, game_id)'
+    if view_use_case.is_room_full(game_id):
+        await view_use_case.create_or_join(game_id, user_id, websocket)
+        return
+
     game, player = await game_mode.create_or_join(game_id, user_id, websocket)
     try:
         while not game.config.is_game_mode_over:
             user_event_request = await game_mode.get_user_event_request(websocket)
+            await chat_observer.listen_request_event(user_event_request, game=game, player=player)
             ic(user_event_request)
             if game.current_player and game.current_player.is_player_turn(player) or game.state == GameState.REMATCH:
                 await game_mode.play(game, player, user_event_request)

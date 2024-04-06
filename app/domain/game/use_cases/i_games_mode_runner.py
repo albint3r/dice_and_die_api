@@ -25,6 +25,10 @@ class IGamesModeRunner(BaseModel, ABC):
         """Print the Game for debugging"""
 
     @abstractmethod
+    def get_valid_game_id(self, user_id: str, game_id: str) -> str:
+        """Create, update or maintain the game id to handle where redirect the user."""
+
+    @abstractmethod
     async def create_or_join(self, game_id: str, user_id: str, websocket: WebSocket) -> TGamePlayer:
         """Create a new room or joint the user to the room."""
 

@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 from pydantic import BaseModel
 from starlette.websockets import WebSocket
 
-from app.domain.core.ref_types import TGamePlayer
 from app.domain.game.entities.game import Game
 from app.domain.game.schemas.request import ViewerRequest
 from app.domain.game.use_cases.i_game_websocket_manager import IGameWebSocketManager
@@ -24,4 +23,8 @@ class IViewUseCase(BaseModel, ABC):
 
     @abstractmethod
     async def get_user_request_event(self, websocket: WebSocket) -> ViewerRequest:
+        """Get the user request event"""
+
+    @abstractmethod
+    def is_room_full(self, game_id: str) -> bool:
         """Get the user request event"""

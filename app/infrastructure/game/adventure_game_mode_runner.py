@@ -1,7 +1,9 @@
 import copy
+import uuid
 from json import JSONDecodeError
 from random import choice
 
+from fastapi import WebSocketException, status
 from icecream import ic
 from pydantic import ValidationError, validate_call
 from starlette.websockets import WebSocket
@@ -72,6 +74,17 @@ class AdventureGameModeRunner(IGamesModeRunner):
 
             case GameState.DISCONNECT_PLAYER:
                 await self._disconnect_player(game)
+
+    @validate_call
+    def get_valid_game_id(self, user_id: str, game_id: str) -> str:
+        """Create, update or maintain the game id to handle where redirect the user."""
+        game = self.ws_game.active_games.get(game_id)
+        if game_id == 'new_game':
+            return str(uuid.uuid4())
+        if game and game.p1.user.user_id != user_id:
+            return game_id
+        else:
+            raise WebSocketException(code=status.WS_1014_BAD_GATEWAY, reason='You are already in the match.')
 
     @validate_call(config=dict(arbitrary_types_allowed=True), validate_return=True)
     async def create_or_join(self, game_id: str, user_id: str, websocket: WebSocket) -> TGamePlayer:
@@ -286,6 +299,7 @@ class AdventureGameModeRunner(IGamesModeRunner):
             extras = {}
             message = 'roll_dice'
             await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
+            await self.ws_viewers.broadcast(game=game, message=message, extras=extras)
             game.config.reset_confirmed_players_rematch_game()
 
     @validate_call
@@ -303,6 +317,8 @@ class AdventureGameModeRunner(IGamesModeRunner):
         extras = {}
         message = 'finish_game'
         await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
+        await self.ws_viewers.broadcast(game=game, message=message, extras=extras)
+
         self.save_game_history(game)
 
     @validate_call
@@ -312,6 +328,7 @@ class AdventureGameModeRunner(IGamesModeRunner):
         extras = {}
         message = 'change_current_player'
         await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
+        await self.ws_viewers.broadcast(game=game, message=message, extras=extras)
 
     @validate_call
     async def _update_players_points(self, game):
@@ -323,6 +340,8 @@ class AdventureGameModeRunner(IGamesModeRunner):
         extras = {}
         message = 'update_players_points'
         await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
+        await self.ws_viewers.broadcast(game=game, message=message, extras=extras)
+
         await self.play(game)
 
     @validate_call
@@ -334,6 +353,8 @@ class AdventureGameModeRunner(IGamesModeRunner):
         extras = {'removed_indices': removed_indices}
         message = 'destroy_opponent_target_column'
         await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
+        await self.ws_viewers.broadcast(game=game, message=message, extras=extras)
+
         await self.play(game)
 
     @validate_call
@@ -374,6 +395,7 @@ class AdventureGameModeRunner(IGamesModeRunner):
             extras = {}
             message = 'roll_dice'
             await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
+            await self.ws_viewers.broadcast(game=game, message=message, extras=extras)
 
     @validate_call
     async def _waiting_opponent(self, game):
@@ -383,6 +405,7 @@ class AdventureGameModeRunner(IGamesModeRunner):
         extras = {}
         message = 'player_2_connected'
         await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
+        await self.ws_viewers.broadcast(game=game, message=message, extras=extras)
 
     @validate_call
     async def _create_new_game(self, game):
@@ -390,3 +413,4 @@ class AdventureGameModeRunner(IGamesModeRunner):
         extras = {}
         message = 'player_1_connected'
         await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
+        await self.ws_viewers.broadcast(game=game, message=message, extras=extras)

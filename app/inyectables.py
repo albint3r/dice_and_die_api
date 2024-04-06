@@ -24,6 +24,7 @@ from app.infrastructure.game.chat_observer import ChatObserver
 from app.infrastructure.game.game_use_case import GameUseCase
 from app.infrastructure.game.game_websocket_manager import game_websocket_manger
 from app.infrastructure.game.level_use_case import LevelUserCase
+from app.infrastructure.game.manager_leveling_game_mode_use_case import ManagerLevelingGameModeUseCase
 from app.infrastructure.game.manager_leveling_use_case import ManagerLevelingUseCase
 from app.infrastructure.game.pve_game_use_case import PVEGameUseCase
 from app.infrastructure.game.rank_use_case import RankUseCase
@@ -133,16 +134,16 @@ manager_leveling_use_case_dependency = Annotated[
     IManagerLevelingUseCase, Depends(ManagerLevelingUseCaseDependency.inject)]
 
 
-class ManagerLevelingGameModeUseCase(Inyectables):
+class ManagerLevelingGameModeUseCaseDependency(Inyectables):
 
     @staticmethod
     def inject(level_manager: level_use_case_dependency,
                rank_manager: rank_use_case_dependency) -> IManagerLevelingUseCase:
-        return ManagerLevelingUseCase(leve_manager=level_manager, rank_manager=rank_manager)
+        return ManagerLevelingGameModeUseCase(leve_manager=level_manager, rank_manager=rank_manager)
 
 
 manager_leveling_game_mode_use_case_dependency = Annotated[
-    IManagerLevelingUseCase, Depends(ManagerLevelingGameModeUseCase.inject)]
+    IManagerLevelingUseCase, Depends(ManagerLevelingGameModeUseCaseDependency.inject)]
 
 
 class GameWebSocketDependency(Inyectables):

@@ -19,7 +19,6 @@ class GameConfig(BaseModel):
     wins_counter: TWinCounter = {}
     confirmed_players: set[str] = Field(default_factory=set)
     games_counter: int = 0
-    score: int = 0
 
     @property
     def is_rematch(self) -> bool:

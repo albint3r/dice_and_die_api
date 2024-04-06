@@ -36,7 +36,10 @@ class ManagerLevelingGameModeUseCase(IManagerLevelingUseCase):
             # Level to needed to level up: 50 exp
             # You have current exp: 40 + win_exp: 30 = 70
             # You have a difference of 20 (your exp: 70 - 50) point for the level to block.
+            exp_points_diff = abs(user.user_level.exp_points - user.user_level.next_level_points)
+            user.user_level.exp_points = exp_points_diff
             user.user_level = self.leve_manager.progress(user_level=user.user_level, formula=next_level_basic_formula)
+            user.user_level.exp_points = abs(user.user_level.next_level_points - exp_points_diff)
             # User can upgrade rank?
             ready_to_rank_up = self.rank_manager.ready_to_progress(user_level=user.user_level)
             if ready_to_rank_up:

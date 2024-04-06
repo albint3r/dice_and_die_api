@@ -97,7 +97,7 @@ class AdventureGameModeRunner(IGamesModeRunner):
 
     def create_new_game(self, game_id: str, player: Player) -> Game:
         config = GameConfig(game_mode=GameMode.CLASSIC,
-                            rematch_mode=RematchMode.best_total_games_score,
+                            rematch_mode=RematchMode.n_best,
                             col_length=1,
                             total_columns=1,
                             total_games=3)
@@ -144,7 +144,7 @@ class AdventureGameModeRunner(IGamesModeRunner):
 
     async def get_overall_games_winner(self, game: Game, player: Player) -> None:
         """This is the final result of the players after playing all the games."""
-        if not game.config.score:
+        if not game.config.winner_player:
             p1_score = game.config.wins_counter.get(game.p1.user.user_id, 0)
             p2_score = game.config.wins_counter.get(game.p2.user.user_id, 0)
             player_score = game.config.wins_counter.get(player.user.user_id, 0)
@@ -155,10 +155,11 @@ class AdventureGameModeRunner(IGamesModeRunner):
             else:
                 winner_player, tied_player = (game.p1, game.p2)
 
-            exp_points = self.leveling_game_mode_manager.get_winner_earned_exp_points(p2_score,
-                                                                                      p2_score,
-                                                                                      player_score,
-                                                                                      game.config.rematch_mode)
+            game.config.winner_player = winner_player, tied_player
+            exp_points = self.leveling_game_mode_manager.get_winner_earned_exp_points(p1_score=p1_score,
+                                                                                      p2_score=p2_score,
+                                                                                      player_score=player_score,
+                                                                                      rematch_mode=game.config.rematch_mode)
 
             if tied_player:
                 # Update both players points and ranks

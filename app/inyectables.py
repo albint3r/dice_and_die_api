@@ -133,6 +133,18 @@ manager_leveling_use_case_dependency = Annotated[
     IManagerLevelingUseCase, Depends(ManagerLevelingUseCaseDependency.inject)]
 
 
+class ManagerLevelingGameModeUseCase(Inyectables):
+
+    @staticmethod
+    def inject(level_manager: level_use_case_dependency,
+               rank_manager: rank_use_case_dependency) -> IManagerLevelingUseCase:
+        return ManagerLevelingUseCase(leve_manager=level_manager, rank_manager=rank_manager)
+
+
+manager_leveling_game_mode_use_case_dependency = Annotated[
+    IManagerLevelingUseCase, Depends(ManagerLevelingGameModeUseCase.inject)]
+
+
 class GameWebSocketDependency(Inyectables):
 
     @staticmethod
@@ -214,10 +226,12 @@ class AdventureGameModeRunnerDependency(Inyectables):
     def inject(ws_game: game_websocket_dependency,
                ws_viewers: viewers_websocket_dependency,
                leveling_manager: manager_leveling_use_case_dependency,
+               leveling_game_mode_manager: manager_leveling_game_mode_use_case_dependency,
                repo: auth_repository_dependency) -> IGamesModeRunner:
         return AdventureGameModeRunner(ws_game=ws_game,
                                        ws_viewers=ws_viewers,
                                        leveling_manager=leveling_manager,
+                                       leveling_game_mode_manager=leveling_game_mode_manager,
                                        repo=repo)
 
 

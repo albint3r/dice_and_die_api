@@ -34,6 +34,7 @@ class AdventureGameModeRunner(IGamesModeRunner):
     ws_game: IGameWebSocketManager
     ws_viewers: IViewersWebSocketManager
     leveling_manager: IManagerLevelingUseCase
+    leveling_game_mode_manager: IManagerLevelingUseCase
 
     async def play(self, game: Game, player: Player | None = None,
                    game_events: GamePlayerRequest | None = None, **kwargs) -> None:
@@ -141,20 +142,31 @@ class AdventureGameModeRunner(IGamesModeRunner):
         else:
             await self.ws_game.disconnect(game_id=game.game_id, websocket=websocket)
 
-    # Todo: add to abs methods
-    # Create class to handle the confing last result exp and rewards
-    async def get_overall_games_winner(self, game: Game) -> TWinner:
+    async def get_overall_games_winner(self, game: Game, player: Player) -> None:
         """This is the final result of the players after playing all the games."""
-        p1_score = game.config.wins_counter.get(game.p1.user.user_id, 0)
-        p2_score = game.config.wins_counter.get(game.p2.user.user_id, 0)
-        if p1_score > p2_score:
-            winner_player = (game.p1, None)
-        elif p2_score > p1_score:
-            winner_player = (game.p2, None)
-        else:
-            winner_player = (game.p1, game.p2)
+        if not game.config.score:
+            p1_score = game.config.wins_counter.get(game.p1.user.user_id, 0)
+            p2_score = game.config.wins_counter.get(game.p2.user.user_id, 0)
+            player_score = game.config.wins_counter.get(player.user.user_id, 0)
+            if p1_score > p2_score:
+                winner_player, tied_player = (game.p1, None)
+            elif p2_score > p1_score:
+                winner_player, tied_player = (game.p2, None)
+            else:
+                winner_player, tied_player = (game.p1, game.p2)
 
-        return winner_player
+            exp_points = self.leveling_game_mode_manager.get_winner_earned_exp_points(p2_score,
+                                                                                      p2_score,
+                                                                                      player_score,
+                                                                                      game.config.rematch_mode)
+
+            if tied_player:
+                # Update both players points and ranks
+                self.update_game_mode_user_level_rank_and_bank_account(exp_points, tied_player)
+            self.update_game_mode_user_level_rank_and_bank_account(exp_points, winner_player)
+            extras = {}
+            message = 'finish_game'
+            await self.ws_game.broadcast(game_id=game.game_id, message=message, extras=extras)
 
     def verbose(self, game: Game) -> None:
         ic('/' * 100)
@@ -186,6 +198,20 @@ class AdventureGameModeRunner(IGamesModeRunner):
         """
         old_user: User = copy.deepcopy(winner_player.user)
         user = self.leveling_manager.update_user_level(winner_player.user, exp_points)
+        # Update user bank account if level up:
+        if old_user.user_level.level != user.user_level.level:
+            self.repo.update_user_bank_account_amount(user.user_id, 100.0)
+        self.repo.update_user_level(user.user_level)
+
+    def update_game_mode_user_level_rank_and_bank_account(self, exp_points, winner_player):
+        """Update Winner level, rank and bank account.
+
+        This method is used after the game finished or when the usr disconnect.
+        Note: Only update the bank account if the user level up. We have a fix amount by the moment, but later
+        could change this for a dynamic formula.
+        """
+        old_user: User = copy.deepcopy(winner_player.user)
+        user = self.leveling_game_mode_manager.update_user_level(winner_player.user, exp_points)
         # Update user bank account if level up:
         if old_user.user_level.level != user.user_level.level:
             self.repo.update_user_bank_account_amount(user.user_id, 100.0)

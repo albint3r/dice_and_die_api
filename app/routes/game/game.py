@@ -37,6 +37,7 @@ async def play_adventure_game(websocket: WebSocket,
             if game.current_player and game.current_player.is_player_turn(player) or game.state == GameState.REMATCH:
                 await game_mode.play(game, player, user_event_request)
                 game_mode.verbose(game)
+        await game_mode.get_overall_games_winner(game, player)
         await websocket.close()
         await game_mode.ws_game.disconnect(game_id=game_id, websocket=websocket)
     except WebSocketDisconnect:

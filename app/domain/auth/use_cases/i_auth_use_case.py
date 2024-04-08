@@ -10,7 +10,7 @@ from app.domain.auth.use_cases.i_auth_handler import IAuthHandler
 class IAuthUseCase(BaseModel, ABC):
 
     @abstractmethod
-    def signin(self, email: str, password: str, auth_handler: IAuthHandler) -> ResponseSignin:
+    def signin(self, email: str, name: str, password: str, auth_handler: IAuthHandler) -> ResponseSignin:
         """Create a new user in the database."""
 
     @abstractmethod

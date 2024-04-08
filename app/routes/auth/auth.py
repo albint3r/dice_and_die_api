@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status, HTTPException
 
-from app.domain.auth.schemas.request import LoginOrSignInRequest, UserUpdateNamesRequest
+from app.domain.auth.schemas.request import UserUpdateNamesRequest, LoginRequest, SignInRequest
 from app.domain.auth.schemas.response import (ResponseLogIn, ResponseSignin, ResponseUpdateUserNameAndLastName,
                                               ResponseUsersRanking, ResponseUserRank)
 from app.infrastructure.auth.auth_handler_impl import auth_handler, token_http_dependency
@@ -19,15 +19,15 @@ router = APIRouter(
 
 
 @router.post('/signin', status_code=status.HTTP_201_CREATED)
-async def signin_with_email_and_password(form_data: LoginOrSignInRequest, facade: auth_use_case_dependency) -> ResponseSignin:
+async def signin_with_email_and_password(form_data: SignInRequest, facade: auth_use_case_dependency) -> ResponseSignin:
     try:
-        return facade.signin(form_data.email, form_data.password.get_secret_value(), auth_handler)
+        return facade.signin(form_data.email, form_data.name, form_data.password.get_secret_value(), auth_handler)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e}')
 
 
 @router.post('/login', status_code=status.HTTP_202_ACCEPTED)
-async def login_with_email_and_password(form_data: LoginOrSignInRequest, facade: auth_use_case_dependency) -> ResponseLogIn:
+async def login_with_email_and_password(form_data: LoginRequest, facade: auth_use_case_dependency) -> ResponseLogIn:
     try:
         return facade.login(form_data.email, form_data.password.get_secret_value(), auth_handler)
     except Exception as e:

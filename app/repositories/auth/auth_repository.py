@@ -28,10 +28,10 @@ class AuthRepository(BaseModel):
         if result:
             return User(**result)
 
-    def create_user(self, email: str, password: str | bytes) -> None:
+    def create_user(self, email: str, name: str, password: str | bytes) -> None:
         """Create a new user"""
-        query = "INSERT INTO users (email, password) VALUES (%s, %s);"
-        self.db.execute(query, (email, password))
+        query = "INSERT INTO users (email, name, password) VALUES (%s, %s, %s);"
+        self.db.execute(query, (email, name, password))
 
     def delete_user(self, user_id: str) -> None:
         """Delete a user by user_id"""

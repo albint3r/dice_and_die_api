@@ -10,14 +10,14 @@ from app.repositories.auth.auth_repository import AuthRepository
 class AuthUseCase(IAuthUseCase):
     repo: AuthRepository
 
-    def signin(self, email: str, password: str, auth_handler: IAuthHandler) -> ResponseSignin:
+    def signin(self, email: str, name: str, password: str, auth_handler: IAuthHandler) -> ResponseSignin:
         user = self.repo.get_user(email)
         # If user don't exist created
         if not user:
             hash_password = auth_handler.get_password_hash(password)
             # Create new user with Hash Password
             # Convert the bytecode password into a string
-            self.repo.create_user(email, hash_password.decode('utf-8'))
+            self.repo.create_user(email, name, hash_password.decode('utf-8'))
             # Get User to Create the new bank account and level progress
             user = self.repo.get_user(email)
             self.repo.create_user_level(user.user_id)

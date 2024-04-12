@@ -3,22 +3,36 @@ from fastapi import HTTPException, status
 from firebase_admin import credentials, auth
 from icecream import ic
 
+from app.domain.auth.errors.errors import GoogleUserNotExit
 from app.domain.auth.schemas.response import (ResponseSignin, ResponseLogIn, ResponseUsersRanking,
                                               ResponseUpdateUserNameAndLastName, ResponseUserRank)
 from app.domain.auth.use_cases.i_auth_handler import IAuthHandler
 from app.domain.auth.use_cases.i_auth_use_case import IAuthUseCase
+from app.infrastructure.auth.auth_handler_impl import auth_handler
 from app.repositories.auth.auth_repository import AuthRepository
 
 
 class AuthUseCase(IAuthUseCase):
     repo: AuthRepository
 
-    def signin_with_google(self, access_token: str, id_token: str) -> ResponseSignin:
-        ic()
-        cred = credentials.Certificate('dice-n-die-5a5d411f3e82.json')
-        ic(cred)
-        firebase_admin.initialize_app(cred)
-        ic(firebase_admin.auth.get_user('VJQrZ06y1fQrDEWHetkkuYNuBws1').email)
+    def signin_with_google(self, google_user_id: str) -> ResponseSignin:
+
+        # How obtain credentials:
+        # https://www.youtube.com/watch?v=h-k4FBCkLDs
+        try:
+            cred = credentials.Certificate('dice-n-die-5a5d411f3e82.json')
+            firebase_admin.initialize_app(cred)
+        except ValueError as e:
+            ic(f"The instances is already initialized: {e}")
+        user_google = firebase_admin.auth.get_user(google_user_id)
+        user = self.repo.get_user(user_google.email)
+        if user:
+            user = self.repo.get_user_by_id(user.user_id)
+            user.user_level = self.repo.get_user_level(user.user_id)
+            user.bank_account = self.repo.get_user_bank_account(user.user_id)
+            session_token = auth_handler.encode_token(user.user_id)
+            return ResponseLogIn(user=user, session_token=session_token)
+        raise GoogleUserNotExit('The user not exist in firebase.')
 
     def signin(self, email: str, name: str, password: str, auth_handler: IAuthHandler) -> ResponseSignin:
         user = self.repo.get_user(email)

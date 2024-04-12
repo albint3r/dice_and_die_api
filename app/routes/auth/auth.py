@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status, HTTPException
 from icecream import ic
 
-from app.domain.auth.schemas.request import UserUpdateNamesRequest, LoginRequest, SignInRequest
+from app.domain.auth.schemas.request import UserUpdateNamesRequest, LoginRequest, SignInRequest, LogInWithGoogle
 from app.domain.auth.schemas.response import (ResponseLogIn, ResponseSignin, ResponseUpdateUserNameAndLastName,
                                               ResponseUsersRanking, ResponseUserRank)
 from app.infrastructure.auth.auth_handler_impl import auth_handler, token_http_dependency
@@ -20,10 +20,9 @@ router = APIRouter(
 
 
 @router.post('/signin/google', status_code=status.HTTP_201_CREATED)
-async def signin_with_google(facade: auth_use_case_dependency) -> int:
+async def signin_with_google(data: LogInWithGoogle, facade: auth_use_case_dependency) -> ResponseSignin:
     try:
-        facade.signin_with_google('', '')
-        return 200
+        return facade.signin_with_google(data.google_user_id)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e}')
 

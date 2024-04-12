@@ -1,5 +1,7 @@
+import firebase_admin
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError, HTTPException, WebSocketException
+from firebase_admin import credentials
 
 from app.infrastructure.logs.logger import logger_conf
 from app.infrastructure.logs.middleware import log_request_middleware
@@ -10,6 +12,8 @@ from app.routes.lobby import lobby
 from app.routes.analytics import analytics
 
 app = FastAPI()
+cred = credentials.Certificate('dice-n-die-5a5d411f3e82.json')
+firebase_admin.initialize_app(cred)
 
 # Logs
 app.middleware("http")(log_request_middleware)

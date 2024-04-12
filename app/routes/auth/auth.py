@@ -22,7 +22,7 @@ router = APIRouter(
 @router.post('/signin/google', status_code=status.HTTP_201_CREATED)
 async def signin_with_google(data: LogInWithGoogle, facade: auth_use_case_dependency) -> ResponseSignin:
     try:
-        return facade.signin_with_google(data.google_user_id)
+        return facade.signin_with_google(data.google_user_id, auth_handler)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e}')
 

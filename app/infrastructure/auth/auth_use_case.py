@@ -1,4 +1,7 @@
+import firebase_admin
 from fastapi import HTTPException, status
+from firebase_admin import credentials, auth
+from icecream import ic
 
 from app.domain.auth.schemas.response import (ResponseSignin, ResponseLogIn, ResponseUsersRanking,
                                               ResponseUpdateUserNameAndLastName, ResponseUserRank)
@@ -9,6 +12,12 @@ from app.repositories.auth.auth_repository import AuthRepository
 
 class AuthUseCase(IAuthUseCase):
     repo: AuthRepository
+
+    def signin_with_google(self, access_token: str, id_token: str) -> ResponseSignin:
+        cred = credentials.Certificate(
+            'client_secret_358426600749-t65snpmgi1ldkjiqausmd7hdcrvi7dkb.apps.googleusercontent.com.json')
+        firebase_admin.initialize_app(cred)
+        ic(firebase_admin.auth)
 
     def signin(self, email: str, name: str, password: str, auth_handler: IAuthHandler) -> ResponseSignin:
         user = self.repo.get_user(email)

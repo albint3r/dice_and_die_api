@@ -14,6 +14,10 @@ class IAuthUseCase(BaseModel, ABC):
         """Create a new user in the database."""
 
     @abstractmethod
+    def signin_with_google(self, access_token: str, id_token: str) -> ResponseSignin:
+        """Create a new user in the database or login with Google Auth."""
+
+    @abstractmethod
     def login(self, email: str, password: str, auth_handler: IAuthHandler) -> ResponseLogIn:
         """ Log the user in their account."""
 

@@ -14,10 +14,11 @@ class AuthUseCase(IAuthUseCase):
     repo: AuthRepository
 
     def signin_with_google(self, access_token: str, id_token: str) -> ResponseSignin:
-        cred = credentials.Certificate(
-            'client_secret_358426600749-t65snpmgi1ldkjiqausmd7hdcrvi7dkb.apps.googleusercontent.com.json')
+        ic()
+        cred = credentials.Certificate('dice-n-die-5a5d411f3e82.json')
+        ic(cred)
         firebase_admin.initialize_app(cred)
-        ic(firebase_admin.auth)
+        ic(firebase_admin.auth.get_user('VJQrZ06y1fQrDEWHetkkuYNuBws1').email)
 
     def signin(self, email: str, name: str, password: str, auth_handler: IAuthHandler) -> ResponseSignin:
         user = self.repo.get_user(email)

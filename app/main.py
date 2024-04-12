@@ -5,13 +5,14 @@ from firebase_admin import credentials
 
 from app.infrastructure.logs.logger import logger_conf
 from app.infrastructure.logs.middleware import log_request_middleware
-from fastapi.middleware.cors import CORSMiddleware
+from app.routes.analytics import analytics
 from app.routes.auth import auth
 from app.routes.game import game
 from app.routes.lobby import lobby
-from app.routes.analytics import analytics
 
 app = FastAPI()
+# How obtain credentials:
+# https://www.youtube.com/watch?v=h-k4FBCkLDs
 cred = credentials.Certificate('dice-n-die-5a5d411f3e82.json')
 firebase_admin.initialize_app(cred)
 

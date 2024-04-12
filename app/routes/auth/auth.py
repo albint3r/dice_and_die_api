@@ -24,7 +24,7 @@ async def signin_with_google(data: LogInWithGoogle, facade: auth_use_case_depend
     try:
         return facade.signin_with_google(data.google_user_id, auth_handler)
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e}')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'{e}')
 
 
 @router.post('/signin', status_code=status.HTTP_201_CREATED)

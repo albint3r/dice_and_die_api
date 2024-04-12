@@ -13,13 +13,11 @@ class AuthUseCase(IAuthUseCase):
     repo: AuthRepository
 
     def signin_with_google(self, google_user_id: str, auth_handler: IAuthHandler) -> ResponseSignin:
+        try:
+            user_google = auth.get_user(google_user_id)
+        except Exception:
+            raise GoogleUserNotExit('The userId Provider by the client not exist in Firebase.')
 
-        # How obtain credentials:
-        # https://www.youtube.com/watch?v=h-k4FBCkLDs
-
-        user_google = auth.get_user(google_user_id)
-        if not user_google:
-            raise GoogleUserNotExit('The user not exist in firebase.')
         user = self.repo.get_user(user_google.email)
 
         if not user:

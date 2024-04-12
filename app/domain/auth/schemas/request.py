@@ -12,6 +12,10 @@ class SignInRequest(BaseModel):
     password: SecretStr = Field(exclude=True, min_length=8)
 
 
+class LogInWithGoogle(BaseModel):
+    google_user_id: str
+
+
 class UserUpdateNamesRequest(BaseModel):
     """Schema SignIn Responses"""
     name: str

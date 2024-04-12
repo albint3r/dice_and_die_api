@@ -5,6 +5,10 @@ class AuthErrors(Exception, ABC):
     """This is the base Auth Error class"""
 
 
+class GoogleUserNotExit(Exception, ABC):
+    """User not exist in firebase"""
+
+
 class UserLevelNotExist(AuthErrors):
     """User ID don't match with the table UserLevel"""
 

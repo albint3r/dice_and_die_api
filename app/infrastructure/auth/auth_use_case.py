@@ -1,5 +1,7 @@
 from fastapi import HTTPException, status
+from firebase_admin import auth
 
+from app.domain.auth.errors.errors import GoogleUserNotExit
 from app.domain.auth.schemas.response import (ResponseSignin, ResponseLogIn, ResponseUsersRanking,
                                               ResponseUpdateUserNameAndLastName, ResponseUserRank)
 from app.domain.auth.use_cases.i_auth_handler import IAuthHandler
@@ -9,6 +11,22 @@ from app.repositories.auth.auth_repository import AuthRepository
 
 class AuthUseCase(IAuthUseCase):
     repo: AuthRepository
+
+    def signin_with_google(self, google_user_id: str, auth_handler: IAuthHandler) -> ResponseSignin:
+        try:
+            user_google = auth.get_user(google_user_id)
+        except Exception:
+            raise GoogleUserNotExit('The userId Provider by the client not exist in Firebase.')
+
+        user = self.repo.get_user(user_google.email)
+
+        if not user:
+            return self.signin(user_google.email, user_google.display_name, 'passwordFake', auth_handler)
+
+        user.user_level = self.repo.get_user_level(user.user_id)
+        user.bank_account = self.repo.get_user_bank_account(user.user_id)
+        session_token = auth_handler.encode_token(user.user_id)
+        return ResponseLogIn(user=user, session_token=session_token)
 
     def signin(self, email: str, name: str, password: str, auth_handler: IAuthHandler) -> ResponseSignin:
         user = self.repo.get_user(email)

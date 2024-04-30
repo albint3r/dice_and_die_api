@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 
 from pydantic import BaseModel
 
+from app.domain.referral_program.schemas.response import PromoterUserHistoryResponse
+
 
 class IReferralProgramRepository(BaseModel, ABC):
 
@@ -14,5 +16,5 @@ class IReferralProgramRepository(BaseModel, ABC):
         """Update the information when a user make a deposit"""
 
     @abstractmethod
-    def get_promoter_user_history(self, promoter_user_id: str):
+    def get_promoter_user_history(self, promoter_user_id: str) -> PromoterUserHistoryResponse:
         """This method create the referral promoter for each new user created"""

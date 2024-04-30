@@ -9,6 +9,7 @@ from app.routes.analytics import analytics
 from app.routes.auth import auth
 from app.routes.game import game
 from app.routes.lobby import lobby
+from app.routes.referral_program import referral_program
 
 app = FastAPI()
 # How obtain credentials:
@@ -28,3 +29,4 @@ app.include_router(auth.router)
 app.include_router(game.router)
 app.include_router(lobby.router)
 app.include_router(analytics.router)
+app.include_router(referral_program.router)

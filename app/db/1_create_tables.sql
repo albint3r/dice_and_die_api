@@ -100,6 +100,26 @@ CREATE TABLE single_play_history (
     column_index INT
 );
 
+CREATE TABLE referral_program (
+    creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    referral_code VARCHAR(36) DEFAULT (UUID()) PRIMARY KEY UNIQUE,
+    promoter_user_id VARCHAR(36),
+    referred_user_id VARCHAR(36) UNIQUE,
+    total_deposits INTEGER DEFAULT 0,
+    total_rewards DOUBLE DEFAULT 0,
+    active BOOLEAN TRUE
+);
+
+CREATE TABLE referral_transactions (
+    transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    transaction_id VARCHAR(36) DEFAULT (UUID()) PRIMARY KEY UNIQUE,
+    referral_code VARCHAR(36),
+    referred_user_id VARCHAR(36),
+    amount DOUBLE,
+    FOREIGN KEY (referral_code) REFERENCES referral_program(referral_code) ON DELETE CASCADE,
+    FOREIGN KEY (referred_user_id) REFERENCES referral_program(referred_user_id) ON DELETE CASCADE
+);
+
 
 
 

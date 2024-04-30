@@ -29,7 +29,6 @@ async def signin_with_google(data: LogInWithGoogle, facade: auth_use_case_depend
 
 @router.post('/signin', status_code=status.HTTP_201_CREATED)
 async def signin_with_email_and_password(form_data: SignInRequest, facade: auth_use_case_dependency) -> ResponseSignin:
-    ic(form_data)
     try:
         return facade.signin(form_data.email, form_data.name, form_data.password.get_secret_value(), auth_handler)
     except Exception as e:

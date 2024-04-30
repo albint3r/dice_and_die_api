@@ -9,3 +9,4 @@ class PromoterUserRequest(BaseModel):
 class ReferredUserRequest(BaseModel):
     """This is the ReferredUserRequest"""
     referred_user_id: str
+    amount: float | None = None

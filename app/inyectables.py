@@ -17,6 +17,8 @@ from app.domain.game.use_cases.i_view_use_case import IViewUseCase
 from app.domain.game.use_cases.i_viewers_websocket_manager import IViewersWebSocketManager
 from app.domain.lobby.use_cases.i_lobby_use_case import ILobbyUseCase
 from app.domain.lobby.use_cases.i_lobby_websocket_manager import ILobbyWebSocketManager
+from app.domain.referral_program.use_cases.i_referral_program_repository import IReferralProgramRepository
+from app.domain.referral_program.use_cases.i_referral_program_use_case import IReferralProgramUseCase
 from app.infrastructure.analytics.analytics_use_case import AnalyticsUseCase
 from app.infrastructure.auth.auth_use_case import AuthUseCase
 from app.infrastructure.game.adventure_game_mode_runner import AdventureGameModeRunner
@@ -32,8 +34,10 @@ from app.infrastructure.game.view_user_cases import ViewUseCase
 from app.infrastructure.game.viewers_websocket_manager import viewers_websocket_manager
 from app.infrastructure.lobby.lobby_use_case import LobbyUseCase
 from app.infrastructure.lobby.lobby_websocket_manager import lobby_websocket_manager
+from app.infrastructure.referral_program.referral_program_use_case import ReferralProgramUseCase
 from app.repositories.analytics.analytics_repository import AnalyticsRepository
 from app.repositories.auth.auth_repository import AuthRepository
+from app.repositories.referral_program.referral_program_respository import ReferralProgramRepository
 
 
 class Inyectables(BaseModel, ABC):
@@ -237,3 +241,23 @@ class AdventureGameModeRunnerDependency(Inyectables):
 
 
 adventure_game_mode_runner_dependency = Annotated[IGamesModeRunner, Depends(AdventureGameModeRunnerDependency.inject)]
+
+
+class ReferralProgramRepositoryDependency(Inyectables):
+    @staticmethod
+    def inject() -> IReferralProgramRepository:
+        return ReferralProgramRepository(db=db)
+
+
+referral_program_repository_dependency = Annotated[
+    IReferralProgramRepository, Depends(ReferralProgramRepositoryDependency.inject)]
+
+
+class ReferralProgramUseCaseDependency(Inyectables):
+    @staticmethod
+    def inject(repo: referral_program_repository_dependency) -> IReferralProgramUseCase:
+        return ReferralProgramUseCase(repo=repo)
+
+
+referral_program_use_case_dependency = Annotated[
+    IReferralProgramUseCase, Depends(ReferralProgramUseCaseDependency.inject)]

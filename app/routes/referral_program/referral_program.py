@@ -1,8 +1,6 @@
 from fastapi import APIRouter
 
-from app.domain.analytics.entities.single_play_history import SinglePlayHistory
 from app.domain.referral_program.schemas.response import PromoterUserHistoryResponse
-from app.inyectables import analytics_use_case_dependency
 
 router = APIRouter(tags=['referral_program'], prefix='/v2/referral_program')
 

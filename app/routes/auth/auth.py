@@ -4,8 +4,9 @@ from icecream import ic
 from app.domain.auth.schemas.request import UserUpdateNamesRequest, LoginRequest, SignInRequest, LogInWithGoogle
 from app.domain.auth.schemas.response import (ResponseLogIn, ResponseSignin, ResponseUpdateUserNameAndLastName,
                                               ResponseUsersRanking, ResponseUserRank)
+from app.domain.referral_program.errors.errors import ReferredUserAlreadyExistError
 from app.infrastructure.auth.auth_handler_impl import auth_handler, token_http_dependency
-from app.inyectables import auth_use_case_dependency
+from app.inyectables import auth_use_case_dependency, referral_program_use_case_dependency
 
 router = APIRouter(
     prefix='/v2/auth',
@@ -28,9 +29,19 @@ async def signin_with_google(data: LogInWithGoogle, facade: auth_use_case_depend
 
 
 @router.post('/signin', status_code=status.HTTP_201_CREATED)
-async def signin_with_email_and_password(form_data: SignInRequest, facade: auth_use_case_dependency) -> ResponseSignin:
+async def signin_with_email_and_password(form_data: SignInRequest,
+                                         facade: auth_use_case_dependency,
+                                         referral_use_case: referral_program_use_case_dependency) -> ResponseSignin:
     try:
-        return facade.signin(form_data.email, form_data.name, form_data.password.get_secret_value(), auth_handler)
+        response = facade.signin(form_data.email, form_data.name, form_data.password.get_secret_value(), auth_handler)
+        # Assign the new user to the promoter user.
+        if form_data.referral_code:
+            try:
+                referral_use_case.create_referral_program_from_promoter(promoter_user_id=form_data.referral_code,
+                                                                        referred_user_id=response.user.user_id)
+            except ReferredUserAlreadyExistError as e:
+                ic(f'ReferredUserAlreadyExistError: {e}')
+        return response
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{e}')
 

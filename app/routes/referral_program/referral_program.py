@@ -9,14 +9,6 @@ from app.inyectables import referral_program_use_case_dependency
 router = APIRouter(tags=['referral_program'], prefix='/v2/referral_program')
 
 
-@router.post('/promoter')
-async def create_referral_program_from_promoter(request: PromoterUserRequest,
-                                                use_case: referral_program_use_case_dependency):
-    use_case.create_referral_program_from_promoter(promoter_user_id=request.promoter_user_id,
-                                                   referred_user_id=request.referred_user_id)
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-
 @router.get('/promoter/history')
 async def get_promoter_user_history(request: PromoterUserHistoryRequest,
                                     use_case: referral_program_use_case_dependency,

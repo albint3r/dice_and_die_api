@@ -107,17 +107,16 @@ CREATE TABLE referral_program (
     referred_user_id VARCHAR(36) UNIQUE,
     total_deposits INTEGER DEFAULT 0,
     total_rewards DOUBLE DEFAULT 0,
-    active BOOLEAN TRUE
+    active BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (promoter_user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE referral_transactions (
     transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     transaction_id VARCHAR(36) DEFAULT (UUID()) PRIMARY KEY UNIQUE,
-    referral_code VARCHAR(36),
-    referred_user_id VARCHAR(36),
-    amount DOUBLE,
-    FOREIGN KEY (referral_code) REFERENCES referral_program(referral_code) ON DELETE CASCADE,
-    FOREIGN KEY (referred_user_id) REFERENCES referral_program(referred_user_id) ON DELETE CASCADE
+    referral_code VARCHAR(36) NOT NULL,
+    amount DOUBLE NOT NULL,
+    FOREIGN KEY (referral_code) REFERENCES referral_program(referral_code) ON DELETE CASCADE
 );
 
 

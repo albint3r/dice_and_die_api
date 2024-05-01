@@ -8,6 +8,10 @@ from app.domain.referral_program.schemas.response import PromoterUserHistoryResp
 class IReferralProgramRepository(BaseModel, ABC):
 
     @abstractmethod
+    def can_user_be_referred(self, referred_user_id: str) -> bool:
+        """Return TRUE if the user is not already referred by other user."""
+
+    @abstractmethod
     def create_referral_program_from_promoter(self, promoter_user_id: str, referred_user_id: str):
         """This method create the referral promoter for each new user created"""
 

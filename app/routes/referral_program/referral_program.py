@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Response, status, HTTPException
+from icecream import ic
 
 from app.domain.referral_program.schemas.request import PromoterUserRequest, ReferredUserRequest, \
     PromoterUserHistoryRequest
@@ -9,7 +10,7 @@ from app.inyectables import referral_program_use_case_dependency
 router = APIRouter(tags=['referral_program'], prefix='/v2/referral_program')
 
 
-@router.get('/promoter/history')
+@router.post('/promoter/history')
 async def get_promoter_user_history(request: PromoterUserHistoryRequest,
                                     use_case: referral_program_use_case_dependency,
                                     user_id: token_http_dependency) -> PromoterUserHistoryResponse:

@@ -9,13 +9,13 @@ class ReferralProgramRepository(IReferralProgramRepository):
     db: _DataBase
 
     def can_user_be_referred(self, referred_user_id: str) -> bool:
-        query = "SELECT * FROM referral_program WHERE referred_user_id=%s;"
-        values = (referred_user_id,)
-        response = self.db.query(query, values, fetch_all=False)
-        if response:
-            referral = ReferralProgram(**response)
-            return isinstance(referral, ReferralProgram)
-        return False
+        try:
+            query = "SELECT * FROM referral_program WHERE referred_user_id=%s;"
+            values = (referred_user_id,)
+            response = self.db.query(query, values, fetch_all=False)
+            return response is None
+        except Exception:
+            return False
 
     def create_referral_program_from_promoter(self, promoter_user_id: str, referred_user_id: str):
         try:

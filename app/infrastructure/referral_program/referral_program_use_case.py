@@ -18,4 +18,4 @@ class ReferralProgramUseCase(IReferralProgramUseCase):
         pass
 
     def get_promoter_user_history(self, promoter_user_id: str):
-        pass
+        return self.repo.get_promoter_user_history(promoter_user_id)

@@ -10,7 +10,7 @@ class SignInRequest(BaseModel):
     email: EmailStr = Field(exclude=True)
     name: str = Field(min_length=4, max_length=30, default='')
     password: SecretStr = Field(exclude=True, min_length=8)
-    referral_code: str | None = None
+    promoter_code: str | None = None
 
 
 class LogInWithGoogle(BaseModel):

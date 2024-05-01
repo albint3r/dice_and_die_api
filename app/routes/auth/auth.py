@@ -35,9 +35,9 @@ async def signin_with_email_and_password(form_data: SignInRequest,
     try:
         response = facade.signin(form_data.email, form_data.name, form_data.password.get_secret_value(), auth_handler)
         # Assign the new user to the promoter user.
-        if form_data.referral_code:
+        if form_data.promoter_code:
             try:
-                referral_use_case.create_referral_program_from_promoter(promoter_user_id=form_data.referral_code,
+                referral_use_case.create_referral_program_from_promoter(promoter_user_id=form_data.promoter_code,
                                                                         referred_user_id=response.user.user_id)
             except ReferredUserAlreadyExistError as e:
                 ic(f'ReferredUserAlreadyExistError: {e}')

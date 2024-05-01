@@ -14,10 +14,10 @@ class ReferralProgramRepository(IReferralProgramRepository):
             values = (referred_user_id,)
             response = self.db.query(query, values, fetch_all=False)
             return response is None
-        except Exception:
+        except Exception as _:
             return False
 
-    def create_referral_program_from_promoter(self, promoter_user_id: str, referred_user_id: str):
+    def create_referral_program_from_promoter(self, promoter_user_id: str, referred_user_id: str) -> None:
         try:
             query = 'INSERT INTO referral_program (promoter_user_id, referred_user_id) VALUES (%s, %s);'
             values = (promoter_user_id, referred_user_id)
@@ -34,7 +34,7 @@ class ReferralProgramRepository(IReferralProgramRepository):
             return PromoterUserHistoryResponse(referrals=referrals)
         return PromoterUserHistoryResponse(referrals=[])
 
-    def create_referral_transactions(self, referral_code: str, amount: float):
+    def create_referral_transactions(self, referral_code: str, amount: float) -> None:
         try:
             query = 'INSERT INTO referral_transactions (referral_code, amount) VALUES (%s, %s);'
             values = (referral_code, amount)

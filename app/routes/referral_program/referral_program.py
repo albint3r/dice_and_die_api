@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Response, status, HTTPException
-from icecream import ic
 
-from app.domain.referral_program.schemas.request import PromoterUserRequest, ReferredUserRequest, \
+from app.domain.referral_program.schemas.request import ReferredUserRequest, \
     PromoterUserHistoryRequest
 from app.domain.referral_program.schemas.response import PromoterUserHistoryResponse
 from app.infrastructure.auth.auth_handler_impl import token_http_dependency

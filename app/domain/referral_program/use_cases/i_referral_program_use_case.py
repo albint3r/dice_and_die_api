@@ -10,7 +10,7 @@ class IReferralProgramUseCase(BaseModel, ABC):
         """This method create the referral promoter for each new user created"""
 
     @abstractmethod
-    def create_referral_transactions(self, referred_user_id: str, amount: float):
+    def create_referral_transactions(self, referral_code: str, amount: float):
         """Update the information when a user make a deposit"""
 
     @abstractmethod

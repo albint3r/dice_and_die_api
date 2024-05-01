@@ -1,6 +1,6 @@
 from app.db.db import _DataBase
 from app.domain.referral_program.entities.referral_program import ReferralProgram
-from app.domain.referral_program.errors.errors import ReferralProgramCreationError
+from app.domain.referral_program.errors.errors import ReferralProgramCreationError, AddingTransactionBonusError
 from app.domain.referral_program.schemas.response import PromoterUserHistoryResponse
 from app.domain.referral_program.use_cases.i_referral_program_repository import IReferralProgramRepository
 
@@ -25,9 +25,6 @@ class ReferralProgramRepository(IReferralProgramRepository):
         except Exception as e:
             raise ReferralProgramCreationError(f'Error linking the promoter and the referred. This is your error: {e}')
 
-    def create_referral_transactions(self, referred_user_id: str, amount: float):
-        pass
-
     def get_promoter_user_history(self, promoter_user_id: str) -> PromoterUserHistoryResponse:
         query = "SELECT * FROM referral_program WHERE promoter_user_id=%s;"
         values = (promoter_user_id,)
@@ -36,3 +33,18 @@ class ReferralProgramRepository(IReferralProgramRepository):
             referrals = [ReferralProgram(**referral) for referral in response]
             return PromoterUserHistoryResponse(referrals=referrals)
         return PromoterUserHistoryResponse(referrals=[])
+
+    def create_referral_transactions(self, referral_code: str, amount: float):
+        try:
+            query = 'INSERT INTO referral_transactions (referral_code, amount) VALUES (%s, %s);'
+            values = (referral_code, amount)
+            self.db.execute(query, values)
+        except Exception:
+            raise AddingTransactionBonusError(f'Adding Amount to referral_code fail: {referral_code}')
+
+    def get_referred_record(self, referred_user_id: str) -> ReferralProgram | None:
+        query = "SELECT * FROM referral_program WHERE referred_user_id=%s;"
+        values = (referred_user_id,)
+        response = self.db.query(query, values, fetch_all=False)
+        if response:
+            return ReferralProgram(**response)

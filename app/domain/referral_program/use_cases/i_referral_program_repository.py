@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 from pydantic import BaseModel
 
+from app.domain.referral_program.entities.referral_program import ReferralProgram
 from app.domain.referral_program.schemas.response import PromoterUserHistoryResponse
 
 
@@ -16,9 +17,13 @@ class IReferralProgramRepository(BaseModel, ABC):
         """This method create the referral promoter for each new user created"""
 
     @abstractmethod
-    def create_referral_transactions(self, referred_user_id: str, amount: float):
+    def create_referral_transactions(self, referral_code: str, amount: float):
         """Update the information when a user make a deposit"""
 
     @abstractmethod
     def get_promoter_user_history(self, promoter_user_id: str) -> PromoterUserHistoryResponse:
         """This method create the referral promoter for each new user created"""
+
+    @abstractmethod
+    def get_referred_record(self, referred_user_id: str) -> ReferralProgram | None:
+        """Get the data of the referred record."""

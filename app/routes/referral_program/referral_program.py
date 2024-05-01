@@ -24,6 +24,6 @@ async def update_referral_program(request: ReferredUserRequest,
                                   use_case: referral_program_use_case_dependency,
                                   user_id: token_http_dependency):
     if user_id == request.referred_user_id:
-        use_case.create_referral_transactions(referred_user_id=request.referred_user_id, amount=request.amount)
+        use_case.create_referral_transactions(referred_user_id=user_id, amount=request.amount)
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='No Authorized.')

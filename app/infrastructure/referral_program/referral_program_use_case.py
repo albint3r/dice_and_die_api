@@ -15,11 +15,11 @@ class ReferralProgramUseCase(IReferralProgramUseCase):
         raise ReferredUserAlreadyExistError(
             f'Can add reference because referred user id:{referred_user_id} already exist.')
 
-    def create_referral_transactions(self, referral_code: str, amount: float):
-        referral_record = self.repo.get_referred_record(referral_code)
+    def create_referral_transactions(self, referred_user_id: str, amount: float):
+        referral_record = self.repo.get_referred_record(referred_user_id)
         if referral_record:
             bonus_amount = amount * self._bonus_percentage  # noqa
-            self.repo.create_referral_transactions(referral_record.referral_code, bonus_amount)
+            self.repo.create_referral_transactions(str(referral_record.referral_code), bonus_amount)
 
     def get_promoter_user_history(self, promoter_user_id: str):
         return self.repo.get_promoter_user_history(promoter_user_id)

@@ -20,9 +20,9 @@ async def get_promoter_user_history(request: PromoterUserHistoryRequest,
 
 
 @router.post('/referred_user/deposit')
-async def update_referral_program(request: ReferredUserRequest,
-                                  use_case: referral_program_use_case_dependency,
-                                  user_id: token_http_dependency):
+async def update_referral_transaction(request: ReferredUserRequest,
+                                      use_case: referral_program_use_case_dependency,
+                                      user_id: token_http_dependency):
     if user_id == request.referred_user_id:
         use_case.create_referral_transactions(referred_user_id=user_id, amount=request.amount)
         return Response(status_code=status.HTTP_204_NO_CONTENT)

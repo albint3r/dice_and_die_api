@@ -48,3 +48,10 @@ class ReferralProgramRepository(IReferralProgramRepository):
         response = self.db.query(query, values, fetch_all=False)
         if response:
             return ReferralProgram(**response)
+
+    def update_referred_record(self, referral_code: str, total_rewards: float, total_deposits: int) -> None:
+        query = ("UPDATE referral_program "
+                 "SET total_rewards=%s, total_deposits=%s "
+                 "WHERE referral_code=%s;")
+        values = (total_rewards, total_deposits, referral_code)
+        self.db.execute(query, values)

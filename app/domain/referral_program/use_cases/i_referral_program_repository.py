@@ -27,3 +27,7 @@ class IReferralProgramRepository(BaseModel, ABC):
     @abstractmethod
     def get_referred_record(self, referred_user_id: str) -> ReferralProgram | None:
         """Get the data of the referred record."""
+
+    @abstractmethod
+    def update_referred_record(self, referral_code: str, total_rewards: float, total_deposits: int) -> None:
+        """Update the rewards and total deposits from the user record."""

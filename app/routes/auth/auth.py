@@ -39,6 +39,7 @@ async def signin_with_email_and_password(form_data: SignInRequest,
             try:
                 referral_use_case.create_referral_program_from_promoter(promoter_user_id=form_data.promoter_code,
                                                                         referred_user_id=response.user.user_id)
+
             except ReferredUserAlreadyExistError as e:
                 ic(f'ReferredUserAlreadyExistError: {e}')
         return response

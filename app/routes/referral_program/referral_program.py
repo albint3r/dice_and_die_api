@@ -10,19 +10,20 @@ router = APIRouter(tags=['referral_program'], prefix='/v2/referral_program')
 
 
 @router.post('/promoter/history')
-async def get_promoter_user_history(request: PromoterUserHistoryRequest,
-                                    use_case: referral_program_use_case_dependency,
+async def get_promoter_user_history(use_case: referral_program_use_case_dependency,
                                     user_id: token_http_dependency) -> PromoterUserHistoryResponse:
-    if user_id == request.promoter_user_id:
-        return use_case.get_promoter_user_history(promoter_user_id=request.promoter_user_id)
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='No Authorized.')
+    return use_case.get_promoter_user_history(promoter_user_id=user_id)
 
 
-@router.post('/referred_user/deposit')
-async def update_referral_transaction(request: ReferredUserRequest,
-                                      use_case: referral_program_use_case_dependency,
-                                      user_id: token_http_dependency):
-    if user_id == request.referred_user_id:
-        use_case.create_referral_transactions(referred_user_id=user_id, amount=request.amount)
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='No Authorized.')
+# I left this old code only for next testings of the logic in the deposito from the user.
+# At the moment We don't know how we are going to monetize. So the first part of the referral program is to track
+# the referred people from the users. Is possible that the solution only is give a percentage of the money
+# from each user deposit. This deposit would be retained until the player made 10 bets.
+
+# @router.post('/referred_user/deposit')
+# async def update_referral_transaction(request: ReferredUserRequest,
+#                                       use_case: referral_program_use_case_dependency,
+#                                       user_id: token_http_dependency):
+#     use_case.create_referral_transactions(referred_user_id=user_id, amount=request.amount)
+#     return Response(status_code=status.HTTP_204_NO_CONTENT)
+

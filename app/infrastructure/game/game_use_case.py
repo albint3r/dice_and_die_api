@@ -78,7 +78,8 @@ class GameUseCase(IGameUseCase):
         # Update user bank account if level up:
         if old_user.user_level.level != user.user_level.level:
             win_amount = 100
-            self.repo.update_user_bank_account_amount(user.user_id, user.bank_account.amount + win_amount)
+            new_amount = user.bank_account.amount + win_amount
+            self.repo.update_user_bank_account_amount(user.user_id, new_amount)
         self.repo.update_user_level(user.user_level)
 
     def verbose(self, game) -> None:  # noqa

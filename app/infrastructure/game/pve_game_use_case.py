@@ -68,7 +68,7 @@ class PVEGameUseCase(GameUseCase):
         if p2_col.is_empty():
             return True
         unique_values = set(p2_col.values)
-        is_early_filled = len(unique_values) == 3 and len(p1_col.values) == 0
+        is_early_filled = len(unique_values) == 3 and len(p1_col.values) <= 1
         if not p2_col.is_empty() and range_points >= 4 and not is_early_filled:
             return True
         return False
@@ -117,7 +117,9 @@ class PVEGameUseCase(GameUseCase):
     def get_ai_selected_column(self, game: Game) -> str:  # noqa
         """Return the index integer of the column to select by the AI"""
         # To give some variance in the game style I put 66% of chances that the zero-sum strategy appears.
-        ai_func = choice([self._get_ai_selected_column_by_zero_sum, self._get_ai_selected_column_by_zero_sum,
+        ai_func = choice([self._get_ai_selected_column_by_zero_sum,
+                          self._get_ai_selected_column_by_zero_sum,
+                          self._get_ai_selected_column_by_zero_sum,
                           self._get_ai_selected_column_by_machinelearning])
         index_column = ai_func(game)  # noqa
         # In some cases zero-sum fails, so is when I use the machine learning model.

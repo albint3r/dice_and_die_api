@@ -63,18 +63,26 @@ class PVEGameUseCase(GameUseCase):
         old_column.get_score()
         return old_column
 
+    def _validate_not_fill_column_early(self, p2_col: Column, p1_col: Column, range_points: int) -> bool:
+
+        if p2_col.is_empty():
+            return True
+        unique_values = set(p2_col.values)
+        is_early_filled = len(unique_values) == 3 and len(p1_col.values) == 0
+        if not p2_col.is_empty() and range_points >= 4 and not is_early_filled:
+            return True
+        return False
+
     def _get_ai_selected_column_by_zero_sum(self, game: Game) -> str:
         """This use the zero-sum strategy to select the column.
 
         This strategy consist in select the column that give the AI they must number of points.
         """
         die_val = game.p2.die.current_number
-        ic(die_val)
         max_points = float('-inf')
         best_index = None
         # Check each column scenario
-        ic(game.p1.board.columns)
-        ic(game.p2.board.columns)
+        last_simulated_columns = []
         for i in range(1, 4):
             p1_column = game.p1.board.columns.get(i)
             p2_column = game.p2.board.columns.get(i)
@@ -82,16 +90,17 @@ class PVEGameUseCase(GameUseCase):
             if not p2_column.is_full():
                 p2_simulate_column = self._simulate_add_values_from_column(p2_column, die_val)
                 p1_simulate_column = self._simulate_remove_values_from_column(p1_column, die_val)
-                ic(p1_simulate_column)
-                ic(p2_simulate_column)
-                old_result = ic(p2_column.score - p1_column.score)
-                simulate_result = ic(p2_simulate_column.score - p1_simulate_column.score)
-                result = ic(simulate_result - old_result)
-                ic(max_points)
-                if result >= max_points:
-                    max_points = result
+                last_simulated_columns.append(p1_simulate_column)
+                # Get the difference to have the absolute range separation
+                old_range_points = p2_column.score - p1_column.score
+                simulate_range_points = p2_simulate_column.score - p1_simulate_column.score
+                range_points = simulate_range_points - old_range_points
+                can_use_index = range_points > max_points and self._validate_not_fill_column_early(p2_simulate_column,
+                                                                                                   p1_simulate_column,
+                                                                                                   range_points)
+                if can_use_index:
+                    max_points = range_points
                     best_index = i
-        ic(best_index)
         return str(best_index)
 
     def _get_ai_selected_column_by_machinelearning(self, game: Game) -> str:
@@ -107,9 +116,13 @@ class PVEGameUseCase(GameUseCase):
 
     def get_ai_selected_column(self, game: Game) -> str:  # noqa
         """Return the index integer of the column to select by the AI"""
-        ai_bag = choice([self._get_ai_selected_column_by_zero_sum, self._get_ai_selected_column_by_machinelearning,
-                         self._get_ai_selected_column_by_machinelearning])
-        index_column = self._get_ai_selected_column_by_zero_sum(game)
+        # To give some variance in the game style I put 66% of chances that the zero-sum strategy appears.
+        ai_func = choice([self._get_ai_selected_column_by_zero_sum, self._get_ai_selected_column_by_zero_sum,
+                          self._get_ai_selected_column_by_machinelearning])
+        index_column = ai_func(game)  # noqa
+        # In some cases zero-sum fails, so is when I use the machine learning model.
+        if not index_column:
+            index_column = self._get_ai_selected_column_by_machinelearning(game)
         columns = game.p2.board.columns
         available_columns = [str(i) for i, col in columns.items() if not col.is_full()]
         if index_column in available_columns:

@@ -76,7 +76,9 @@ async def play_game_ai(websocket: WebSocket, game_use_case: pve_game_use_case_de
                 await game_use_case.execute(game)
                 ai_event = game_use_case.get_ai_selected_column(game)
                 await sleep(1)
+                # Select column
                 await game_use_case.execute(game, selected_column=GamePlayerRequest(event=GameEvent(ai_event)))
+                # Chang player
                 await game_use_case.execute(game)
         await game_use_case.websocket_manager.disconnect(game_id=game_id, websocket=websocket)
         await websocket.close()

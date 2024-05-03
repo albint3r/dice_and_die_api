@@ -32,6 +32,7 @@ class Column(BaseModel):
         if self.is_empty():
             raise RemoveValuesFromColumnError("Can't remove values from an empty column.")
         removed_indices = []
+        # Don't remove the [:] in values, this helps to avoid add a ghost dice in the opponent column.
         for index, value in enumerate(self.values[:]):
             if value == num:
                 removed_indices.append(index)

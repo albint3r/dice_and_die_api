@@ -12,4 +12,3 @@ jobs:
           python-version: '3.12.1'
       - name: Install Dependencies
         run: pip install -r requirements.txt
-

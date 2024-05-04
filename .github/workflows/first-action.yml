@@ -2,10 +2,11 @@ name: CI
 on: workflow_dispatch
 jobs: 
   dice-and-die-first-job:
-    runs-on: ubuntu-lates
+    runs-on: ubuntu-latest
     steps:
       - name: Print Greetings
         run: echo "Hello tobe"
-      - name: echo "Done - bye!"
+      - name: Print Goodbye
+        run: echo "Done - bye!"
   
 

@@ -27,7 +27,3 @@ class TestGame:
         result = die.current_number
         erros_msg = f'Expected a number between {max_num} and {min_num}. And You get {result}'
         assert min_num <= result <= max_num, erros_msg
-
-    def test_fail(self, die):
-        """This test the dice numbers are between the 1 and six"""
-        assert False

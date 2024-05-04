@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Copy Code tmp server
-        run: actions/checkout@v3
+        run: actions/checkout@v4
       - name: Install Python
         uses: actions/setup-python@v5
         with:
